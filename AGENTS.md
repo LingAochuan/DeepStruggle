@@ -240,6 +240,13 @@ comes from the engine's layout export (`web/ui/src/engine/layout.ts`). Details:
 [`web/ui/AGENTS.md`](web/ui/AGENTS.md). Deployment: GitHub Pages with no
 server (`.github/workflows/pages.yml`), or `deploy/web/Dockerfile` (`deploy/web/README.md`).
 
+A personal Azure Static Web Apps target is documented in `deploy/azure/README.md`.
+`.github/workflows/azure-static-web-apps.yml` builds only the browser artifacts, smoke-tests the
+packaged WebAssembly engine and optionally uploads them to a dedicated Static Web App. It is
+triggered by pushes to `personal` or manual dispatch and uses `AZURE_STATIC_WEB_APPS_API_TOKEN`;
+deployment on push requires `AZURE_STATIC_WEB_APPS_DEPLOY_ENABLED=true`. It does not deploy to
+an Azure VM. Keep `main` for upstream updates and personal changes on `personal`.
+
 A finished game can be submitted to the **stats database** with the player's Playdek login and
 rating: the page sends the game's compact record (seed, steps, who made each move and under which
 settings, the build's commit) to a Cloudflare Worker that keeps it in D1

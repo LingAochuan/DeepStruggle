@@ -1,0 +1,107 @@
+name: Build and deploy personal Azure site
+
+on:
+  push:
+    branches: [personal]
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: Deploy to the dedicated DeepStruggle Static Web App (personal only)
+        type: boolean
+        default: false
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: personal-azure-site
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      EMSDK_VERSION: "6.0.10"
+      TS_PYTHON: python3
+      TS_WEB_BASE: /
+      TS_STATS_ENDPOINT: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/ui/package-lock.json
+      - uses: actions/cache@v4
+        with:
+          path: ~/.local/opt/emsdk
+          key: personal-azure-emsdk-${{ runner.os }}-${{ env.EMSDK_VERSION }}
+      - name: Install the WebAssembly compiler
+        run: bash tools/scripts/install_emsdk.sh
+      - name: Build the engine and website
+        run: bash tools/scripts/build_web.sh
+      - name: Prepare Azure configuration
+        run: cp deploy/azure/staticwebapp.config.json web/ui/dist/staticwebapp.config.json
+      - name: Smoke test the packaged engine and check site size
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/web/wasm_parity.mjs web/ui/dist/engine/ts_engine.mjs selftest 10 > "$RUNNER_TEMP/wasm-selftest.json"
+          python3 - "$RUNNER_TEMP/wasm-selftest.json" <<'PY'
+          import json
+          import pathlib
+          import sys
+
+          result = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+          if result.get("steps", 0) <= 0 or result.get("fingerprint") in (None, "", "unknown"):
+              raise SystemExit(f"Engine smoke test failed: {result}")
+          root = pathlib.Path("web/ui/dist")
+          for name in ("index.html", "engine/ts_engine.mjs", "engine/ts_engine.wasm", "staticwebapp.config.json"):
+              if not (root / name).is_file() or (root / name).stat().st_size == 0:
+                  raise SystemExit(f"Missing or empty deployment file: {name}")
+          files = [p for p in root.rglob("*") if p.is_file()]
+          size = sum(p.stat().st_size for p in files)
+          print(f"Engine smoke test: {result}")
+          print(f"Site: {len(files)} files, {size / 1_000_000:.1f} MB")
+          if size > 250_000_000 or len(files) > 15_000:
+              raise SystemExit("Site exceeds the Azure Static Web Apps Free environment budget.")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deepstruggle-static-site
+          path: web/ui/dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    if: ${{ github.ref == 'refs/heads/personal' && ((github.event_name == 'workflow_dispatch' && inputs.deploy) || (github.event_name == 'push' && vars.AZURE_STATIC_WEB_APPS_DEPLOY_ENABLED == 'true')) }}
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: azure-static-web-apps
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: deepstruggle-static-site
+          path: site
+      - name: Check dedicated site token
+        env:
+          AZURE_SITE_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+        run: |
+          if [ -z "$AZURE_SITE_TOKEN" ]; then
+            echo "::error::Set AZURE_STATIC_WEB_APPS_API_TOKEN for the dedicated DeepStruggle site. Do not use the PCOL site token."
+            exit 1
+          fi
+      - name: Upload the prebuilt website
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: upload
+          production_branch: personal
+          app_location: site
+          api_location: ""
+          output_location: ""
+          skip_app_build: true
+          skip_api_build: true

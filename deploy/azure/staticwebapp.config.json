@@ -1,0 +1,15 @@
+{
+  "mimeTypes": {
+    ".wasm": "application/wasm",
+    ".mjs": "text/javascript",
+    ".onnx": "application/octet-stream"
+  },
+  "routes": [
+    {
+      "route": "/engine/*",
+      "headers": {
+        "Cache-Control": "no-cache"
+      }
+    }
+  ]
+}
