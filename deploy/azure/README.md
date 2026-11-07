@@ -1,5 +1,7 @@
 # Personal Azure Static Web Apps deployment
 
+Deployment target: [DeepStruggle](https://polite-ocean-092aa1a00.6.azurestaticapps.net/).
+
 This deploys the browser game to a dedicated Azure Static Web App. GitHub Actions builds
 the C++ engine as WebAssembly and bundles the TypeScript page. The browser runs the rules
 and ONNX inference. No VM, SSH key, Python web server, CUDA or training dependencies are needed.
