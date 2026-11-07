@@ -136,6 +136,9 @@ body.player-view .vtt-effects { left: 12px; }
 #text-card-picker-list { overflow: auto; padding: 4px 0; }
 .vtt-text-card { display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px 12px; border: 0; border-bottom: 1px solid #ffffff0c; background: none; color: var(--text-main); text-align: left; cursor: pointer; font: inherit; }
 .vtt-text-card:hover, .vtt-text-card:focus-visible { background: #b3955b30; }
+.vtt-shell .vtt-text-card:disabled { opacity: 1; cursor: default; }
+.vtt-shell .vtt-text-card:disabled:hover { background: #ffffff09; }
+.vtt-card-list-note { padding: 8px 12px; color: var(--text-muted); font-size: 11px; border-bottom: 1px solid var(--border-color); }
 .vtt-card-number { font-size: 10px; min-width: 28px; color: var(--text-muted); }
 .vtt-card-name { flex: 1; }
 .vtt-card-ops { font-size: 11px; white-space: nowrap; color: #cdbda1; }

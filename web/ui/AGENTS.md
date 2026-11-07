@@ -600,10 +600,13 @@ Settings contain language, view, analysis visibility, board theme/registration,
 new game and the replay controls. Replay remains developer-only. The left undo/debug
 rail is hidden in player view; debug still opens an independent modal. Numbered
 ongoing-effect buttons open descriptions and will later accept artwork.
-`CardsView.renderTextChoices` shows the redacted engine's legal SELECT_CARD IDs in
-a temporary bottom-left text list, including headlines and event choices; no card
-image area is implemented yet. Never expose a hidden opponent decision. Replays
-disable text-card actions. Existing engine, AI, saved game and replay handlers stay
+`CardsView.renderTextChoices` always shows the viewed hand (including the China card)
+in the bottom-left text list, even outside card decisions or while the opponent acts.
+Player views stay on their own hand; developer view follows the decision player.
+Only redacted legal SELECT_CARD IDs are enabled. Extra event choices from other piles
+are listed separately below the hand. Manual minimization survives phase changes;
+an empty hand retains its panel. No card image area is implemented yet. Never expose
+a hidden opponent decision. Replays disable text-card actions. Existing engine, AI, saved game and replay handlers stay
 in TSApp. Model leaderboard data uses the published JSON, not recomputed ratings.
 
 When changing this shell, verify both action-panel locations, all four tools, mode

@@ -796,7 +796,7 @@ export class CardsView {
     document.getElementById("modal-container")!.classList.remove("hidden");
   }
 
-  /** Temporary text-only card selection. The engine's redacted legal IDs are the only source. */
+  /** Keep the viewed hand visible; only the current redacted card choices can be played. */
   private renderTextChoices(state: GameState) {
     const picker = document.getElementById("text-card-picker");
     const list = document.getElementById("text-card-picker-list");
@@ -805,21 +805,41 @@ export class CardsView {
     const L = engineLayout();
     const selectCard = !state.is_terminal && !state.view_hidden_decision && L && ctx
       && num(ctx.decision_type) === L.decision_types.SELECT_CARD;
-    const ids = selectCard ? (state.legal_actions?.valid_ids ?? []).map(Number).filter(id => id >= 1 && id <= 110) : [];
-    picker.classList.toggle("hidden", ids.length === 0);
+    const legal = new Set(selectCard ? (state.legal_actions?.valid_ids ?? []).map(Number).filter(id => id >= 1 && id <= 110) : []);
+    const side = state.view === 'US' || state.view === 'USSR' ? state.view
+      : ctx?.decision_player === 'US' || ctx?.decision_player === 'USSR' ? ctx.decision_player
+      : state.phasing_player === 'US' ? 'US' : 'USSR';
+    const hand = new Set((state.hands?.[side] ?? []).map(Number));
+    if (state.china_card?.holder === side) hand.add(6);
+    const ids = [...hand, ...[...legal].filter(id => !hand.has(id))];
+    picker.classList.remove('hidden');
     list.replaceChildren();
-    document.getElementById("text-card-picker-count")!.textContent = String(ids.length);
-    document.getElementById("text-card-picker-title")!.textContent = t("{0} · Choose a card", [label(String(ctx?.decision_player ?? ""))]);
+    document.getElementById("text-card-picker-count")!.textContent = String(hand.size);
+    const heading = t(side === 'US' ? 'US hand' : 'USSR hand');
+    document.getElementById("text-card-picker-title")!.textContent = heading;
+    picker.setAttribute('aria-label', heading);
+    if (!hand.size) {
+      const empty = document.createElement('div');
+      empty.className = 'vtt-card-list-note'; empty.textContent = t('No cards in hand'); list.append(empty);
+    }
+    let choiceHeading = false;
     for (const id of ids) {
       const meta = this.cardsMeta.get(id);
       if (!meta) continue;
+      // Events may select from the discard pile or the opponent's hand. Keep these
+      // legal choices accessible without presenting them as cards in our own hand.
+      if (!hand.has(id) && !choiceHeading) {
+        const note = document.createElement('div');
+        note.className = 'vtt-card-list-note'; note.textContent = t('Choose a card'); list.append(note);
+        choiceHeading = true;
+      }
       const button = document.createElement("button");
       button.className = `vtt-text-card card-item side-${meta.side.toLowerCase()}`;
       button.dataset.cardId = String(id);
       button.dataset.primary = String(id);
-      button.disabled = document.body.classList.contains("replay-view");
+      button.disabled = !legal.has(id) || document.body.classList.contains("replay-view");
       button.innerHTML = `<span class="vtt-card-number">#${id}</span><span class="vtt-card-name">${escapeHtml(meta.name)}</span><span class="vtt-card-ops">${t("{0} Ops", [meta.ops])}</span>`;
-      button.addEventListener("click", () => { this.hideTooltip(); this.onCardClick(id); });
+      button.addEventListener("click", () => { if (!button.disabled) { this.hideTooltip(); this.onCardClick(id); } });
       button.addEventListener("mouseenter", ev => this.showCardTooltip(ev, id));
       button.addEventListener("mouseleave", () => this.hideTooltip());
       list.appendChild(button);

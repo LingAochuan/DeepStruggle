@@ -32,7 +32,7 @@ try {
    w.cardsView.render(s);w.analysisPanel.lastAnalysis={decision_type:dt,decision_player:'US',policy:{argmax_idx:1},choices:[5,21,23].map((id,i)=>({idx:i,primary_id:id,flags:0,p:i===1?0.95:0.025}))};w.analysisPanel.decorate(s);
  });
  assert.equal(await page.locator('.vtt-text-card .trace-choice-badge').count(),3);
- for(const row of await page.locator('.vtt-text-card').all()){
+ for(const row of await page.locator('.vtt-text-card:has(.trace-choice-badge)').all()){
    const a=await row.locator('.vtt-card-ops').boundingBox(),b=await row.locator('.trace-choice-badge').boundingBox();assert(a.x+a.width<=b.x,JSON.stringify({a,b}));
  }
  await page.screenshot({path:out+'/card-probabilities.png'});

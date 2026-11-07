@@ -48,7 +48,11 @@ The map fills the viewport. Four right-edge tools select log, analysis, model
 configuration (with a compact leaderboard) and settings; clicking the selected tool again closes it. The
 current action sits below the selected panel while expanded, and floats at the
 bottom right while collapsed. A bottom-left text selector keeps card play usable
-until separate card artwork is supplied. Developer-only undo/debug controls and
+until separate card artwork is supplied. It remains visible in all phases, including
+influence placement and the opponent's turn; only legal card choices are clickable.
+Manual minimization is preserved. A player sees their own hand, while developer
+view follows the decision player. Extra event choices are separate from hand cards.
+Developer-only undo/debug controls and
 numbered active effects occupy two left-edge columns. The debug editor remains a
 dialog. Settings house language, player/developer view, replay, analysis visibility,
 map style, registration and new-game controls. There are no zoom or region buttons.
@@ -71,6 +75,10 @@ disabled for this UI check; it does not benchmark or validate inference.
 panel minimizers, single action scrollbar, batch debug form, non-overlapping card
 probabilities, HUD hover references and bilingual play-mode labels. It uses the
 same Playwright environment variables.
+`node tests/web/tabletop_hand.mjs <base-url>` checks hand visibility during actual
+setup and Ops influence placement, collapse persistence, read-only tooltips,
+headline choices, player privacy, event choices from other piles, the China card,
+empty hands and replay read-only behavior.
 Browser checks must cover actual country selection after zoom/pan, hover, mobile
 tap, undo, language/style switches retaining a game, and missing-artwork fallback.
 Run the repository's full `tests/web` suite in its configured native-engine build
