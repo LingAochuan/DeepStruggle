@@ -1,0 +1,62 @@
+{
+  "workshopId": "2793711137",
+  "board": {
+    "source": "https://images.steamusercontent.com/ugc/1848173365184640946/F3465B72EC0E8DFFAD3F6DF08AA722234C3251EE/",
+    "sha256": "a4237c6f8966e37793d7b36bba50a632e5b3fb61c3d3aa2fa8cbed165acb35e5"
+  },
+  "textureSize": 2048,
+  "frontUV": [
+    605,
+    132,
+    891,
+    891
+  ],
+  "backUV": [
+    605,
+    1136,
+    891,
+    891
+  ],
+  "assets": {
+    "influence-us": {
+      "source": "http://cloud-3.steamusercontent.com/ugc/1848173079363335735/C2D298D50677D60E1070985088B2B3329133A89C/",
+      "sha256": "748c4e6814dbb8669f6a2340487d3f32e1be5120a6c82fe0229fae449b9f4758"
+    },
+    "influence-ussr": {
+      "source": "http://cloud-3.steamusercontent.com/ugc/1848173079363326738/329C7183DFEDE446A1B9A54119925E0AB3BC9456/",
+      "sha256": "8c673abce5495dfd08ef6891630fd45b6a07f5ddf36ca43865df894063dd4139"
+    },
+    "turn": {
+      "source": "http://cloud-3.steamusercontent.com/ugc/1848173562352577793/83B95DDC28B3371AC1DA0F833DB3C016188FA1D9/",
+      "sha256": "212997f32d6cf2611d09a0a504a5d1662c814e64079d558daadfa8198f57c58c"
+    },
+    "vp": {
+      "source": "http://cloud-3.steamusercontent.com/ugc/1848173562352578072/31CF4574B079E40E8028FBBE649D0FCAAAAE8121/",
+      "sha256": "72126e1f2044ddb6a18a4d66e9a6ed216ddcbd0eaf41a0276e1919c0a58e8928"
+    },
+    "space-ussr": {
+      "source": "http://cloud-3.steamusercontent.com/ugc/1848173562352578339/6AD395F9CD1ECC3ED51D40BA45EBF36FF17A8826/",
+      "sha256": "66d576b23d4a93371bc7e321a1cdaffe93f876d959f7f608db2dec06040a6540"
+    },
+    "space-us": {
+      "source": "http://cloud-3.steamusercontent.com/ugc/1848173562352578250/8FA9EC03C24E3E0D8A78E391BD00A1BBD613B606/",
+      "sha256": "edcd6f9691f2d3b56e38c78364f17ab63f64707a26159d90c73b71524b651a9a"
+    },
+    "action-round": {
+      "source": "http://cloud-3.steamusercontent.com/ugc/1009312085870836852/77577ADDE33595FBC1168966A0293831DF6DE0C2/",
+      "sha256": "1d7065f6f9e95b18c285ec98c9e42e1dbe3cf3cbda0de9d2a4e06d65575dbd91"
+    },
+    "defcon": {
+      "source": "http://cloud-3.steamusercontent.com/ugc/1848173562352577420/972B2B9CF6EF36EAFCDCFB62007D67C9ACF309A0/",
+      "sha256": "0b4b4551d8a21bc8955ce6bc4823263a3c333044443050cb2d0e64a4d501b8f2"
+    },
+    "mil-ussr": {
+      "source": "http://cloud-3.steamusercontent.com/ugc/1848173562352577964/D68468619B51A62DF1A4665282C678B926A292C1/",
+      "sha256": "4d41f2cbd8e479f915963bcb536e856c5e0fcef84e5263efb6c06ab82c1b6dd8"
+    },
+    "mil-us": {
+      "source": "http://cloud-3.steamusercontent.com/ugc/1848173562352577878/911E000E7021383D0D0AE6235ACF87B4C93BD604/",
+      "sha256": "a6b6c8881924d7b615b93e6033b5e536ca6af4fc416cfa39a3709489826694c8"
+    }
+  }
+}

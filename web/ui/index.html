@@ -1,449 +1,294 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-i18n="Twilight Struggle Engine Workbench">Twilight Struggle Engine Workbench</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/src/style.css">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title data-i18n="Twilight Struggle Engine Workbench">Twilight Struggle Engine Workbench</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;family=Cinzel:wght@700;900&amp;display=swap" rel="stylesheet"/>
+<link href="/src/style.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/src/fvtt_shell.css">
 </head>
-<body>
-  <div id="app">
-    <div class="disclaimer-bar" id="disclaimer-bar" role="note">
-      <div class="brand">
-        <span class="brand-title" data-i18n="TWILIGHT STRUGGLE">TWILIGHT STRUGGLE</span>
-        <span class="brand-badge" data-i18n="ENGINE WORKBENCH">ENGINE WORKBENCH</span>
-      </div>
-      <span class="disclaimer-text" data-i18n="Unofficial fan project, not affiliated with or endorsed by GMT Games. Twilight Struggle® is a registered trademark of GMT Games, LLC.">
-        Unofficial fan project, not affiliated with or endorsed by GMT Games.
-        Twilight Struggle® is a registered trademark of GMT Games, LLC.
-      </span>
-    </div>
+<body class="vtt-shell">
+<div id="app">
+<section class="map-container" id="map-container">
+<!-- The effects that last for this turn, always in view (cards_view.ts renderTurnEffects). -->
 
-    <!-- Technical block: the engine, the play mode, the model and its search, the developer's
-         tools. Nothing here is about the position; that is the game bar below. -->
-    <header class="top-bar tech-bar" id="tech-bar">
-      <div class="tech-group" id="tech-engine">
-        <!-- The engine running in the page: its fingerprint, and a warning when the local
-             server's sources have moved on from the build the page loaded. The badge names itself. -->
-        <span id="connection-status" class="status-badge" data-i18n="LOADING ENGINE…">LOADING ENGINE…</span>
-      </div>
 
-      <div class="tech-group" id="tech-mode">
-        <span class="tech-label" data-i18n="Play mode">Play mode</span>
-        <!-- Whose eyes the board is drawn for (game/view.ts): a player's view hides the other
-             side's hand, face-down headline and options; the model plays that side. The page asks
-             for it when it opens and when New Game is pressed (the mode dialog below). -->
-        <select id="view-select" class="view-select" title="Developer: everything. Play as US / USSR: the other side's private information is hidden and the model plays it." data-i18n-title="Developer: everything. Play as US / USSR: the other side's private information is hidden and the model plays it.">
-          <option value="DEV" data-i18n="Developer">Developer</option>
-          <option value="US" data-i18n="Play as US">Play as US</option>
-          <option value="USSR" data-i18n="Play as USSR">Play as USSR</option>
-        </select>
-        <button id="btn-new-game" class="btn btn-secondary btn-sm" title="A new game with a fresh deal; asks for the play mode first" data-i18n="New Game" data-i18n-title="A new game with a fresh deal; asks for the play mode first">New Game</button>
-        <!-- Shown once the game is over: the result dialog, and its offer of the stats database. -->
-        <button id="btn-game-result" class="btn btn-primary btn-sm hidden" title="The result, and adding the game to the stats database" data-i18n="Result" data-i18n-title="The result, and adding the game to the stats database">Result</button>
-      </div>
 
-      <div class="tech-group tech-model" id="tech-model">
-        <span class="tech-label" data-i18n="Model">Model</span>
-        <!-- The model and how it plays, in one line (main.ts renderModelModeLabels). A click opens
-             the model & search section (#model-mode-section) in #model-mode-dialog. -->
-        <button id="btn-model-choose" class="model-mode-label" title="Choose the model -- a local checkpoint, a Hugging Face repo or an .onnx file -- and how it plays" aria-haspopup="dialog" aria-controls="model-mode-dialog" data-i18n-title="Choose the model -- a local checkpoint, a Hugging Face repo or an .onnx file -- and how it plays">
-          <span id="model-mode-label-model" class="mm-model" data-i18n="no model">no model</span>
-          <span class="mm-sep">·</span>
-          <span id="model-mode-label-mode" class="mm-mode" data-i18n="Policy">Policy</span>
-          <span class="mm-caret" aria-hidden="true">▾</span>
-        </button>
-        <!-- The model's readout (its win chances, move probabilities, search) and its badges on the
-             board: on in the Developer view, off in a player's view, either switchable here. The
-             model's own decisions stay hidden in a player's view regardless (main.ts setView). -->
-        <label class="analysis-toggle" title="Show the model's readout -- win chances, move probabilities, search -- and its badges on the board. On in the Developer view, off when you play a side." data-i18n-title="Show the model's readout -- win chances, move probabilities, search -- and its badges on the board. On in the Developer view, off when you play a side.">
-          <input type="checkbox" id="analysis-visible-toggle">
-          <span data-i18n="Show analysis">Show analysis</span>
-        </label>
-      </div>
+<!-- Frame one region (map_view.ts zoomToRegion), like the region buttons of the app. -->
 
-      <div class="tech-group tech-dev" id="tech-dev">
-        <span class="tech-label" data-i18n="Dev">Dev</span>
-        <button id="btn-undo-action" class="btn btn-warning btn-sm" title="Undo / Cancel Last Action (Ctrl+Z / Esc)" data-i18n="⟲ Cancel Action" data-i18n-title="Undo / Cancel Last Action (Ctrl+Z / Esc)">⟲ Cancel Action</button>
-        <button id="btn-toggle-debug" class="btn btn-secondary btn-sm" data-i18n="Debug Tools">Debug Tools</button>
-        <button id="btn-toggle-replay" class="btn btn-primary btn-sm" data-i18n="Replay Mode">Replay Mode</button>
-        <a id="link-leaderboard" class="btn btn-secondary btn-sm" href="leaderboard.html" title="Elo ratings of the published models" data-i18n="Leaderboard" data-i18n-title="Elo ratings of the published models">Leaderboard</a>
-      </div>
-      <label class="locale-control">
-        <span data-i18n="Language">Language</span>
-        <select aria-label="Language" data-i18n-aria-label="Language" data-locale-select>
-          <option value="en">English</option>
-          <option value="zh-CN">简体中文</option>
-        </select>
-      </label>
-    </header>
-
-    <!-- Game bar: the position -- the tracks and whose decision it is. -->
-    <div class="game-bar" id="game-bar">
-      <div class="global-tracks" id="global-tracks">
-        <!-- Rendered by tracks_view.ts -->
-      </div>
-      <div class="game-controls">
-        <span id="active-player-badge" class="player-badge ussr" data-i18n="USSR TURN">USSR TURN</span>
-      </div>
-    </div>
-
-    <!-- Main Central Grid -->
-    <main class="main-content">
-      <!-- Left Sidebar: the card lists, beside the map rather than under the model readout. -->
-      <aside class="cards-sidebar" id="cards-sidebar">
-        <!-- Cards & Hands (full visibility): both hands, the piles, and all 110 cards. -->
-        <div class="panel hands-panel" id="hands-panel">
-          <div class="tabs">
-            <button class="tab-btn active" data-tab="tab-ussr-hand"><span data-i18n="USSR (">USSR (</span><span id="ussr-hand-count">0</span>)</button>
-            <button class="tab-btn" data-tab="tab-us-hand"><span data-i18n="US (">US (</span><span id="us-hand-count">0</span>)</button>
-            <button class="tab-btn" data-tab="tab-board-cards" data-i18n="Piles">Piles</button>
-            <button class="tab-btn" data-tab="tab-all-cards" title="All 110 cards and where each one is" data-i18n="All (110)" data-i18n-title="All 110 cards and where each one is">All (110)</button>
-          </div>
-
-          <div class="tab-content active" id="tab-ussr-hand">
-            <div class="card-list" id="ussr-cards-list"></div>
-          </div>
-          <div class="tab-content" id="tab-us-hand">
-            <div class="card-list" id="us-cards-list"></div>
-          </div>
-          <div class="tab-content" id="tab-board-cards">
-            <div id="china-card-container"></div>
-            <div class="draw-count-label"><span id="draw-count-name" data-i18n="Draw Deck">Draw Deck</span>: <strong id="draw-count">0</strong> <span data-i18n="cards remaining">cards remaining</span></div>
-            <!-- The piles as the hands are drawn, packed, by side then Ops (cards_view.ts renderPile). -->
-            <div class="pile-head"><span data-i18n="Discard Pile">Discard Pile</span> <span class="pile-head-count" id="discard-count">0</span></div>
-            <div class="card-list card-list-packed" id="discard-cards-list"></div>
-            <div class="pile-head"><span data-i18n="Removed from Game">Removed from Game</span> <span class="pile-head-count" id="removed-count">0</span></div>
-            <div class="card-list card-list-packed" id="removed-cards-list"></div>
-          </div>
-          <div class="tab-content" id="tab-all-cards">
-            <div class="all-cards-controls">
-              <input type="text" id="all-cards-search" placeholder="Search cards by name/ID..." class="all-cards-search-input" data-i18n-placeholder="Search cards by name/ID...">
-              <select id="all-cards-filter" class="all-cards-filter-select">
-                <option value="ALL" data-i18n="All (110 Cards)">All (110 Cards)</option>
-                <option value="HAND_US" data-i18n="US Hand">US Hand</option>
-                <option value="HAND_USSR" data-i18n="USSR Hand">USSR Hand</option>
-                <option value="DRAW_DECK" data-i18n="Draw Deck">Draw Deck</option>
-                <option value="DISCARD_PILE" data-i18n="Discard Pile">Discard Pile</option>
-                <option value="REMOVED_FROM_GAME" data-i18n="Removed Pile">Removed Pile</option>
-                <option value="ONGOING_EVENT" data-i18n="Ongoing / China">Ongoing / China</option>
-                <option value="UNAVAILABLE" data-i18n="Future Era">Future Era</option>
-                <option value="PEEKED_TEMP" data-i18n="Drawn, being chosen">Drawn, being chosen</option>
-              </select>
-            </div>
-            <div class="card-list all-cards-scroll-list" id="all-cards-list"></div>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Center: Interactive Deluxe Map Canvas -->
-      <section class="map-container" id="map-container">
-        <!-- The effects that last for this turn, always in view (cards_view.ts renderTurnEffects). -->
-        <div class="map-turn-effects" id="map-turn-effects"></div>
-        <div class="map-viewport-controls">
-          <button id="btn-zoom-in" class="btn-icon" title="Zoom In" data-i18n-title="Zoom In">+</button>
-          <button id="btn-zoom-out" class="btn-icon" title="Zoom Out" data-i18n-title="Zoom Out">−</button>
-          <button id="btn-zoom-reset" class="btn-icon" title="Reset View" data-i18n-title="Reset View">⟲</button>
-          <div class="map-legend-toggle" id="map-legend"></div>
-        </div>
-        <!-- Frame one region (map_view.ts zoomToRegion), like the region buttons of the app. -->
-        <nav class="map-region-jump" id="map-region-jump" aria-label="Zoom to a region" data-i18n-aria-label="Zoom to a region">
-          <button data-region="Europe" title="Europe" data-i18n="Eu" data-i18n-title="Europe">Eu</button>
-          <button data-region="Asia" title="Asia" data-i18n="As" data-i18n-title="Asia">As</button>
-          <button data-region="Southeast Asia" title="Southeast Asia" data-i18n="SE" data-i18n-title="Southeast Asia">SE</button>
-          <button data-region="Middle East" title="Middle East" data-i18n="ME" data-i18n-title="Middle East">ME</button>
-          <button data-region="Africa" title="Africa" data-i18n="Af" data-i18n-title="Africa">Af</button>
-          <button data-region="Central America" title="Central America" data-i18n="CA" data-i18n-title="Central America">CA</button>
-          <button data-region="South America" title="South America" data-i18n="SA" data-i18n-title="South America">SA</button>
-        </nav>
-        <!-- A player's view: what the other side's latest turn did (map_view.ts renderLastTurnSummary). -->
-        <div class="map-last-turn hidden" id="map-last-turn"></div>
-        <!-- The latest action round's dice while recent (roll_tray.ts, from game/rolls.ts). -->
-        <div class="map-rolls hidden" id="map-rolls" aria-live="polite"></div>
-        <div id="map-canvas-wrapper">
-          <svg id="ts-map-svg" viewBox="0 0 1000 650" preserveAspectRatio="xMidYMid meet"></svg>
-        </div>
-      </section>
-
-      <!-- Right Sidebar: Decision HUD, model analysis / readout, active effects -->
-      <aside class="sidebar">
-        <!-- Section 1: Decision & Interactive HUD -->
-        <div class="panel decision-panel" id="decision-panel">
-          <div class="panel-header">
-            <h3 data-i18n="CURRENT ACTION">CURRENT ACTION</h3>
-            <span id="decision-type-badge" class="badge" data-i18n="POINT_NODE">POINT_NODE</span>
-          </div>
-          <div class="decision-body" id="decision-body">
-            <!-- Rendered by action_hud.ts -->
-          </div>
-        </div>
-
-        <!-- Section 1a: Live analysis. A model's policy over the open decision and its critic on
-             the position, recomputed in the page on every move (analysis_view.ts). -->
-        <div class="panel analysis-panel" id="analysis-panel">
-          <div class="panel-header">
-            <h3 data-i18n="MODEL ANALYSIS">MODEL ANALYSIS</h3>
-            <span id="analysis-status" class="badge" data-i18n="off">off</span>
-          </div>
-          <!-- The model itself is chosen in the technical bar (#tech-model); here is what it says. -->
-          <div class="analysis-controls">
-            <button id="btn-play-favourite" class="btn btn-primary btn-sm" title="Play the model's most likely move (F)" disabled data-i18n="★ Play favourite" data-i18n-title="Play the model's most likely move (F)">★ Play favourite</button>
-            <label class="analysis-autoplay" title="This side plays the model's favourite automatically; you play the other" data-i18n-title="This side plays the model's favourite automatically; you play the other">
-              <span data-i18n="Auto-play">Auto-play</span>
-              <select id="analysis-autoplay-select" class="analysis-select">
-                <option value="" data-i18n="none">none</option>
-                <option value="USSR" data-i18n="USSR">USSR</option>
-                <option value="US" data-i18n="US">US</option>
-              </select>
-            </label>
-          </div>
-          <div id="analysis-body" class="trace-body"></div>
-        </div>
-
-        <!-- Section 1b: What the model believed here, and what its critic thinks of the
-             position. Present only for replays that carry a trace; hidden otherwise. -->
-        <div class="panel trace-panel hidden" id="trace-panel">
-          <div class="panel-header">
-            <h3 data-i18n="MODEL READOUT">MODEL READOUT</h3>
-            <span id="trace-source-badge" class="badge" data-i18n="policy">policy</span>
-          </div>
-          <div id="trace-panel-body" class="trace-body">
-            <!-- Rendered by trace_view.ts -->
-          </div>
-        </div>
-
-        <!-- Section 3: Persistent Flags & Context Stack -->
-        <div class="panel effects-panel">
-          <div class="panel-header">
-            <h3 data-i18n="ACTIVE EFFECTS &amp; CONTEXT">ACTIVE EFFECTS & CONTEXT</h3>
-          </div>
-          <div id="active-flags-container" class="flags-list"></div>
-          <div id="context-stack-container" class="context-stack"></div>
-        </div>
-      </aside>
-    </main>
-
-    <!-- The play-mode question, asked when the page opens on a fresh game and when New Game is
-         pressed (main.ts askMode). Escape keeps the current mode. -->
-    <div id="mode-dialog" class="modal-backdrop mode-dialog hidden" role="dialog" aria-modal="true" aria-labelledby="mode-dialog-title">
-      <div class="modal-content mode-dialog-content">
-        <div class="modal-header">
-          <h2 id="mode-dialog-title" data-i18n="How do you want to play?">How do you want to play?</h2>
-          <button id="mode-dialog-close" class="btn-icon" title="Keep the current mode (Esc)" data-i18n-title="Keep the current mode (Esc)">✕</button>
-        </div>
-        <div class="modal-body mode-dialog-body">
-          <!-- The model & search section (#model-mode-section), folded: main.ts askMode moves it in
-               here and openModelMode back into #model-mode-dialog. -->
-          <details id="mode-model-details" class="mode-model-details">
-            <summary><span class="mode-model-summary-label" data-i18n="Model">Model</span> <span id="mode-model-summary" data-i18n="no model · Policy">no model · Policy</span></summary>
-            <div id="mode-model-slot" class="mode-model-slot"></div>
-          </details>
-          <button id="mode-choice-dev" class="mode-choice" data-mode="DEV">
-            <span class="mode-choice-title" data-i18n="Developer">Developer</span>
-            <span class="mode-choice-text" data-i18n="Both hands, every option, the debug tools and replays. You move both sides, or let the model play one.">Both hands, every option, the debug tools and replays. You move both sides, or let the model play one.</span>
-          </button>
-          <button id="mode-choice-us" class="mode-choice mode-choice-us" data-mode="US">
-            <span class="mode-choice-title" data-i18n="Play as US">Play as US</span>
-            <span class="mode-choice-text" data-i18n="The USSR's hand and headline stay hidden; the model plays the USSR. No hints: its win chances and move probabilities stay off unless you turn on Show analysis.">The USSR's hand and headline stay hidden; the model plays the USSR. No hints: its win chances and move probabilities stay off unless you turn on Show analysis.</span>
-          </button>
-          <button id="mode-choice-ussr" class="mode-choice mode-choice-ussr" data-mode="USSR">
-            <span class="mode-choice-title" data-i18n="Play as USSR">Play as USSR</span>
-            <span class="mode-choice-text" data-i18n="The US's hand and headline stay hidden; the model plays the US. No hints: its win chances and move probabilities stay off unless you turn on Show analysis.">The US's hand and headline stay hidden; the model plays the US. No hints: its win chances and move probabilities stay off unless you turn on Show analysis.</span>
-          </button>
-          <p class="mode-dialog-note" id="mode-dialog-note"></p>
-        </div>
-      </div>
-    </div>
-
-    <!-- The model and how it plays (main.ts openModelMode), from the technical bar's label. Its body
-         holds #model-mode-section unless the New Game dialog has borrowed it. -->
-    <div id="model-mode-dialog" class="modal-backdrop model-mode-dialog hidden" role="dialog" aria-modal="true" aria-labelledby="model-mode-dialog-title">
-      <div class="modal-content model-mode-dialog-content">
-        <div class="modal-header">
-          <h2 id="model-mode-dialog-title" data-i18n="Model &amp; play mode">Model &amp; play mode</h2>
-          <button id="model-mode-dialog-close" class="btn-icon" title="Close (Esc)" data-i18n-title="Close (Esc)">✕</button>
-        </div>
-        <div class="modal-body" id="model-mode-dialog-body">
-          <!-- The section: where the model comes from (analysis_view.ts binds these by id) and how
-               it picks its move (main.ts: the radios set the search). One copy, moved between the
-               two dialogs. -->
-          <div id="model-mode-section" class="model-mode-section">
-            <div class="mm-current">
-              <span id="model-active-status" class="model-active-status" data-i18n="no model">no model</span>
-              <div id="analysis-model-info" class="analysis-model-info hidden"></div>
-            </div>
-            <div id="model-chooser" class="model-chooser">
-              <div class="model-controls">
-                <select id="analysis-source-select" class="analysis-select analysis-source" title="Where the model comes from" data-i18n-title="Where the model comes from">
-                  <option value="" data-i18n="— analysis off —">— analysis off —</option>
-                  <option value="local" id="analysis-source-local-option" data-i18n="Local checkpoints">Local checkpoints</option>
-                  <option value="hf" data-i18n="Hugging Face">Hugging Face</option>
-                  <option value="file" data-i18n=".onnx file">.onnx file</option>
-                </select>
-                <div id="analysis-src-local" class="analysis-src hidden">
-                  <select id="analysis-run-select" class="analysis-select" title="Training run" data-i18n-title="Training run"></select>
-                  <select id="analysis-snapshot-select" class="analysis-select analysis-snapshot" title="Snapshot" disabled data-i18n-title="Snapshot"></select>
-                </div>
-                <div id="analysis-src-hf" class="analysis-src hidden">
-                  <input id="analysis-hf-repo" class="analysis-select" placeholder="owner/repo" title="A public Hugging Face model repo holding .onnx exports (tools/export_onnx.py)" data-i18n-placeholder="owner/repo" data-i18n-title="A public Hugging Face model repo holding .onnx exports (tools/export_onnx.py)">
-                  <input id="analysis-hf-revision" class="analysis-select analysis-snapshot" value="main" title="Branch, tag or commit" data-i18n-title="Branch, tag or commit">
-                  <button id="analysis-hf-list" class="btn btn-secondary btn-sm" title="List the repo's .onnx files" data-i18n="List" data-i18n-title="List the repo's .onnx files">List</button>
-                  <select id="analysis-hf-file" class="analysis-select" title="Model file" data-i18n-title="Model file"></select>
-                  <button id="analysis-hf-clear" class="btn btn-secondary btn-sm" disabled data-i18n="Clear cache">Clear cache</button>
-                </div>
-                <div id="analysis-src-file" class="analysis-src hidden">
-                  <input id="analysis-file-input" type="file" accept=".onnx" class="analysis-file" title="An .onnx export (tools/export_onnx.py); you can also drop it anywhere on the page" data-i18n-title="An .onnx export (tools/export_onnx.py); you can also drop it anywhere on the page">
-                </div>
-              </div>
-            </div>
-            <!-- How the model picks its move: the policy's argmax, or the rollout root -- its top
+<!-- A player's view: what the other side's latest turn did (map_view.ts renderLastTurnSummary). -->
+<div class="map-last-turn hidden" id="map-last-turn"></div>
+<!-- The latest action round's dice while recent (roll_tray.ts, from game/rolls.ts). -->
+<div aria-live="polite" class="map-rolls hidden" id="map-rolls"></div>
+<div id="map-canvas-wrapper">
+<svg id="ts-map-svg" preserveaspectratio="xMidYMid meet" viewbox="0 0 1000 650"></svg>
+</div>
+</section>
+<div id="global-tracks" hidden></div>
+<nav id="vtt-dev-tools" class="vtt-tool-column" aria-label="Developer tools" data-i18n-aria-label="Developer tools">
+<button id="btn-undo-action" class="vtt-tool" title="Undo / Cancel Last Action (Ctrl+Z / Esc)" aria-label="Undo / Cancel Last Action (Ctrl+Z / Esc)" data-i18n-title="Undo / Cancel Last Action (Ctrl+Z / Esc)" data-i18n-aria-label="Undo / Cancel Last Action (Ctrl+Z / Esc)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5 3 10l6 5M4 10h10a6 6 0 0 1 0 12" transform="translate(0 -2)"/></svg></button>
+<button id="btn-toggle-debug" class="vtt-tool" title="Debug Tools" aria-label="Debug Tools" data-i18n-title="Debug Tools" data-i18n-aria-label="Debug Tools"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h6l3 5v9H6v-9zM9 2l2 3m4-3-2 3M2 10h4m12 0h4M2 15h4m12 0h4M3 21l3-3m12 0 3 3M12 9v10"/></svg></button>
+</nav>
+<div id="active-flags-container" class="vtt-effects" role="group" aria-label="Active effects" data-i18n-aria-label="Active effects"></div>
+<section id="text-card-picker" class="vtt-glass hidden" aria-label="Choose a card" data-i18n-aria-label="Choose a card">
+<header class="vtt-panel-heading"><span id="text-card-picker-title" data-i18n="Choose a card">Choose a card</span><span id="text-card-picker-count"></span><button class="vtt-panel-toggle" data-collapse-panel aria-controls="text-card-picker-list" type="button">‹</button></header>
+<div id="text-card-picker-list"></div>
+</section>
+<nav id="vtt-right-tools" class="vtt-tool-column" aria-label="Game tools" data-i18n-aria-label="Game tools">
+<button data-dock-tab="log" class="vtt-tool" title="Action log" aria-label="Action log" data-i18n-title="Action log" data-i18n-aria-label="Action log" aria-expanded="false" aria-controls="vtt-dock"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg></button>
+<button data-dock-tab="analysis" class="vtt-tool" title="Model analysis" aria-label="Model analysis" data-i18n-title="Model analysis" data-i18n-aria-label="Model analysis" aria-expanded="false" aria-controls="vtt-dock"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V5m0 15h17M8 16l4-6 4 3 4-8"/></svg></button>
+<button id="btn-model-choose" class="vtt-tool" title="Configure model" aria-label="Configure model" data-i18n-title="Configure model" data-i18n-aria-label="Configure model"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8v4H8zM5 9h14v11H5zM9 13v2m6-2v2M9 18h6M2 12h3m14 0h3M12 7v2"/></svg></button>
+<button data-dock-tab="settings" class="vtt-tool" title="Settings" aria-label="Settings" data-i18n-title="Settings" data-i18n-aria-label="Settings" aria-expanded="false" aria-controls="vtt-dock"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3 1 3h4l1-3 3 2-1 3 2 3 3 1v3l-3 1-2 3 1 3-3 2-1-3h-4l-1 3-3-2 1-3-2-3-3-1v-3l3-1 2-3-1-3z" transform="translate(1 -1) scale(.85)"/><circle cx="12" cy="11" r="3"/></svg></button>
+</nav>
+<aside id="vtt-dock" class="vtt-glass" hidden>
+<header class="vtt-panel-heading"><span id="vtt-dock-title"></span></header>
+<div id="vtt-dock-content">
+<section data-dock-page="log" hidden>
+<div class="vtt-log-options"><span class="log-count-badge" data-i18n="0 events" id="log-count">0 events</span><label class="log-filter-checkbox" data-i18n-title="Filter log to only show lines affecting VP and 2 context lines before and 2 context lines after" title="Filter log to only show lines affecting VP and 2 context lines before and 2 context lines after">
+<input id="chk-filter-vp" type="checkbox"/>
+<span data-i18n="🎯 VP Events (±2 Context)">🎯 VP Events (±2 Context)</span>
+</label></div>
+<div class="log-messages" id="action-log-stream"></div>
+</section>
+<section data-dock-page="analysis" hidden>
+<div class="panel analysis-panel" id="analysis-panel">
+<div class="panel-header">
+<h3 data-i18n="MODEL ANALYSIS">MODEL ANALYSIS</h3>
+<span class="badge" data-i18n="off" id="analysis-status">off</span>
+</div>
+<!-- The model itself is chosen in the technical bar (#tech-model); here is what it says. -->
+<div class="analysis-controls">
+<button class="btn btn-primary btn-sm" data-i18n="★ Play favourite" data-i18n-title="Play the model's most likely move (F)" disabled="" id="btn-play-favourite" title="Play the model's most likely move (F)">★ Play favourite</button>
+<label class="analysis-autoplay" data-i18n-title="This side plays the model's favourite automatically; you play the other" title="This side plays the model's favourite automatically; you play the other">
+<span data-i18n="Auto-play">Auto-play</span>
+<select class="analysis-select" id="analysis-autoplay-select">
+<option data-i18n="none" value="">none</option>
+<option data-i18n="USSR" value="USSR">USSR</option>
+<option data-i18n="US" value="US">US</option>
+</select>
+</label>
+</div>
+<div class="trace-body" id="analysis-body"></div>
+</div>
+<div class="panel trace-panel hidden" id="trace-panel">
+<div class="panel-header">
+<h3 data-i18n="MODEL READOUT">MODEL READOUT</h3>
+<span class="badge" data-i18n="policy" id="trace-source-badge">policy</span>
+</div>
+<div class="trace-body" id="trace-panel-body">
+<!-- Rendered by trace_view.ts -->
+</div>
+</div>
+</section>
+<section data-dock-page="model" hidden>
+<div id="model-dock-slot"><div class="model-mode-section" id="model-mode-section">
+<div class="mm-current">
+<span class="model-active-status" data-i18n="no model" id="model-active-status">no model</span>
+<div class="analysis-model-info hidden" id="analysis-model-info"></div>
+</div>
+<div class="model-chooser" id="model-chooser">
+<div class="model-controls">
+<select class="analysis-select analysis-source" data-i18n-title="Where the model comes from" id="analysis-source-select" title="Where the model comes from">
+<option data-i18n="— analysis off —" value="">— analysis off —</option>
+<option data-i18n="Local checkpoints" id="analysis-source-local-option" value="local">Local checkpoints</option>
+<option data-i18n="Hugging Face" value="hf">Hugging Face</option>
+<option data-i18n=".onnx file" value="file">.onnx file</option>
+</select>
+<div class="analysis-src hidden" id="analysis-src-local">
+<select class="analysis-select" data-i18n-title="Training run" id="analysis-run-select" title="Training run"></select>
+<select class="analysis-select analysis-snapshot" data-i18n-title="Snapshot" disabled="" id="analysis-snapshot-select" title="Snapshot"></select>
+</div>
+<div class="analysis-src hidden" id="analysis-src-hf">
+<input class="analysis-select" data-i18n-placeholder="owner/repo" data-i18n-title="A public Hugging Face model repo holding .onnx exports (tools/export_onnx.py)" id="analysis-hf-repo" placeholder="owner/repo" title="A public Hugging Face model repo holding .onnx exports (tools/export_onnx.py)"/>
+<input class="analysis-select analysis-snapshot" data-i18n-title="Branch, tag or commit" id="analysis-hf-revision" title="Branch, tag or commit" value="main"/>
+<button class="btn btn-secondary btn-sm" data-i18n="List" data-i18n-title="List the repo's .onnx files" id="analysis-hf-list" title="List the repo's .onnx files">List</button>
+<select class="analysis-select" data-i18n-title="Model file" id="analysis-hf-file" title="Model file"></select>
+<button class="btn btn-secondary btn-sm" data-i18n="Clear cache" disabled="" id="analysis-hf-clear">Clear cache</button>
+</div>
+<div class="analysis-src hidden" id="analysis-src-file">
+<input accept=".onnx" class="analysis-file" data-i18n-title="An .onnx export (tools/export_onnx.py); you can also drop it anywhere on the page" id="analysis-file-input" title="An .onnx export (tools/export_onnx.py); you can also drop it anywhere on the page" type="file"/>
+</div>
+</div>
+</div>
+<!-- How the model picks its move: the policy's argmax, or the rollout root -- its top
                  moves played out in sampled worlds by the engine's own batch
                  (bindings/rollout_batch.hpp, analysis/rollout.ts) in a worker. Its spec is the
                  default (the Hugging Face repo's models.json), one from `search=` in the URL, or
                  what #search-settings say; the URL carries the one in force. -->
-            <fieldset class="mode-opponent" id="mode-opponent">
-              <legend data-i18n="The model plays with">The model plays with</legend>
-              <label class="mode-opponent-option" title="Its top moves each played out by the model in sampled worlds, then the best only on a clear lead over the policy's move. By default the search the Hugging Face repo names (the best player on the leaderboard); the search settings below, or search=rollout:k:worlds:horizon:rule:stop:leaf[:keyed][:aligned][:box4][:beliefN] in the address, for another." data-i18n-title="Its top moves each played out by the model in sampled worlds, then the best only on a clear lead over the policy's move. By default the search the Hugging Face repo names (the best player on the leaderboard); the search settings below, or search=rollout:k:worlds:horizon:rule:stop:leaf[:keyed][:aligned][:box4][:beliefN] in the address, for another.">
-                <input type="radio" name="mode-opponent" value="rollout" id="mode-opponent-rollout">
-                <span><b data-i18n="Rollout root">Rollout root</b> <span data-i18n="-- its strongest player:">-- its strongest player:</span> <span id="mode-opponent-rollout-spec" data-i18n="its top 4 moves, each played out in 32 sampled worlds">its top 4 moves, each played out in 32 sampled worlds</span><span data-i18n=". A few seconds a move.">. A few seconds a move.</span></span>
-              </label>
-              <label class="mode-opponent-option">
-                <input type="radio" name="mode-opponent" value="policy" id="mode-opponent-policy">
-                <span><b data-i18n="Policy">Policy</b> <span data-i18n="-- its most likely move, at once.">-- its most likely move, at once.</span></span>
-              </label>
-              <details class="search-settings" id="search-settings">
-                <summary><span data-i18n="Search settings">Search settings</span> <code id="search-settings-code" class="search-settings-code"></code></summary>
-                <div class="search-settings-grid">
-                  <label title="The candidates: the policy's most probable moves" data-i18n-title="The candidates: the policy's most probable moves"><span data-i18n="Moves">Moves</span> <input type="number" id="ss-k" min="1" step="1"></label>
-                  <label title="Sampled worlds each candidate is played out in" data-i18n-title="Sampled worlds each candidate is played out in"><span data-i18n="Worlds">Worlds</span> <input type="number" id="ss-worlds" min="1" step="1"></label>
-                  <label title="Action-round boundaries a playout runs through" data-i18n-title="Action-round boundaries a playout runs through"><span data-i18n="Horizon">Horizon</span> <input type="number" id="ss-horizon" min="0" step="1"></label>
-                  <label title="The choice: argmax, z&lt;x&gt; (the best only on an x-SE lead over the policy's move) or kl&lt;t&gt;" data-i18n-title="The choice: argmax, z&lt;x&gt; (the best only on an x-SE lead over the policy's move) or kl&lt;t&gt;"><span data-i18n="Rule">Rule</span> <input type="text" id="ss-rule" size="6" spellcheck="false"></label>
-                  <label title="Where a playout stops" data-i18n-title="Where a playout stops"><span data-i18n="Stop">Stop</span> <select id="ss-stop"></select></label>
-                  <label title="Whose side a leaf is read from" data-i18n-title="Whose side a leaf is read from"><span data-i18n="Leaf">Leaf</span> <select id="ss-leaf"></select></label>
-                  <label title="How a world's candidates share chance: one dice stream (shared), each draw tied to its situation (chance=keyed), or keyed with the player fields packed so a USSR side cannot hide the turn (chance=keyed2)" data-i18n-title="How a world's candidates share chance: one dice stream (shared), each draw tied to its situation (chance=keyed), or keyed with the player fields packed so a USSR side cannot hide the turn (chance=keyed2)"><span data-i18n="Chance">Chance</span> <select id="ss-chance"><option value="shared" data-i18n="shared">shared</option><option value="keyed" data-i18n="keyed">keyed</option><option value="keyed2" data-i18n="keyed2">keyed2</option></select></label>
-                  <label class="ss-flag" title="Every candidate's horizon counted from the end of the mover's own action round" data-i18n-title="Every candidate's horizon counted from the end of the mover's own action round"><input type="checkbox" id="ss-aligned"> <span data-i18n="aligned horizon">aligned horizon</span></label>
-                  <label class="ss-flag" title="The opponent's headline revealed by Space Race box 4 kept in every world" data-i18n-title="The opponent's headline revealed by Space Race box 4 kept in every world"><input type="checkbox" id="ss-box4"> <span data-i18n="box 4 headline">box 4 headline</span></label>
-                  <label title="Worlds dealt from the policy-likelihood belief over the opponent's hand, with this many hands; 0 = uniform redeals" data-i18n-title="Worlds dealt from the policy-likelihood belief over the opponent's hand, with this many hands; 0 = uniform redeals"><span data-i18n="Belief hands">Belief hands</span> <input type="number" id="ss-belief" min="0" step="1"></label>
-                  <label title="Worlds every candidate plays before a challenger trailing the policy's move leaves the race; the other worlds are played by the policy's move and the challengers left. 0 = every candidate on every world" data-i18n-title="Worlds every candidate plays before a challenger trailing the policy's move leaves the race; the other worlds are played by the policy's move and the challengers left. 0 = every candidate on every world"><span data-i18n="Race worlds">Race worlds</span> <input type="number" id="ss-race" min="0" step="1"></label>
-                </div>
-                <div class="search-settings-foot">
-                  <button id="ss-default" class="btn btn-secondary btn-sm" data-i18n="Default">Default</button>
-                  <span id="ss-error" class="search-settings-error" role="status"></span>
-                </div>
-              </details>
-            </fieldset>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Game over (result_dialog.ts): the result, how the game was played, and the offer to add it
-         to the stats database. Shown when a game ends and from the Result button. -->
-    <div id="result-dialog" class="modal-backdrop result-dialog hidden" role="dialog" aria-modal="true" aria-labelledby="result-dialog-title">
-      <div class="modal-content result-dialog-content">
-        <div class="modal-header">
-          <h2 id="result-dialog-title" data-i18n="Game over">Game over</h2>
-          <button id="result-dialog-close" class="btn-icon" title="Close (Esc)" data-i18n-title="Close (Esc)">✕</button>
-        </div>
-        <div class="modal-body result-dialog-body">
-          <p id="result-dialog-outcome" class="result-outcome"></p>
-          <dl id="result-dialog-facts" class="result-facts"></dl>
-          <div id="result-dialog-notes" class="result-notes"></div>
-          <form id="result-form" class="result-form" novalidate>
-            <p class="result-form-intro" data-i18n="Add this game to the stats database? With your Playdek rating, games like it estimate the models' strength on Playdek's scale.">Add this game to the stats database? With your Playdek rating, games like it estimate the models' strength on Playdek's scale.</p>
-            <div class="result-fields">
-              <label><span data-i18n="Playdek login">Playdek login</span> <input id="result-login" type="text" autocomplete="username" maxlength="64" spellcheck="false"></label>
-              <label><span data-i18n="Playdek rating">Playdek rating</span> <input id="result-rating" type="number" inputmode="numeric" min="1" max="5000" step="1"></label>
-            </div>
-            <label class="result-note-label"><span data-i18n="Note (optional)">Note (optional)</span> <textarea id="result-note" maxlength="500" rows="2"></textarea></label>
-            <p class="result-privacy" data-i18n="Stored privately: your login and rating, the game's moves, the model and how it played, and this page's version. Nothing is sent unless you press Add.">Stored privately: your login and rating, the game's moves, the model and how it played, and this page's version. Nothing is sent unless you press Add.</p>
-            <div class="result-actions">
-              <button type="submit" id="result-submit" class="btn btn-primary btn-sm" data-i18n="Add to database">Add to database</button>
-              <button type="button" id="result-download" class="btn btn-secondary btn-sm" title="The record as the database would get it, as a .json file" data-i18n="Download record" data-i18n-title="The record as the database would get it, as a .json file">Download record</button>
-              <button type="button" id="result-skip" class="btn btn-secondary btn-sm" data-i18n="Not now">Not now</button>
-            </div>
-            <p id="result-status" class="result-status" role="status"></p>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom Bar: Action Log & Replay Transport Controls with Resizer -->
-    <div class="bottom-bar-resizer" id="bottom-resizer" title="Drag vertically to resize panel" data-i18n-title="Drag vertically to resize panel">
-      <div class="resizer-handle"></div>
-    </div>
-    <footer class="bottom-bar" id="bottom-panel">
-      <!-- Live Action Log Stream -->
-      <div class="log-stream-container">
-        <div class="log-header-row">
-          <div class="log-header-left">
-            <span class="log-header" data-i18n="ACTION STREAM">ACTION STREAM</span>
-            <span class="log-count-badge" id="log-count" data-i18n="0 events">0 events</span>
-          </div>
-          <div class="log-header-right">
-            <label class="log-filter-checkbox" title="Filter log to only show lines affecting VP and 2 context lines before and 2 context lines after" data-i18n-title="Filter log to only show lines affecting VP and 2 context lines before and 2 context lines after">
-              <input type="checkbox" id="chk-filter-vp">
-              <span data-i18n="🎯 VP Events (±2 Context)">🎯 VP Events (±2 Context)</span>
-            </label>
-          </div>
-        </div>
-        <div class="log-messages" id="action-log-stream"></div>
-      </div>
-
-      <!-- Replay Transport Controls (Visible in Replay or Debug Mode) -->
-      <div class="replay-toolbar" id="replay-toolbar">
-        <div class="transport-controls">
-          <button id="btn-rep-first" class="btn-icon" title="First Step" data-i18n-title="First Step">⏮</button>
-          <button id="btn-rep-prev" class="btn-icon" title="Previous Step" data-i18n-title="Previous Step">◀</button>
-          <button id="btn-rep-play" class="btn btn-primary btn-sm" data-i18n="▶ Play">▶ Play</button>
-          <button id="btn-rep-next" class="btn-icon" title="Next Step" data-i18n-title="Next Step">▶</button>
-          <button id="btn-rep-last" class="btn-icon" title="Last Step" data-i18n-title="Last Step">⏭</button>
-        </div>
-        <div class="timeline-container">
-          <span id="rep-step-label" data-i18n="Step 0 / 0">Step 0 / 0</span>
-          <input type="range" id="rep-timeline-slider" min="0" max="0" value="0">
-          <!-- The calibrated critic across the whole game as P(US wins), one column per step:
+<fieldset class="mode-opponent" id="mode-opponent">
+<legend data-i18n="The model plays with">The model plays with</legend>
+<label class="mode-opponent-option" data-i18n-title="Its top moves each played out by the model in sampled worlds, then the best only on a clear lead over the policy's move. By default the search the Hugging Face repo names (the best player on the leaderboard); the search settings below, or search=rollout:k:worlds:horizon:rule:stop:leaf[:keyed][:aligned][:box4][:beliefN] in the address, for another." title="Its top moves each played out by the model in sampled worlds, then the best only on a clear lead over the policy's move. By default the search the Hugging Face repo names (the best player on the leaderboard); the search settings below, or search=rollout:k:worlds:horizon:rule:stop:leaf[:keyed][:aligned][:box4][:beliefN] in the address, for another.">
+<input id="mode-opponent-rollout" name="mode-opponent" type="radio" value="rollout"/>
+<span><b data-i18n="Rollout root">Rollout root</b> <span data-i18n="-- its strongest player:">-- its strongest player:</span> <span data-i18n="its top 4 moves, each played out in 32 sampled worlds" id="mode-opponent-rollout-spec">its top 4 moves, each played out in 32 sampled worlds</span><span data-i18n=". A few seconds a move.">. A few seconds a move.</span></span>
+</label>
+<label class="mode-opponent-option">
+<input id="mode-opponent-policy" name="mode-opponent" type="radio" value="policy"/>
+<span><b data-i18n="Policy">Policy</b> <span data-i18n="-- its most likely move, at once.">-- its most likely move, at once.</span></span>
+</label>
+<details class="search-settings" id="search-settings">
+<summary><span data-i18n="Search settings">Search settings</span> <code class="search-settings-code" id="search-settings-code"></code></summary>
+<div class="search-settings-grid">
+<label data-i18n-title="The candidates: the policy's most probable moves" title="The candidates: the policy's most probable moves"><span data-i18n="Moves">Moves</span> <input id="ss-k" min="1" step="1" type="number"/></label>
+<label data-i18n-title="Sampled worlds each candidate is played out in" title="Sampled worlds each candidate is played out in"><span data-i18n="Worlds">Worlds</span> <input id="ss-worlds" min="1" step="1" type="number"/></label>
+<label data-i18n-title="Action-round boundaries a playout runs through" title="Action-round boundaries a playout runs through"><span data-i18n="Horizon">Horizon</span> <input id="ss-horizon" min="0" step="1" type="number"/></label>
+<label data-i18n-title="The choice: argmax, z&lt;x&gt; (the best only on an x-SE lead over the policy's move) or kl&lt;t&gt;" title="The choice: argmax, z&lt;x&gt; (the best only on an x-SE lead over the policy's move) or kl&lt;t&gt;"><span data-i18n="Rule">Rule</span> <input id="ss-rule" size="6" spellcheck="false" type="text"/></label>
+<label data-i18n-title="Where a playout stops" title="Where a playout stops"><span data-i18n="Stop">Stop</span> <select id="ss-stop"></select></label>
+<label data-i18n-title="Whose side a leaf is read from" title="Whose side a leaf is read from"><span data-i18n="Leaf">Leaf</span> <select id="ss-leaf"></select></label>
+<label data-i18n-title="How a world's candidates share chance: one dice stream (shared), each draw tied to its situation (chance=keyed), or keyed with the player fields packed so a USSR side cannot hide the turn (chance=keyed2)" title="How a world's candidates share chance: one dice stream (shared), each draw tied to its situation (chance=keyed), or keyed with the player fields packed so a USSR side cannot hide the turn (chance=keyed2)"><span data-i18n="Chance">Chance</span> <select id="ss-chance"><option data-i18n="shared" value="shared">shared</option><option data-i18n="keyed" value="keyed">keyed</option><option data-i18n="keyed2" value="keyed2">keyed2</option></select></label>
+<label class="ss-flag" data-i18n-title="Every candidate's horizon counted from the end of the mover's own action round" title="Every candidate's horizon counted from the end of the mover's own action round"><input id="ss-aligned" type="checkbox"/> <span data-i18n="aligned horizon">aligned horizon</span></label>
+<label class="ss-flag" data-i18n-title="The opponent's headline revealed by Space Race box 4 kept in every world" title="The opponent's headline revealed by Space Race box 4 kept in every world"><input id="ss-box4" type="checkbox"/> <span data-i18n="box 4 headline">box 4 headline</span></label>
+<label data-i18n-title="Worlds dealt from the policy-likelihood belief over the opponent's hand, with this many hands; 0 = uniform redeals" title="Worlds dealt from the policy-likelihood belief over the opponent's hand, with this many hands; 0 = uniform redeals"><span data-i18n="Belief hands">Belief hands</span> <input id="ss-belief" min="0" step="1" type="number"/></label>
+<label data-i18n-title="Worlds every candidate plays before a challenger trailing the policy's move leaves the race; the other worlds are played by the policy's move and the challengers left. 0 = every candidate on every world" title="Worlds every candidate plays before a challenger trailing the policy's move leaves the race; the other worlds are played by the policy's move and the challengers left. 0 = every candidate on every world"><span data-i18n="Race worlds">Race worlds</span> <input id="ss-race" min="0" step="1" type="number"/></label>
+</div>
+<div class="search-settings-foot">
+<button class="btn btn-secondary btn-sm" data-i18n="Default" id="ss-default">Default</button>
+<span class="search-settings-error" id="ss-error" role="status"></span>
+</div>
+</details>
+</fieldset>
+</div></div>
+<section class="vtt-leaderboard"><h3 data-i18n="Leaderboard">Leaderboard</h3><div id="vtt-leaderboard-body" aria-live="polite"></div><a href="leaderboard.html" target="_blank" rel="noopener" data-i18n="Full leaderboard">Full leaderboard</a></section>
+</section>
+<section data-dock-page="settings" hidden>
+<div class="vtt-settings">
+<label class="locale-control">
+<span data-i18n="Language">Language</span>
+<select aria-label="Language" data-i18n-aria-label="Language" data-locale-select="">
+<option value="en">English</option>
+<option value="zh-CN">简体中文</option>
+</select>
+</label>
+<label class="vtt-setting"><span data-i18n="Play mode">Play mode</span><select class="view-select" data-i18n-title="Developer: everything. Play as US / USSR: the other side's private information is hidden and the model plays it." id="view-select" title="Developer: everything. Play as US / USSR: the other side's private information is hidden and the model plays it.">
+<option data-i18n="Developer" value="DEV">Developer</option>
+<option data-i18n="Play as US" value="US">Play as US</option>
+<option data-i18n="Play as USSR" value="USSR">Play as USSR</option>
+</select></label>
+<label class="analysis-toggle" data-i18n-title="Show the model's readout -- win chances, move probabilities, search -- and its badges on the board. On in the Developer view, off when you play a side." title="Show the model's readout -- win chances, move probabilities, search -- and its badges on the board. On in the Developer view, off when you play a side.">
+<input id="analysis-visible-toggle" type="checkbox"/>
+<span data-i18n="Show analysis">Show analysis</span>
+</label>
+<label class="vtt-setting"><span data-i18n="Map style">Map style</span><select id="map-theme" disabled><option value="classic" data-i18n="Classic board">Classic board</option><option value="diagram" data-i18n="Diagram">Diagram</option></select></label>
+<button id="map-registration" class="btn vtt-dev-setting" aria-pressed="false" data-i18n="Show alignment">Show alignment</button>
+<div class="vtt-setting-buttons"><button class="btn btn-secondary btn-sm" data-i18n="New Game" data-i18n-title="A new game with a fresh deal; asks for the play mode first" id="btn-new-game" title="A new game with a fresh deal; asks for the play mode first">New Game</button><button class="btn btn-primary btn-sm hidden" data-i18n="Result" data-i18n-title="The result, and adding the game to the stats database" id="btn-game-result" title="The result, and adding the game to the stats database">Result</button></div>
+<details class="vtt-replay-settings"><summary data-i18n="Game and replay">Game and replay</summary><button class="btn btn-primary btn-sm" data-i18n="Replay Mode" id="btn-toggle-replay">Replay Mode</button><div class="replay-toolbar" id="replay-toolbar">
+<div class="transport-controls">
+<button class="btn-icon" data-i18n-title="First Step" id="btn-rep-first" title="First Step">⏮</button>
+<button class="btn-icon" data-i18n-title="Previous Step" id="btn-rep-prev" title="Previous Step">◀</button>
+<button class="btn btn-primary btn-sm" data-i18n="▶ Play" id="btn-rep-play">▶ Play</button>
+<button class="btn-icon" data-i18n-title="Next Step" id="btn-rep-next" title="Next Step">▶</button>
+<button class="btn-icon" data-i18n-title="Last Step" id="btn-rep-last" title="Last Step">⏭</button>
+</div>
+<div class="timeline-container">
+<span data-i18n="Step 0 / 0" id="rep-step-label">Step 0 / 0</span>
+<input id="rep-timeline-slider" max="0" min="0" type="range" value="0"/>
+<!-- The calibrated critic across the whole game as P(US wins), one column per step:
                each position read from the side to move there. Empty for a replay without a trace. -->
-          <div class="value-ribbon hidden" id="rep-value-ribbon" title="Critic: P(US wins) across the game, each position read from the side to move (the only trained reading); the faint dashed line is the other, untrained side's reading. Click to seek." data-i18n-title="Critic: P(US wins) across the game, each position read from the side to move (the only trained reading); the faint dashed line is the other, untrained side's reading. Click to seek."></div>
-        </div>
-        <div class="replay-options">
-          <select id="rep-server-select" class="replay-select-dropdown" title="Replays in the local server's replay directory" data-i18n-title="Replays in the local server's replay directory">
-            <option value="" data-i18n="Local replays...">Local replays...</option>
-          </select>
-          <label><span data-i18n="Speed:">Speed:</span>
-            <select id="rep-speed-select">
-              <option value="1000" data-i18n="1.0s">1.0s</option>
-              <option value="500" selected data-i18n="0.5s">0.5s</option>
-              <option value="200" data-i18n="0.2s">0.2s</option>
-              <option value="50" data-i18n="Fast">Fast</option>
-            </select>
-          </label>
-          <button id="btn-rep-export" class="btn btn-secondary btn-sm" data-i18n="Export Replay">Export Replay</button>
-          <label class="btn btn-secondary btn-sm file-upload-label">
-            <span data-i18n="Load Replay">Load Replay</span> <input type="file" id="input-replay-file" accept=".json" style="display: none;">
-          </label>
-        </div>
-      </div>
-    </footer>
-
-    <!-- Modal for Discard / Removed Pile / Debug State Tweaker -->
-    <div id="modal-container" class="modal-backdrop hidden">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 id="modal-title" data-i18n="Modal Title">Modal Title</h2>
-          <button id="modal-close" class="btn-icon">✕</button>
-        </div>
-        <div class="modal-body" id="modal-body"></div>
-      </div>
-    </div>
-
-    <!-- Tooltip Element for Card inspection -->
-    <div id="card-tooltip" class="card-tooltip hidden"></div>
-  </div>
-
-  <script type="module" src="/src/main.ts"></script>
+<div class="value-ribbon hidden" data-i18n-title="Critic: P(US wins) across the game, each position read from the side to move (the only trained reading); the faint dashed line is the other, untrained side's reading. Click to seek." id="rep-value-ribbon" title="Critic: P(US wins) across the game, each position read from the side to move (the only trained reading); the faint dashed line is the other, untrained side's reading. Click to seek."></div>
+</div>
+<div class="replay-options">
+<select class="replay-select-dropdown" data-i18n-title="Replays in the local server's replay directory" id="rep-server-select" title="Replays in the local server's replay directory">
+<option data-i18n="Local replays..." value="">Local replays...</option>
+</select>
+<label><span data-i18n="Speed:">Speed:</span>
+<select id="rep-speed-select">
+<option data-i18n="1.0s" value="1000">1.0s</option>
+<option data-i18n="0.5s" selected="" value="500">0.5s</option>
+<option data-i18n="0.2s" value="200">0.2s</option>
+<option data-i18n="Fast" value="50">Fast</option>
+</select>
+</label>
+<button class="btn btn-secondary btn-sm" data-i18n="Export Replay" id="btn-rep-export">Export Replay</button>
+<label class="btn btn-secondary btn-sm file-upload-label">
+<span data-i18n="Load Replay">Load Replay</span> <input accept=".json" id="input-replay-file" style="display: none;" type="file"/>
+</label>
+</div>
+</div></details>
+<details class="vtt-about"><summary data-i18n="About this game">About this game</summary><span class="status-badge" data-i18n="LOADING ENGINE…" id="connection-status">LOADING ENGINE…</span><p data-i18n="Unofficial fan project, not affiliated with or endorsed by GMT Games. Twilight Struggle® is a registered trademark of GMT Games, LLC.">Unofficial fan project, not affiliated with or endorsed by GMT Games. Twilight Struggle® is a registered trademark of GMT Games, LLC.</p></details>
+</div>
+</section>
+</div>
+<div id="vtt-dock-action-slot"></div>
+</aside>
+<div id="vtt-floating-action-slot"><div class="panel decision-panel" id="decision-panel">
+<div class="panel-header">
+<h3 data-i18n="CURRENT ACTION">CURRENT ACTION</h3>
+<span class="badge" data-i18n="POINT_NODE" id="decision-type-badge">POINT_NODE</span><button class="vtt-panel-toggle" data-collapse-panel aria-controls="decision-body" type="button">‹</button>
+</div>
+<div class="decision-body" id="decision-body">
+<!-- Rendered by action_hud.ts -->
+</div>
+</div></div>
+<div aria-labelledby="mode-dialog-title" aria-modal="true" class="modal-backdrop mode-dialog hidden" id="mode-dialog" role="dialog">
+<div class="modal-content mode-dialog-content">
+<div class="modal-header">
+<h2 data-i18n="How do you want to play?" id="mode-dialog-title">How do you want to play?</h2>
+<button class="btn-icon" data-i18n-title="Keep the current mode (Esc)" id="mode-dialog-close" title="Keep the current mode (Esc)">✕</button>
+</div>
+<div class="modal-body mode-dialog-body">
+<!-- The model & search section (#model-mode-section), folded: main.ts askMode moves it in
+               here and openModelMode back into #model-mode-dialog. -->
+<details class="mode-model-details" id="mode-model-details">
+<summary><span class="mode-model-summary-label" data-i18n="Model">Model</span> <span data-i18n="no model · Policy" id="mode-model-summary">no model · Policy</span></summary>
+<div class="mode-model-slot" id="mode-model-slot"></div>
+</details>
+<button class="mode-choice" data-mode="DEV" id="mode-choice-dev">
+<span class="mode-choice-title" data-i18n="Developer">Developer</span>
+<span class="mode-choice-text" data-i18n="Both hands, every option, the debug tools and replays. You move both sides, or let the model play one.">Both hands, every option, the debug tools and replays. You move both sides, or let the model play one.</span>
+</button>
+<button class="mode-choice mode-choice-us" data-mode="US" id="mode-choice-us">
+<span class="mode-choice-title" data-i18n="Play as US">Play as US</span>
+<span class="mode-choice-text" data-i18n="The USSR's hand and headline stay hidden; the model plays the USSR. No hints: its win chances and move probabilities stay off unless you turn on Show analysis.">The USSR's hand and headline stay hidden; the model plays the USSR. No hints: its win chances and move probabilities stay off unless you turn on Show analysis.</span>
+</button>
+<button class="mode-choice mode-choice-ussr" data-mode="USSR" id="mode-choice-ussr">
+<span class="mode-choice-title" data-i18n="Play as USSR">Play as USSR</span>
+<span class="mode-choice-text" data-i18n="The US's hand and headline stay hidden; the model plays the US. No hints: its win chances and move probabilities stay off unless you turn on Show analysis.">The US's hand and headline stay hidden; the model plays the US. No hints: its win chances and move probabilities stay off unless you turn on Show analysis.</span>
+</button>
+<p class="mode-dialog-note" id="mode-dialog-note"></p>
+</div>
+</div>
+</div>
+<div aria-labelledby="result-dialog-title" aria-modal="true" class="modal-backdrop result-dialog hidden" id="result-dialog" role="dialog">
+<div class="modal-content result-dialog-content">
+<div class="modal-header">
+<h2 data-i18n="Game over" id="result-dialog-title">Game over</h2>
+<button class="btn-icon" data-i18n-title="Close (Esc)" id="result-dialog-close" title="Close (Esc)">✕</button>
+</div>
+<div class="modal-body result-dialog-body">
+<p class="result-outcome" id="result-dialog-outcome"></p>
+<dl class="result-facts" id="result-dialog-facts"></dl>
+<div class="result-notes" id="result-dialog-notes"></div>
+<form class="result-form" id="result-form" novalidate="">
+<p class="result-form-intro" data-i18n="Add this game to the stats database? With your Playdek rating, games like it estimate the models' strength on Playdek's scale.">Add this game to the stats database? With your Playdek rating, games like it estimate the models' strength on Playdek's scale.</p>
+<div class="result-fields">
+<label><span data-i18n="Playdek login">Playdek login</span> <input autocomplete="username" id="result-login" maxlength="64" spellcheck="false" type="text"/></label>
+<label><span data-i18n="Playdek rating">Playdek rating</span> <input id="result-rating" inputmode="numeric" max="5000" min="1" step="1" type="number"/></label>
+</div>
+<label class="result-note-label"><span data-i18n="Note (optional)">Note (optional)</span> <textarea id="result-note" maxlength="500" rows="2"></textarea></label>
+<p class="result-privacy" data-i18n="Stored privately: your login and rating, the game's moves, the model and how it played, and this page's version. Nothing is sent unless you press Add.">Stored privately: your login and rating, the game's moves, the model and how it played, and this page's version. Nothing is sent unless you press Add.</p>
+<div class="result-actions">
+<button class="btn btn-primary btn-sm" data-i18n="Add to database" id="result-submit" type="submit">Add to database</button>
+<button class="btn btn-secondary btn-sm" data-i18n="Download record" data-i18n-title="The record as the database would get it, as a .json file" id="result-download" title="The record as the database would get it, as a .json file" type="button">Download record</button>
+<button class="btn btn-secondary btn-sm" data-i18n="Not now" id="result-skip" type="button">Not now</button>
+</div>
+<p class="result-status" id="result-status" role="status"></p>
+</form>
+</div>
+</div>
+</div>
+<div class="modal-backdrop hidden" id="modal-container">
+<div class="modal-content">
+<div class="modal-header">
+<h2 data-i18n="Modal Title" id="modal-title">Modal Title</h2>
+<button class="btn-icon" id="modal-close">✕</button>
+</div>
+<div class="modal-body" id="modal-body"></div>
+</div>
+</div>
+<div class="card-tooltip hidden" id="card-tooltip"></div>
+</div>
+<script type="module" src="/src/main.ts"></script>
 </body>
 </html>

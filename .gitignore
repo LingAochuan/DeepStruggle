@@ -75,3 +75,5 @@ data/checkpoints/*
 
 .claude
 .vast_host
+# Personal imported artwork is separate from the source contribution.
+/web/ui/public/personal/

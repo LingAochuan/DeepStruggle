@@ -316,8 +316,8 @@ ${note}` : ""));
 }
 
 /**
- * A country's probability, small, in the free corner right of its influence markers: placed from
- * the rightmost marker (`rect.inf-box`, map_view.ts) so it can never cover a number.
+ * Country probabilities sit below classic-board cells or right of schematic influence markers,
+ * keeping full-size artwork and influence numbers unobscured.
  */
 export function svgBadge(g: Element, p: number, played: boolean, note?: string): void {
   const rect = g.querySelector("rect.country-card-bg");
@@ -326,9 +326,11 @@ export function svgBadge(g: Element, p: number, played: boolean, note?: string):
   const num = (e: Element, a: string) => parseFloat(e.getAttribute(a) || "0");
   const inf = boxes.reduce((a, b) => (num(b, "x") > num(a, "x") ? b : a));
   const right = num(rect, "x") + num(rect, "width") - 0.9;
-  const x = num(inf, "x") + num(inf, "width") + 1.0;
-  const w = right - x, h = 5.6;
-  const y = num(inf, "y") + (num(inf, "height") - h) / 2;
+  const classic = g.classList.contains("board-country");
+  // Full-size artwork fills the influence cells. Keep odds just below the country, clear of both numbers.
+  const x = classic ? num(rect, 'x') + num(rect, 'width') / 2 - 8 : num(inf, "x") + num(inf, "width") + 1.0;
+  const w = classic ? 16 : right - x, h = classic ? 4.4 : 5.6;
+  const y = classic ? num(rect, 'y') + num(rect, 'height') + .3 : num(inf, "y") + (num(inf, "height") - h) / 2;
 
   const NS = "http://www.w3.org/2000/svg";
   const box = document.createElementNS(NS, "rect");
@@ -338,13 +340,15 @@ export function svgBadge(g: Element, p: number, played: boolean, note?: string):
   box.setAttribute("width", w.toString());
   box.setAttribute("height", h.toString());
   box.setAttribute("rx", "0.8");
-  box.setAttribute("fill", played ? "#422006" : "#0F172A");
+  box.setAttribute("fill", played ? "#4a3c26" : "#2d2b26");
+  box.setAttribute('pointer-events', 'none');
   box.setAttribute("stroke", played ? "var(--warning)" : probColor(p));
   box.setAttribute("stroke-width", played ? "0.7" : "0.45");
   g.appendChild(box);
 
   const text = document.createElementNS(NS, "text");
   text.setAttribute("class", "trace-choice-badge");
+  text.setAttribute('pointer-events', 'none');
   text.setAttribute("x", (x + w / 2).toString());
   text.setAttribute("y", (y + h / 2 + 1.15).toString());
   text.setAttribute("text-anchor", "middle");

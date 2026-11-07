@@ -2,7 +2,7 @@ import { localizeLog } from "./i18n/log";
 import { t, label } from "./i18n";
 import { GameState, MicroAction, RegionScores } from "./types";
 import { MapView } from "./map_view";
-import { TracksView } from "./tracks_view";
+import { TabletopShell } from "./fvtt_shell";
 import { CardsView } from "./cards_view";
 import { ActionHud } from "./action_hud";
 import { ReplayControls, ReplayStep } from "./replay_controls";
@@ -23,7 +23,7 @@ import { ViewMode, opponentOf, redactState, viewFromParam, viewToParam } from ".
 import { lastTurnOf } from "./game/last_turn";
 import { recentRolls } from "./game/rolls";
 import { LogEntry, groupLog, replayItems } from "./game/log_view";
-import { CardNames, linkCardRefs } from "./game/card_refs";
+import { CardNames, linkCardRefs, annotateCardRefs } from "./game/card_refs";
 import { MoveHow, buildSubmission, sha256Hex, summarize } from "./game/record";
 import { loadStoredGame, storeGame } from "./game/saved_game";
 import { ResultDialog } from "./result_dialog";
@@ -47,7 +47,7 @@ export class TSApp {
   private isVpFilterActive: boolean = false;
 
   private mapView: MapView;
-  private tracksView: TracksView;
+  private shell: TabletopShell;
   private cardsView: CardsView;
   private actionHud: ActionHud;
   public replayControls: ReplayControls;
@@ -117,10 +117,9 @@ export class TSApp {
     bindLanguageControls();
     this.parseQueryParams();
 
-    const tracksContainer = document.getElementById("global-tracks")!;
     const mapSvg = document.getElementById("ts-map-svg") as unknown as SVGSVGElement;
 
-    this.tracksView = new TracksView(tracksContainer);
+    this.shell = new TabletopShell();
     this.mapView = new MapView(mapSvg, (countryId: number) => this.handleCountryClick(countryId));
     this.cardsView = new CardsView((cardId: number) => this.handleCardClick(cardId));
     this.actionHud = new ActionHud((action: MicroAction) => this.sendAction(action));
@@ -169,13 +168,14 @@ export class TSApp {
     };
     this.setupSearchChoice();
     this.setupGlobalControls();
-    this.setupBottomResizer();
     this.setupFileDrop();
     onLocaleChange(() => {
       this.badge(...this.badgeState);
       this.logCardNames = null;
       this.renderState();
       this.renderModelModeLabels();
+      const replayToggle = document.getElementById("btn-toggle-replay");
+      if (replayToggle) replayToggle.textContent = t(this.isReplayMode ? "Live Mode" : "Replay Mode");
       const spec = this.rolloutChoice;
       const specText = document.getElementById("mode-opponent-rollout-spec");
       if (specText) specText.textContent = t("its top {0} move{1}, each played out in ", [spec.k, spec.k === 1 ? "" : "s"]) + t("{0} sampled world{1}", [spec.worlds, spec.worlds === 1 ? "" : "s"]);
@@ -423,7 +423,7 @@ export class TSApp {
     if (note) {
       note.textContent = label(reason === "new"
         ? t("A fresh deal follows your choice. Close to keep the game on the board.")
-        : t("You can change this any time in the Play mode select above."));
+        : t("You can change this any time in Settings."));
     }
     this.closeModelMode();
     this.moveModelSection("mode-model-slot");
@@ -435,6 +435,7 @@ export class TSApp {
     dialog.classList.remove("hidden");
     const choose = (mode: ViewMode | null) => {
       dialog.classList.add("hidden");
+      this.moveModelSection("model-dock-slot");
       let searchChanged = false;
       if (mode === "US" || mode === "USSR" || (mode !== null && this.searchChoiceTouched)) {
         const spec = this.searchChoice();
@@ -481,24 +482,20 @@ export class TSApp {
     if (section && slot && section.parentElement !== slot) slot.appendChild(section);
   }
 
-  /** The model & search dialog, from the technical bar's model · mode label. */
+  /** The one model form is shared with the new-game question and restored to the dock. */
   private openModelMode() {
-    const dialog = document.getElementById("model-mode-dialog");
-    const question = document.getElementById("mode-dialog");
-    if (!dialog || (question && !question.classList.contains("hidden"))) return;
-    this.moveModelSection("model-mode-dialog-body");
+    if (this.modeQuestionOpen) return;
+    this.moveModelSection("model-dock-slot");
     this.showSearchChoice(this.searchSpec !== null);
-    dialog.classList.remove("hidden");
-    document.getElementById("btn-model-choose")?.setAttribute("aria-expanded", "true");
+    this.shell.toggleTab("model");
   }
 
   private closeModelMode() {
-    document.getElementById("model-mode-dialog")?.classList.add("hidden");
-    document.getElementById("btn-model-choose")?.setAttribute("aria-expanded", "false");
+    if (this.shell.modelOpen) this.shell.close();
   }
 
   private get modelModeOpen(): boolean {
-    return !document.getElementById("model-mode-dialog")?.classList.contains("hidden");
+    return this.shell.modelOpen;
   }
 
   /** The play-mode question is on screen (its search choice waits for a side). */
@@ -992,13 +989,17 @@ export class TSApp {
 
   private setReplayMode(on: boolean) {
     this.isReplayMode = on;
+    document.body.classList.toggle("replay-view", on);
     this.replayControls.watching = on;
     const replayBtn = document.getElementById("btn-toggle-replay");
     if (replayBtn) {
+      replayBtn.removeAttribute("data-i18n");
       replayBtn.textContent = label(on ? t("Live Mode") : t("Replay Mode"));
       replayBtn.className = on ? "btn btn-warning btn-sm" : "btn btn-primary btn-sm";
     }
     this.analysisPanel?.show(!on);
+    // The same position can change from playable to replay-only without a state refresh.
+    if (this.shown) this.cardsView.render(this.shown);
   }
 
   private renderState() {
@@ -1014,10 +1015,10 @@ export class TSApp {
     // What each scoring card would score here: the engine's scoring of the state shown.
     shown.region_scores = this.regionScores(shown);
     this.shown = shown;
-    this.tracksView.render(shown);
     this.mapView.render(shown);
     this.cardsView.render(shown);
     this.actionHud.render(shown);
+    annotateCardRefs(document.getElementById('decision-body')!, this.cardNames());
     this.renderLogStream();
     if (!this.isReplayMode) {
       this.analysisPanel.render(this.liveAnalysis, shown);
@@ -1043,6 +1044,7 @@ export class TSApp {
 
   /** Re-apply the probability badges after part of the board re-rendered on its own. */
   private redecorate() {
+    annotateCardRefs(document.getElementById('decision-body')!, this.cardNames());
     if (this.isReplayMode) {
       const next = this.replaySteps[this.replayCurrentStep + 1];
       decorateChoices(next?.policy, this.shown);
@@ -1378,51 +1380,33 @@ export class TSApp {
   }
 
   private sendDebugOverride(override: any) {
-    if (!this.session) return;
+    if (!this.session || this.view !== 'DEV' || this.isReplayMode) return t('No active decision required.');
+    if (override.op === 'batch') {
+      let applied = 0;
+      for (const change of override.changes) {
+        const why = change.op === 'set_country' ? this.session.setCountry(change.country_id, change.us, change.ussr)
+          : change.op === 'set_defcon' ? this.session.setDefcon(change.defcon) : this.session.setVp(change.vp);
+        if (why) {
+          while (applied > 0) { this.session.undo(); applied--; }
+          this.refresh();
+          return localizeLog(why);
+        }
+        applied++;
+      }
+      if (applied) this.refresh();
+      return null;
+    }
     let why: string | null = null;
     if (override.op === "set_country") why = this.session.setCountry(override.country_id, override.us, override.ussr);
     else if (override.op === "set_defcon") why = this.session.setDefcon(override.defcon);
     else if (override.op === "set_vp") why = this.session.setVp(override.vp);
     if (why) {
       this.refused(why);
-      return;
+      return localizeLog(why);
     }
     this.refresh();
+    return null;
   }
-  private setupBottomResizer() {
-    const resizer = document.getElementById("bottom-resizer");
-    const bottomPanel = document.getElementById("bottom-panel");
-    if (!resizer || !bottomPanel) return;
-
-    let isResizing = false;
-    let startY = 0;
-    let startHeight = 0;
-
-    resizer.addEventListener("mousedown", (e) => {
-      isResizing = true;
-      startY = e.clientY;
-      startHeight = bottomPanel.offsetHeight;
-      resizer.classList.add("active");
-      document.body.style.cursor = "ns-resize";
-      e.preventDefault();
-    });
-
-    window.addEventListener("mousemove", (e) => {
-      if (!isResizing) return;
-      const deltaY = startY - e.clientY;
-      const newHeight = Math.max(100, Math.min(window.innerHeight * 0.65, startHeight + deltaY));
-      bottomPanel.style.height = `${newHeight}px`;
-    });
-
-    window.addEventListener("mouseup", () => {
-      if (isResizing) {
-        isResizing = false;
-        resizer.classList.remove("active");
-        document.body.style.cursor = "";
-      }
-    });
-  }
-
   private setupGlobalControls() {
     // Undo / Cancel Action button
     document.getElementById("btn-undo-action")?.addEventListener("click", () => {
@@ -1434,6 +1418,12 @@ export class TSApp {
     // and must not also take back a move.
     window.addEventListener("keydown", (e) => {
       if (this.modeQuestionOpen) return;
+      if (!document.getElementById("modal-container")?.classList.contains("hidden")) return;
+      if (this.shell.isOpen && e.key === "Escape" && !this.resultDialog.isOpen) {
+        this.shell.close();
+        e.preventDefault();
+        return;
+      }
       if (this.modelModeOpen) {
         if (e.key === "Escape") this.closeModelMode();
         return;
@@ -1456,13 +1446,6 @@ export class TSApp {
         }
       }
     });
-
-    // Zoom buttons
-    document.getElementById("btn-zoom-in")?.addEventListener("click", () => this.mapView.zoom(0.85));
-    document.getElementById("btn-zoom-out")?.addEventListener("click", () => this.mapView.zoom(1.15));
-    document.getElementById("btn-zoom-reset")?.addEventListener("click", () => this.mapView.resetView());
-    document.querySelectorAll<HTMLButtonElement>("#map-region-jump [data-region]").forEach(b =>
-      b.addEventListener("click", () => this.mapView.zoomToRegion(b.dataset.region ?? "")));
 
     // New Game: ask how to play, then a fresh seed in that mode (askMode -> newGame).
     document.getElementById("btn-new-game")?.addEventListener("click", () => {
@@ -1507,16 +1490,25 @@ export class TSApp {
       this.renderLogStream();
     });
 
-    // A card named in the action log shows its tooltip -- Ops, side, text -- as in the hand tabs.
-    const logStream = document.getElementById("action-log-stream");
-    logStream?.addEventListener("mouseover", (e) => {
-      const ref = (e.target as HTMLElement).closest<HTMLElement>(".log-card[data-card-id]");
-      if (ref) this.cardsView.showCardTooltip(e, Number(ref.dataset.cardId));
-    });
-    logStream?.addEventListener("mouseout", (e) => {
-      const ref = (e.target as HTMLElement).closest<HTMLElement>(".log-card[data-card-id]");
-      if (ref && !ref.contains(e.relatedTarget as Node | null)) this.cardsView.hideTooltip();
-    });
+    // Log and current-action card references share the same tooltip and keyboard behavior.
+    for (const id of ['action-log-stream', 'decision-body']) {
+      const logStream = document.getElementById(id);
+      logStream?.addEventListener("mouseover", (e) => {
+        const ref = (e.target as HTMLElement).closest<HTMLElement>(".log-card[data-card-id]");
+        if (ref) this.cardsView.showCardTooltip(e, Number(ref.dataset.cardId));
+      });
+      logStream?.addEventListener("mouseout", (e) => {
+        const ref = (e.target as HTMLElement).closest<HTMLElement>(".log-card[data-card-id]");
+        if (ref && !ref.contains(e.relatedTarget as Node | null)) this.cardsView.hideTooltip();
+      });
+      logStream?.addEventListener('focusin', e => {
+        const ref = (e.target as HTMLElement).closest<HTMLElement>('.log-card[data-card-id]');
+        if (!ref) return;
+        const box = ref.getBoundingClientRect();
+        this.cardsView.showCardTooltip(new MouseEvent('mouseover', { clientX: box.left, clientY: box.bottom }), Number(ref.dataset.cardId));
+      });
+      logStream?.addEventListener('focusout', () => this.cardsView.hideTooltip());
+    }
 
     // VP Filter Checkbox
     const vpFilterCheckbox = document.getElementById("chk-filter-vp") as HTMLInputElement;

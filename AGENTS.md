@@ -16,6 +16,14 @@ values, rule metadata, model identifiers, stored action logs or saved-game schem
 See [`docs/i18n/UPSTREAM.md`](docs/i18n/UPSTREAM.md) for the source-patch boundary and
 `node tests/web/i18n.mjs` for language-resource checks in addition to `tests/web`.
 
+The personal classic-board view uses display-only geometry and locally supplied
+artwork; see [`docs/board-theme.md`](docs/board-theme.md). Keep board registration
+separate from rule metadata and validate it with `node tests/web/board_layout.mjs`.
+The fullscreen tabletop shell uses FVTT-style floating controls (`fvtt_shell.ts`,
+`fvtt_shell.css`), with current actions docked into the expanded right panel and
+text card choices at bottom left. Live tracks render inside the SVG using
+`board/track-layout.json`; the original header tracks are no longer mounted.
+
 ---
 
 ## 1. Project Architecture & Components
@@ -377,3 +385,24 @@ that directory changes; this file carries the same duty in reverse. A change to 
 invariant, a CLI flag or a directory's contents is not finished until the documentation says so in
 the same change. `README.md` and `CLAUDE.md` are published, so what they claim must be true of the
 code as it stands, with experiment history and private artifacts left out.
+
+The current-action and text-card panels independently minimize to a plus button.
+Only the action body scrolls; its target list has no nested scrollbar. Text cards
+reserve separate columns for Ops and probability badges. HUD card mentions share
+the log tooltip using display-only card references. The debug inspector has one
+bottom Apply button: only edited fields are submitted, country values start from
+the viewed position, and drafts survive country/language changes. Existing debug
+events and per-edit undo records remain unchanged.
+
+The optional counter pack (`public/personal/counters/`, ignored by git) uses the
+original Hanon TTS textures. `board/counter-sources.json` records URLs and hashes;
+`counter-art.ts` clips the mesh face UVs directly in SVG without rewriting images.
+Classic influence counters fill their printed half-cells and retain control faces
+and numeric overlays. Track counters match printed cells (20–30 SVG units); two
+sides in one cell are offset diagonally. Missing textures leave vector fallbacks.
+The redundant classic-board phase caption is removed; the schematic keeps its
+footer. Country probabilities sit below full-size counters, with no pointer hit area.
+Transient dice results, dice input, analysis/result dialogs and the leaderboard
+use the same neutral tabletop palette; side colours still identify US/USSR.
+Minimized panels use a full-inset button and a panel-level click fallback so the
+entire square opens the panel, including its border/padding.

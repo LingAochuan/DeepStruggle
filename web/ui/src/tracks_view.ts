@@ -62,6 +62,11 @@ export class TracksView {
     this.container = container;
   }
 
+  /** Board markers own the visible tracks; retain the rules dialog's latest snapshot. */
+  public updateState(state: GameState) {
+    this.currentState = state;
+  }
+
   public render(state: GameState) {
     this.currentState = state;
     // Numbers and names, as a replay snapshot may hold anything.

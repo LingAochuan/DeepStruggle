@@ -2701,3 +2701,19 @@ html[lang="zh-CN"] .pill-side { white-space: nowrap; }
 html[lang="zh-CN"] .space-race-track-group { min-width: 0; }
 html[lang="zh-CN"] .space-race-header-widget { flex-wrap: wrap; height: auto; }
 html[lang="zh-CN"] .card-desc { line-height: 1.6; }
+#map-theme { width: 92px; padding: 5px 4px; font-size: 11px; }
+.map-style-controls { position: absolute; top: 10px; right: 12px; display: flex; gap: 6px; z-index: 6; }
+.map-style-controls .btn-icon { width: 28px; height: 28px; }
+#ts-map-svg.classic-board .board-country.legal-target rect.country-card-bg { stroke-width: 1.2px !important; }
+#map-registration[aria-pressed="true"] { color: #67e8f9; border-color: #67e8f9; }
+.classic-board .board-country { cursor: pointer; }
+.classic-board .board-country .inf-marker { pointer-events: none; }
+.classic-board .board-country .inf-box.empty { fill: none; stroke: none; }
+.classic-board .board-country:hover { filter: none; }
+.classic-board .board-country:focus-visible { outline: none; }
+.classic-board .board-country:focus-visible .country-card-bg,
+.classic-board .board-country.hover-focus .country-card-bg { stroke: #0891b2; stroke-width: 1.5; }
+.classic-board .board-country.legal-target .country-card-bg { stroke: #fbbf24; stroke-width: 1.6; }
+.classic-board .registration-box { fill: none; stroke: #00e5ff; stroke-width: .6; stroke-dasharray: 2 1; pointer-events: none; }
+.classic-board .registration-label { fill: #fff; stroke: #102033; stroke-width: 1.5; paint-order: stroke; font-size: 4.5px; font-weight: bold; pointer-events: none; }
+.classic-board .last-turn-delta { stroke: #172033; stroke-width: 1.6; paint-order: stroke; }

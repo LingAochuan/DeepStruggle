@@ -11,7 +11,7 @@ WebAssembly, models as ONNX -- so `dist/` works from GitHub Pages as well as fro
 
 ```
 web/ui/
-├── index.html                  # Workbench layout (Top Bar; cards | SVG Map | HUD rail; Bottom Drawer)
+├── index.html                  # Fullscreen board with floating tabletop tools and right dock
 ├── leaderboard.html            # The Elo leaderboard page (src/leaderboard_page.ts, src/leaderboard.css)
 ├── package.json                # Dependencies and build scripts
 ├── vite.config.ts              # base path (TS_WEB_BASE, for Pages), /api proxy, the two pages,
@@ -19,6 +19,8 @@ web/ui/
 ├── tsconfig.json
 ├── src/
 │   ├── main.ts                 # TSApp coordinator: boot, refresh(), links, auto-play, Action Stream
+│   ├── fvtt_shell.ts           # Right dock, action-panel placement, compact leaderboard
+│   ├── fvtt_shell.css          # Neutral translucent tabletop skin, tools, panels and mobile layout
 │   ├── engine/wasm_engine.ts   # the WebAssembly engine (public/engine/, built by build_web.sh)
 │   ├── engine/layout.ts        # the engine's own enums, card ids, rollout stop/leaf names and Space
 │   │                           # Race track (ts_action_layout_json), set by every engine that loads
@@ -47,15 +49,15 @@ web/ui/
 │   │                           # scoring badges, hover card, pan/pinch/zoom, region jump)
 │   ├── region_summary.ts       # A region's scoring summary, the two sides side by side
 │   ├── roll_tray.ts            # The map's roll tray: dice faces, modifiers, totals and outcomes
-│   ├── cards_view.ts           # Hand tabs + Card Explorer (left column), Active Continuous Effects panel (EFFECT_INFO_MAP)
-│   ├── tracks_view.ts          # Turn, Action Round, DEFCON, Mil Ops, Space Race, and Victory Points tracks
+│   ├── cards_view.ts           # Legal text-card picker and numbered ongoing effects (EFFECT_INFO_MAP)
+│   ├── tracks_view.ts          # Space Race metadata and detail modal; board/tracks.ts draws track markers
 │   ├── action_hud.ts           # Decision HUD (branch choices worded by game/branches.ts) and dice selector
 │   ├── replay_controls.ts      # Replay timeline scrubber, playback engine, and server replay picker
 │   ├── trace_view.ts           # Replay trace: value ribbon, log chips, readout panel, probability badges;
 │   │                           # the critic display (which reading is calibrated) shared with analysis_view
 │   ├── analysis_view.ts        # Live model analysis panel: model picker, critic readings, top choices, badges
 │   ├── debug_panel.ts          # State inspector and engine override tools
-│   ├── style.css               # Theme tokens, dark mode palette, animations, layout styles
+│   ├── style.css               # SVG/component detail styles (shell overrides in fvtt_shell.css)
 │   ├── leaderboard_page.ts     # The leaderboard: views (main / + lineages / all) filter one fit,
 │   │                           # head-to-head on click, links to reports, weights and the workbench
 │   │                           # (a player's own report; a search never shows its network's greedy one);
@@ -144,54 +146,33 @@ web/ui/
      the next (the reply; the next turn's headline follows the last action round), after that
      they are the log's. The Olympic Games record holds the sponsor's die and its +2 apart
      (`roll1` = die, `mod1` = 2), like every other roll; until 2026-10-19 `roll1` was die + 2.
-   - **This turn's effects** (`#map-turn-effects`, `CardsView.renderTurnEffects`) run across the
-     top of the map: every flag whose `EFFECT_INFO_MAP` duration is `TURN`, the card's text on
-     hover. Permanent and conditional effects, and the Space Race attempt flags, stay in the
-     right rail's effects panel.
+   - **Ongoing effects** appear as numbered buttons in the second left tool column;
+     clicking a button opens its duration and description. Turn, permanent, conditional
+     and Space Race effects share this one list, without a second strip above the map.
    - Pan and zoom through Pointer Events, one path for mouse and touch: drag to pan, two fingers
      to pinch (`zoomAt` keeps the point between them fixed), the wheel zooms at the cursor. A
      press that moves more than `DRAG_SLOP` (6px) is a pan and the click after it is swallowed in
-     the capture phase, so a pan never chooses a country. `#map-region-jump` (Eu/As/SE/ME/Af/CA/SA,
-     as the Playdek app's side buttons) frames a region (`zoomToRegion`); the reset button shows
-     the whole map.
+     the capture phase, so a pan never chooses a country. There are no zoom, reset or
+     region-jump buttons in the tabletop shell.
    - **Touch has no hover.** A tap on a country that is not a target shows its card (on a phone
      a bottom sheet) and lights its neighbours; a tap on open map puts it away; a target is still
      chosen by the tap. On touch, mouseenter/mouseleave are ignored (`lastPointer`): Chromium's
      compatibility mouse events after a tap fire a mouseleave elsewhere and would close the card.
-2. **Layout: cards on the left, the board, the HUD rail on the right (`index.html`, `style.css`)**:
-   - The top of the page is three blocks: the disclaimer; the technical bar (engine badge, play
-     mode with New Game, the **model · mode label** (`#btn-model-choose`: the model's name and
-     *Rollout root* / *Policy*, `renderModelModeLabels`) and Show analysis, then the developer's
-     tools: Cancel Action, Debug Tools, Replay Mode, Leaderboard); and the game bar (the tracks and
-     whose decision it is). A fresh open (a link naming no position, replay or view) and every New
-     Game first ask for the play mode (`#mode-dialog`, `main.ts askMode`).
-   - **The model & search section** (`#model-mode-section`): where the model comes from (the
-     source, run / snapshot, Hugging Face repo or file -- `analysis_view.ts` binds them by id) and
-     how it plays (`#mode-opponent`: rollout root or policy). It is one copy in the DOM, moved
-     (`moveModelSection`) into whichever dialog shows it: the label opens it in
-     `#model-mode-dialog` (`openModelMode`; a modal, closed by its button, the backdrop or Escape),
-     and the play-mode question holds it folded in `#mode-model-details`, under a one-line summary
-     of what it says, folded again on every opening. A model picked in either loads at once; how
-     the search radios apply depends on the dialog (*How the model plays a side* below).
-   - `.main-content` is a three-column grid: `#cards-sidebar` (the hands panel -- USSR / US /
-     Piles / All tabs, the switch unchanged) the full height of the board on the left, the map in
-     the middle, and the right rail with the Decision HUD, model analysis / replay readout and
-     active effects. Below 1280px the side columns narrow; below 960px it becomes one scrolling
-     column: map, HUD rail, cards.
-   - **Phones (720px and narrower)**: the whole page scrolls, nothing is wider than the screen.
-     The bars wrap, the map is `clamp(380px, 65vw + 150px, 72svh)` tall with the zoom buttons in
-     a row at its top left and the region buttons along its bottom, the action log and replay bar
-     stack below, and the modal fills the width. `(pointer: coarse)` enlarges the buttons on any
-     touch screen.
-   - The *All* tab lists each card's name and where it is -- no era/side line and no hover
-     description (the hand tabs keep their tooltip); a click opens the card's text.
-   - The *Piles* tab lists the Discard Pile and Removed from Game in the tab itself
-     (`renderPile`): each card as the hand tabs draw it (`cardItem`: era bar, Ops in the side's
-     colour, number and name, the text on hover), packed -- no gap between the cards
-     (`.card-list-packed`) -- by side (USSR, US, Neutral, as the tabs run), then highest Ops first
-     (`sortPile`). The tab scrolls as a whole, not each pile. A pile's cards carry no
-     `data-card-id`, so the model's probabilities are painted on the hands only. It replaced the
-     Discard / Removed buttons, whose modal had a column a side.
+2. **Fullscreen tabletop layout (`index.html`, `fvtt_shell.ts`, `fvtt_shell.css`)**:
+   - The board fills the viewport. Five translucent right-side tools open the log, analysis,
+     model configuration/leaderboard, settings, and collapse or reopen the dock. The default
+     is collapsed; all tools and the floating bottom-right Current Action remain visible.
+     Expanding moves that same action panel to the dock footer, preserving its listeners.
+   - Settings hold view/language, new game, replay/live, analysis visibility and board theme.
+     Undo/debug form the first left column in developer mode; effect buttons form the second.
+     A temporary text-only card chooser appears at bottom left when the engine requests cards.
+     Hand/pile image galleries are deferred and the old three-column layout is absent.
+   - `model-mode-section` is one DOM instance. New Game borrows it into `mode-model-slot`;
+     closing the question restores it to `model-dock-slot`. Model sources and search callbacks
+     are unchanged. The dock closes on Escape before the undo shortcut is considered.
+   - The viewport stays a tabletop on phones. The dock fits the remaining width and the action
+     panel/card chooser stack when needed; the map remains pannable underneath. Modal content
+     scrolls independently. No bottom action-log/replay resizer remains.
 3. **Active Continuous Effects Panel (`cards_view.ts`)**:
    - `EFFECT_INFO_MAP` describes every persistent continuous-effect and state bit (e.g. *Containment*, *Brezhnev Doctrine*, *Red Scare/Purge*, *Quagmire*, *Bear Trap*, *Flower Power*, *Willy Brandt*, *NORAD*, *NATO*, Space Race bonuses) with side tags (`US`, `USSR`, `Both`, `Neutral`), duration badges (`Turn Only`, `Permanent`, `Conditional`, `Space Perk`), and rule summaries. Add an entry here whenever the engine gains an effect bit.
 4. **Descriptive Branch Choice HUD (`action_hud.ts`)**:
@@ -203,11 +184,10 @@ web/ui/
      (improve) (Summit)") and the analysis panel's choice names (`game/names.ts`) all read it, so
      no option shows as a bare number. It replaced `CARD_BRANCHES`, whose Summit entries described
      the pre-P17 +1/-1 branches and whose other entries were for cards that ask no branch.
-   - An event's card choice (`SELECT_CARD` with a `resolving_card`) lists every offered card as a
-     button in the HUD -- name, ops, side and where it is -- because those cards are mostly in no
-     hand tab: Our Man in Tehran's five drawn cards (`PEEKED_TEMP`, "Drawn"), Star Wars' and SALT
-     Negotiations' discard pile. The pass button appears whenever the mask offers card 0, labelled
-     for what it means there (Done / Take no card / No card can be chosen).
+   - Every SELECT_CARD decision is listed in the bottom-left legal text chooser, including
+     regular headline/action-round cards and event choices from the deck or discard pile.
+     Current Action retains the prompt and the engine's pass/done button. A hidden opponent
+     decision yields no chooser. The pass button appears whenever the mask offers card 0.
    - Grain Sales to Soviets resolves the card it drew on a play-mode node (`resolving_card` 67,
      the drawn card in `pending_op_card`): the HUD names both, offers the play modes, and adds
      *Return … to the USSR* -- the engine's CONFIRM_DONE there (primary 255, flag 128; signalled by
@@ -222,22 +202,22 @@ web/ui/
      eligible target left" (`tests/web/test_e2e_muslim_revolution.py`).
    - `tests/web/test_e2e_card_choices.py` plays all of these from the US hand.
 5. **Deluxe Space Race Track & Modal Inspector (`tracks_view.ts`)**:
-   - Renders the 9-step ladder (0..8) in the top status bar with US and USSR marker tokens and turn attempt counters (`Attempts: used/max`).
-     Each side's pill says what its next attempt needs (`.pill-next`, "next 2 Ops · 1–3", the
-     Playdek app's *NEXT PROJECT*). `spaceRaceBoxes()` takes each box's Ops, roll and VP from the
-     engine (`WasmEngine.layout.space_boxes`, `SpaceRace::get_box_info`); only the boxes' names and
-     privileges are the page's words (Man in Space is box 3, Man in Earth Orbit box 4).
-   - Clicking the widget opens the full modal: all 9 boxes, required Ops, success rolls, 1st/2nd VP awards, and special ongoing privileges.
+   - `board/tracks.ts` renders markers in the map's coordinate system, including the
+     0..8 space ladder. `spaceRaceBoxes()` reads Ops, rolls and VP from the engine; only
+     box names and privilege descriptions are UI words. MapView keeps TracksView state
+     for the detail modal without rendering a top status bar.
+   - Clicking the map's space track opens all nine boxes, their required Ops, rolls,
+     first/second VP awards and ongoing privileges in the shared modal.
 6. **Interactive Action Stream & Replay Timeline (`replay_controls.ts`, `main.ts`)**:
    - Timeline scrubber with play/pause, step forward/backward, and server replay loading.
-   - The bottom Action Stream lists recorded game events with active-step highlighting (`.active-replay-step`) and click-to-scrub navigation.
+   - The right dock's Action Stream lists recorded game events with active-step highlighting (`.active-replay-step`) and click-to-scrub navigation.
 7. **The game runs in the page (`engine/`, `game/`, `main.ts`)**:
    - `engine/wasm_engine.ts` loads the WebAssembly build of `engine/` + `bindings/`
      (`bindings/wasm/ts_engine_wasm.cpp`, built into `public/engine/` by
      `tools/scripts/build_web.sh`). Display state, saves, rules and observations are the same C++
      as the Python stack; `tests/web/test_wasm_engine.py` holds the two builds to bit-identical
      games. **After any engine change, rebuild the page** -- it runs its own copy of the engine.
-     The header badge shows the page engine's fingerprint and turns **ENGINE STALE** when the
+     The settings/about badge shows the page engine's fingerprint and turns **ENGINE STALE** when the
      local server's sources have moved on (`/api/local/info`).
    - `game/session.ts` is the game: apply a click (a MicroAction; `secondary_id` carries the HUD's
      manual die) or a model's flat action, resolve dice, undo (raw GameState snapshots; the log and
@@ -569,6 +549,14 @@ with Vite (`tests/web/js_runner.py`).
 
 ## Display locales (English and Simplified Chinese)
 
+The optional personal classic board is documented in `../../docs/board-theme.md`.
+`src/board/hanon-layout.json` maps all 84 engine country IDs to artwork rectangles;
+do not replace `rules/map.json` positions or names. Image and interaction overlays
+share one SVG viewBox. Artwork under `public/personal/` is ignored by git; missing
+artwork falls back to the existing diagram. Validate `tests/web/board_layout.mjs`
+and browser pan/zoom hit testing when changing geometry. Board track markers are
+rendered over the printed track artwork; no separate header widgets remain.
+
 `src/i18n/index.ts` initializes the locale before component construction. English is the default;
 `?lang=en|zh-CN` overrides the saved `deepstruggle.locale.v1` preference. The language selectors
 change the display in place, preserving the engine, position, undo history and saved game. The
@@ -595,3 +583,50 @@ MutationObserver translation. Preserve parameter sets except documented English-
 agreement suffixes. Validate `tsc --noEmit`, the localization test (`tests/web/i18n.mjs`), the
 existing English log/card-reference regressions, and a browser language round trip during a game.
 Check Chinese first load, open dialogs, persisted language, errors, and narrow-screen layout.
+
+
+### Fullscreen tabletop shell
+
+`index.html`, `src/fvtt_shell.ts`, and `src/fvtt_shell.css` provide the personal
+FVTT-inspired tabletop: fullscreen SVG board, four right-side tools (log, analysis,
+model configuration with compact leaderboard, settings), and no legacy
+header/card/sidebar/footer layout. The sidebar starts collapsed. Its current-action
+DOM moves between the independent bottom-right slot and the expanded panel footer;
+handlers are bound once, never duplicated. Escape closes a panel or modal before
+undo can run. The model form is also a single DOM instance, temporarily borrowed by
+the new-game modal and restored to `model-dock-slot` on close.
+
+Settings contain language, view, analysis visibility, board theme/registration,
+new game and the replay controls. Replay remains developer-only. The left undo/debug
+rail is hidden in player view; debug still opens an independent modal. Numbered
+ongoing-effect buttons open descriptions and will later accept artwork.
+`CardsView.renderTextChoices` shows the redacted engine's legal SELECT_CARD IDs in
+a temporary bottom-left text list, including headlines and event choices; no card
+image area is implemented yet. Never expose a hidden opponent decision. Replays
+disable text-card actions. Existing engine, AI, saved game and replay handlers stay
+in TSApp. Model leaderboard data uses the published JSON, not recomputed ratings.
+
+When changing this shell, verify both action-panel locations, all four tools, mode
+changes, language changes with an open panel/modal, ordinary headline card selection,
+new-game model-form restoration, Escape without accidental undo, and narrow screens.
+
+The current-action and text-card panels independently minimize to a plus button.
+Only the action body scrolls; its target list has no nested scrollbar. Text cards
+reserve separate columns for Ops and probability badges. HUD card mentions share
+the log tooltip using display-only card references. The debug inspector has one
+bottom Apply button: only edited fields are submitted, country values start from
+the viewed position, and drafts survive country/language changes. Existing debug
+events and per-edit undo records remain unchanged.
+
+The optional counter pack (`public/personal/counters/`, ignored by git) uses the
+original Hanon TTS textures. `board/counter-sources.json` records URLs and hashes;
+`counter-art.ts` clips the mesh face UVs directly in SVG without rewriting images.
+Classic influence counters fill their printed half-cells and retain control faces
+and numeric overlays. Track counters match printed cells (20–30 SVG units); two
+sides in one cell are offset diagonally. Missing textures leave vector fallbacks.
+The redundant classic-board phase caption is removed; the schematic keeps its
+footer. Country probabilities sit below full-size counters, with no pointer hit area.
+Transient dice results, dice input, analysis/result dialogs and the leaderboard
+use the same neutral tabletop palette; side colours still identify US/USSR.
+Minimized panels use a full-inset button and a panel-level click fallback so the
+entire square opens the panel, including its border/padding.

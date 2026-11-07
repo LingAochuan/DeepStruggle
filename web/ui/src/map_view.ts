@@ -6,6 +6,10 @@ import { NetSide, regionNet, regionSummaryHtml, STANDING_SHORT } from "./region_
 import { CARDS_METADATA, MAP_METADATA } from "./metadata";
 import { engineLayout, namesByValue, titleCase } from "./engine/layout";
 import { escapeHtml } from "./html";
+import { HANON, BOARD_RECTS, BOARD_REGIONS, boardCenter } from "./board/hanon";
+import { renderBoardTracks } from "./board/tracks";
+import { TracksView } from "./tracks_view";
+import { counterArt } from "./board/counter-art";
 
 /** A scoring card's badge and summary: the engine's scoring (RegionScore) with names and colours. */
 export interface RegionScoreAudit {
@@ -206,30 +210,40 @@ function markRoll(g: SVGGElement, r: RecentRoll, left: number, top: number) {
  * white, or -- flipped, when that influence controls the country -- white on the side's colour,
  * outlined in white. Empty, it is a faint dashed space with no number.
  */
-function influenceMarker(side: "us" | "ussr", inf: number, x: number, y: number, controls: boolean): SVGGElement {
+function influenceMarker(side: "us" | "ussr", inf: number, x: number, y: number, controls: boolean, size = MARKER_W, classic = false): SVGGElement {
   const colour = side === "us" ? "#2563EB" : "#DC2626";
   const ink = side === "us" ? "#1D4ED8" : "#B91C1C";
   const g = svgEl("g", { class: `inf-marker inf-marker-${side}` });
   g.appendChild(svgEl("rect", {
-    class: `inf-box inf-${side}${inf > 0 ? "" : " empty"}`, x, y, width: MARKER_W, height: MARKER_H, rx: 1.4,
+    class: `inf-box inf-${side}${inf > 0 ? "" : " empty"}`, x, y, width: size, height: size, rx: classic ? 0 : 1.4,
     fill: inf === 0 ? "rgba(148, 163, 184, 0.06)" : controls ? colour : "#F8FAFC",
     stroke: controls ? "#FFFFFF" : inf > 0 ? colour : "rgba(148, 163, 184, 0.35)",
     "stroke-width": controls ? 1.1 : inf > 0 ? 0.9 : 0.5,
     "stroke-dasharray": inf === 0 ? "1.2,1" : null,
   }));
   if (inf > 0) {
+    if (classic) g.append(counterArt(`influence-${side}`, x, y, size, !controls, controls));
     g.appendChild(svgText(inf.toString(), {
-      class: `inf-num inf-num-${side}`, x: x + MARKER_W / 2, y: y + MARKER_H / 2 + 3.3, "text-anchor": "middle",
-      fill: controls ? "#FFFFFF" : ink, "font-size": inf >= 10 ? 7.6 : 9.2, "font-weight": 900,
+      class: `inf-num inf-num-${side}`,
+      x: x + size * (classic && controls && side === 'ussr' ? .23 : .5),
+      y: y + (classic && controls && side === 'ussr' ? size * .45 : size / 2 + (classic ? 4 : 3.3)), "text-anchor": "middle",
+      fill: classic ? (side === 'us' ? '#005aab' : controls ? '#fff000' : '#b20b0b') : controls ? "#FFFFFF" : ink,
+      stroke: classic && controls ? (side === 'us' ? '#fff' : '#a40000') : 'none', 'stroke-width': .7, 'paint-order': 'stroke',
+      "font-size": classic ? (controls && side === 'ussr' ? (inf >= 10 ? 7 : 8.5) : inf >= 10 ? 10 : 12) : inf >= 10 ? 7.6 : 9.2, "font-weight": 900,
     }));
   }
   return g;
 }
 
 export class MapView {
+  private boardReady = false;
+  private classicBoard = false;
+  private alignment = false;
+  private boardImageUrl = `${import.meta.env.BASE_URL}personal/hanon-board.jpg`;
   private svg: SVGSVGElement;
   private mapData: MapMetadata | null = null;
   private lastState: GameState | null = null;
+  private trackDetails = new TracksView(document.createElement('div'));
   private onCountryClick: (countryId: number) => void;
   private tooltipEl: HTMLElement | null = null;
   /** Each country's "us/ussr" influence at the last render, to flash what changed. */
@@ -252,6 +266,35 @@ export class MapView {
     this.setupPanAndZoom();
     this.updateViewBox();
     this.fetchMetadata();
+    this.setupBoard();
+  }
+
+  private setupBoard() {
+    const select = document.getElementById("map-theme") as HTMLSelectElement | null;
+    const align = document.getElementById("map-registration");
+    select?.addEventListener("change", () => {
+      this.classicBoard = this.boardReady && select.value === "classic";
+      try { localStorage.setItem("deepstruggle.map-style.v1", select.value); } catch { /* optional */ }
+      this.resetView();
+      if (this.lastState) this.render(this.lastState);
+    });
+    align?.addEventListener("click", () => {
+      this.alignment = !this.alignment;
+      align.setAttribute("aria-pressed", String(this.alignment));
+      if (this.lastState) this.render(this.lastState);
+    });
+    const image = new Image();
+    image.onload = () => {
+      this.boardReady = true;
+      let preferred = "classic";
+      try { preferred = localStorage.getItem("deepstruggle.map-style.v1") ?? preferred; } catch { /* optional */ }
+      this.classicBoard = preferred !== "diagram";
+      if (select) { select.disabled = false; select.value = this.classicBoard ? "classic" : "diagram"; }
+      this.resetView();
+      if (this.lastState) this.render(this.lastState);
+    };
+    image.onerror = () => { if (select) select.value = "diagram"; };
+    image.src = this.boardImageUrl;
   }
 
   public fetchMetadata() {
@@ -303,7 +346,7 @@ export class MapView {
   }
 
   public resetView() {
-    this.viewBox = { x: 0, y: 0, w: 1000, h: 650 };
+    this.viewBox = { x: 0, y: 0, w: 1000, h: this.classicBoard ? HANON.height : 650 };
     this.updateViewBox();
   }
 
@@ -314,12 +357,14 @@ export class MapView {
   public zoomToRegion(region: string) {
     const cs = (this.mapData?.countries ?? []).filter(c => c.region === region || (c.subregions ?? []).includes(region));
     if (!cs.length) return;
-    const xs = cs.map(c => c.pos[0]), ys = cs.map(c => c.pos[1]);
+    const positions = cs.map(c => this.classicBoard ? boardCenter(c.id) : c.pos);
+    const xs = positions.map(p => p[0]), ys = positions.map(p => p[1]);
     const pad = 34;
     let x0 = Math.min(...xs) - BOX_W / 2 - pad, x1 = Math.max(...xs) + BOX_W / 2 + pad;
     let y0 = Math.min(...ys) - BOX_H / 2 - pad, y1 = Math.max(...ys) + BOX_H / 2 + pad;
     // The view keeps the map's aspect, so zooming in and out from here does not stretch.
-    const w = Math.max(x1 - x0, (y1 - y0) * (1000 / 650)), h = w * (650 / 1000);
+    const aspect = 1000 / (this.classicBoard ? HANON.height : 650);
+    const w = Math.max(x1 - x0, (y1 - y0) * aspect), h = w / aspect;
     const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
     this.viewBox = { x: cx - w / 2, y: cy - h / 2, w, h };
     this.updateViewBox();
@@ -454,6 +499,7 @@ export class MapView {
 
   public render(state: GameState) {
     this.lastState = state;
+    this.trackDetails.updateState(state);
     if (!this.mapData) {
       this.fetchMetadata();
       return;
@@ -467,6 +513,9 @@ export class MapView {
     this.svg.classList.remove("country-hovering");
     this.hideRegionTooltip();
     this.svg.innerHTML = "";
+    this.svg.classList.toggle("classic-board", this.classicBoard);
+    this.svg.classList.toggle("alignment-visible", this.classicBoard && this.alignment);
+    if (this.classicBoard) { this.renderClassicBoard(state); return; }
 
     // 1. Connection Adjacency Lines
     const linesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -698,6 +747,101 @@ export class MapView {
     });
 
     this.svg.appendChild(nodesGroup);
+    renderBoardTracks(this.svg, state, false, () => this.trackDetails.showSpaceRaceModal(this.lastState!));
+  }
+
+  /** Artwork and interactive geometry share this SVG's coordinate system, including pan/zoom. */
+  private renderClassicBoard(state: GameState) {
+    this.svg.appendChild(svgEl("image", { href: this.boardImageUrl, x: 0, y: 0,
+      width: HANON.width, height: HANON.height, "pointer-events": "none", class: "board-art" }));
+    const legal = new Set(state.legal_actions?.decision_type === engineLayout()?.decision_types.POINT_NODE
+      ? state.legal_actions?.valid_ids ?? [] : []);
+    const changed = this.influenceChanges(state);
+    const lastTurn = new Map((state.last_turn?.countries ?? []).map(c => [c.id, c]));
+    const rolledIn = new Map<number, RecentRoll>();
+    for (const roll of state.recent_rolls ?? []) {
+      if (ROLLED_IN_A_COUNTRY.has(roll.type) && (roll.country_id ?? 255) < 84) rolledIn.set(roll.country_id!, roll);
+    }
+    this.renderLastTurnSummary(state);
+    const tray = document.getElementById("map-rolls");
+    if (tray) renderRollTray(tray, state.recent_rolls ?? []);
+    const nodes = svgEl("g", { id: "country-nodes" });
+    for (const c of this.mapData!.countries) {
+      const [left, top, width, height] = BOARD_RECTS.get(c.id)!;
+      const sc = state.countries?.[c.name];
+      const controlled = sc?.controlled_by ?? "NONE";
+      const lc = lastTurn.get(c.id);
+      const g = svgEl("g", { class: `svg-country-node board-country${legal.has(c.id) ? " legal-target" : ""}${changed.has(c.id) ? " inf-changed" : ""}${c.battleground ? " battleground" : ""}`,
+        "data-id": c.id, "data-name": c.name, "data-control": controlled, tabindex: 0,
+        role: "button", "aria-label": `${countryName(c.id, c.name)}: ${label("US")} ${sc?.us_influence ?? 0}, ${label("USSR")} ${sc?.ussr_influence ?? 0}` });
+      g.appendChild(svgEl("rect", { class: "country-card-bg", x: left, y: top, width, height,
+        fill: controlled === "US" ? "#2563EB" : controlled === "USSR" ? "#DC2626" : "#FFFFFF",
+        "fill-opacity": controlled === "NONE" ? 0 : 0.13,
+        stroke: controlled === "US" ? "#2563EB" : controlled === "USSR" ? "#DC2626" : "transparent", "stroke-width": 0.65 }));
+      const markerSize = Math.min(width / 2 - 1, height - 7.7);
+      const markerY = top + height - markerSize;
+      const usX = left + width / 4 - markerSize / 2;
+      const ussrX = left + width * 3 / 4 - markerSize / 2;
+      g.appendChild(influenceMarker("us", sc?.us_influence ?? 0, usX, markerY, controlled === "US", markerSize, true));
+      g.appendChild(influenceMarker("ussr", sc?.ussr_influence ?? 0, ussrX, markerY, controlled === "USSR", markerSize, true));
+      if (lc) {
+        g.classList.add("last-turn");
+        g.appendChild(svgEl("rect", { class: "last-turn-ring", x: left - 1, y: top - 1, width: width + 2, height: height + 2, rx: 1 }));
+        for (const [side, delta, x] of [["us", lc.us, usX], ["ussr", lc.ussr, ussrX]] as const) {
+          if (delta) g.appendChild(svgText(`${delta > 0 ? "+" : ""}${delta}`, { class: `last-turn-delta ${side}`,
+            x: x + markerSize / 2, y: top + height + 5, "text-anchor": "middle" }));
+        }
+      }
+      const roll = rolledIn.get(c.id);
+      if (roll) markRoll(g, roll, left, top);
+      if (this.alignment) {
+        g.appendChild(svgEl("rect", { class: "registration-box", x: left, y: top, width, height }));
+        g.appendChild(svgText(`${c.id} ${countryName(c.id, c.name)}`, { class: "registration-label", x: left, y: top - 1.3 }));
+      }
+      const activate = (e: MouseEvent) => {
+        if (this.lastPointer !== "mouse" && !legal.has(c.id)) {
+          this.focusCountry(c.name, c.neighbours ?? []);
+          this.showCountryTooltip(e, c, sc, state, lc);
+          return;
+        }
+        this.focusCountry(null, []); this.hideRegionTooltip(); this.onCountryClick(c.id);
+      };
+      g.addEventListener("click", activate);
+      g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault(); e.stopPropagation(); if (legal.has(c.id)) this.onCountryClick(c.id);
+      } });
+      g.addEventListener("mouseenter", e => {
+        if (this.lastPointer !== "mouse") return;
+        this.focusCountry(c.name, c.neighbours ?? []); this.showCountryTooltip(e, c, sc, state, lc);
+      });
+      g.addEventListener("mousemove", e => this.placeTooltip(e));
+      g.addEventListener("mouseleave", () => {
+        if (this.lastPointer === "mouse") { this.focusCountry(null, []); this.hideRegionTooltip(); }
+      });
+      nodes.appendChild(g);
+    }
+    this.svg.appendChild(nodes);
+    const regions = svgEl("g", { id: "regional-scoring-overlay" });
+    for (const audit of this.calculateRegionalScoring(state)) {
+      const pos = BOARD_REGIONS[audit.regionId];
+      if (!pos) continue;
+      const [x, y] = pos, net = regionNet(audit);
+      const g = svgEl("g", { class: "svg-region-badge", "data-region": audit.regionName, role: "button", tabindex: 0,
+        "aria-label": `${label(audit.regionName)} ${label(net.short)}` });
+      g.appendChild(svgEl("rect", { x: x - 28, y: y - 6, width: 56, height: 12, rx: 1,
+        fill: "#2d2b26", "fill-opacity": 0.95, stroke: "#b9aa8d", "stroke-width": 0.6 }));
+      g.appendChild(svgText(`${label(audit.regionName)} ${label(net.short)}`, { x, y: y + 1.9, "text-anchor": "middle",
+        fill: "#FFFFFF", "font-size": 5.2, "font-weight": 700, textLength: 50, lengthAdjust: "spacingAndGlyphs" }));
+      g.addEventListener("mouseenter", e => { if (this.lastPointer === "mouse") this.showRegionTooltip(e, audit); });
+      g.addEventListener("mouseleave", () => { if (this.lastPointer === "mouse") this.hideRegionTooltip(); });
+      g.addEventListener("click", () => this.openRegionSummary(audit));
+      g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault(); e.stopPropagation(); this.openRegionSummary(audit);
+      } });
+      regions.appendChild(g);
+    }
+    this.svg.appendChild(regions);
+    renderBoardTracks(this.svg, state, true, () => this.trackDetails.showSpaceRaceModal(this.lastState!));
   }
 
   /**

@@ -175,7 +175,7 @@ export class ActionHud {
       }
 
       // An event's card choice lists its cards here: they are often in no hand on screen.
-      if (resolvingCard > 0) {
+      if (resolvingCard > 0 && !document.getElementById("text-card-picker")) {
         buttonsHtml += cardChoiceButtons(state, validIds);
       }
       // Offered whenever the engine offers it (id 0 in valid_ids), not only when the context
@@ -206,8 +206,8 @@ export class ActionHud {
       validIds.forEach(m => {
         // Loud, not bland: a mode the engine has and this table has not means the Resolution enum
         // grew. The engine's own name for it is still shown.
-        const label = MODE_LABELS[modeNames[m] ?? ""];
-        const cfg = label ? label(ops) : {
+        const modeLabel = MODE_LABELS[modeNames[m] ?? ""];
+        const cfg = modeLabel ? modeLabel(ops) : {
           title: t("⚠ Unlabelled resolution mode {0} ({1})", [m, escapeHtml(modeNames[m] ?? "unknown")]),
           desc: t("The viewer has no label for this mode — the engine's Resolution enum has changed and web/ui/src/action_hud.ts was not updated."),
           class: "btn-warning",

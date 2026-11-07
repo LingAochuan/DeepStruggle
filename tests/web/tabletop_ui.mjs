@@ -1,0 +1,54 @@
+// Serve a built UI, then run with a Playwright installation and Chromium.
+// PLAYWRIGHT_MODULE and BROWSER_EXECUTABLE_PATH can point to an existing local toolchain.
+const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import assert from 'node:assert/strict';
+import { mkdirSync } from 'node:fs';
+import { join } from 'node:path';
+const artifacts=process.env.TABLETOP_ARTIFACTS || 'scratch/tabletop-check';
+mkdirSync(artifacts,{recursive:true});
+const base=process.argv[2]||'http://127.0.0.1:5177';
+(async()=>{const browser=await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE_PATH || undefined});
+try {
+ const p=await browser.newPage({viewport:{width:1920,height:1080}}); const errors=[];p.on('pageerror',e=>errors.push(String(e)));await p.route('**/huggingface.co/**',r=>r.abort());
+ await p.goto(base+'/?lang=zh-CN&model=off');await p.waitForSelector('.board-country');if(await p.locator('#mode-choice-dev').isVisible())await p.locator('#mode-choice-dev').click();
+ const snapshot=()=>p.evaluate(()=>JSON.stringify({position:window.__wb.engine.snapshot(),steps:window.__wb.session.steps,logs:window.__wb.session.logs}));
+ const initial=await snapshot();assert.equal(await p.locator('#vtt-right-tools button').count(),4);assert.equal(await p.locator('.board-country').count(),84);assert.equal(await p.locator('#btn-zoom-reset').count(),0);
+ const parent=()=>p.locator('#decision-panel').evaluate(el=>el.parentElement.id);
+ assert.equal(await parent(),'vtt-floating-action-slot');await p.locator('[data-dock-tab=log]').click();assert.equal(await parent(),'vtt-dock-action-slot');await p.locator('[data-dock-tab=log]').click();assert.equal(await parent(),'vtt-floating-action-slot');await p.locator('[data-dock-tab=log]').click();assert.equal(await parent(),'vtt-dock-action-slot');await p.keyboard.press('Escape');assert.equal(await parent(),'vtt-floating-action-slot');assert.equal(await snapshot(),initial);
+ const svg=p.locator('#ts-map-svg');const view=await svg.getAttribute('viewBox');await p.mouse.move(950,350);await p.mouse.down();await p.mouse.move(990,375,{steps:5});await p.mouse.up();assert.notEqual(await svg.getAttribute('viewBox'),view);assert.equal(await snapshot(),initial);await p.mouse.wheel(0,-160);await p.waitForTimeout(100);assert.notEqual(await svg.getAttribute('viewBox'),view);
+ await p.locator('.board-country[data-name=Finland] .country-card-bg').click();assert.equal(await p.evaluate(()=>window.__wb.state.countries.Finland.ussr_influence),2);await p.locator('#btn-undo-action').click();assert.equal(await p.evaluate(()=>window.__wb.state.countries.Finland.ussr_influence),1);
+ await p.locator('#btn-toggle-debug').click();await p.locator('#dbg-defcon').fill('3');await p.locator('#dbg-apply-all').click();assert.equal(await p.locator('[data-track=defcon]').getAttribute('data-value'),'3');assert.equal(await p.locator('[data-track=mil-ops-required]').getAttribute('data-value'),'3');await p.locator('#btn-undo-action').click();
+ await p.locator('#btn-toggle-debug').click();await p.locator('#dbg-vp').fill('-13');await p.locator('#dbg-apply-all').click();assert.equal(await p.locator('[data-track=vp]').getAttribute('transform'),'translate(816.5,495)');await p.locator('#btn-undo-action').click();
+ await p.locator('.board-space-details').click();assert(await p.locator('#modal-container').isVisible());await p.keyboard.press('Escape');assert(!(await p.locator('#modal-container').isVisible()));
+ await p.locator('[data-dock-tab=settings]').click();const before=await snapshot();await p.locator('#map-theme').selectOption('diagram');assert.equal(await p.locator('.board-art').count(),0);assert.equal(await p.locator('#board-tracks').count(),1);await p.locator('#map-theme').selectOption('classic');await p.locator('[data-locale-select]').selectOption('en');await p.locator('[data-locale-select]').selectOption('zh-CN');assert.equal(await snapshot(),before);await p.locator('#map-registration').click();assert.equal(await p.locator('.registration-box').count(),84);await p.locator('#map-registration').click();await p.keyboard.press('Escape');
+ // Advance only actual legal setup moves, then use the new text selector for a real headline.
+ let setup=0;while(await p.evaluate(()=>window.__wb.state.current_phase===0)){await p.evaluate(()=>window.__wb.handleCountryClick(window.__wb.state.legal_actions.valid_ids[0]));assert(++setup<30)}
+ await p.waitForSelector('#text-card-picker:not(.hidden)');const legal=await p.evaluate(()=>window.__wb.state.legal_actions.valid_ids);const offered=await p.locator('.vtt-text-card').evaluateAll(els=>els.map(e=>Number(e.dataset.cardId)));assert.deepEqual(offered,legal.filter(id=>id>=1&&id<=110));
+ await p.mouse.move(1900,1000);await p.screenshot({path:join(artifacts,'tabletop-collapsed.png')});const steps=await p.evaluate(()=>window.__wb.session.steps.length);await p.locator('.vtt-text-card').first().click();assert((await p.evaluate(()=>window.__wb.session.steps.length))>steps);
+ await p.locator('[data-dock-tab=settings]').click();const hiddenFor=await p.evaluate(()=>window.__wb.state.decision_context.decision_player==='US'?'USSR':'US');await p.locator('#view-select').selectOption(hiddenFor);assert(!(await p.locator('#vtt-dev-tools').isVisible()));assert(await p.evaluate(()=>window.__wb.shown.view_hidden_decision));assert(!(await p.locator('#text-card-picker').isVisible()));assert.equal(await p.locator('.vtt-text-card').count(),0);await p.locator('#view-select').selectOption('DEV');
+ // Model controls remain a single mounted instance, including after cancelling New Game.
+ await p.locator('#btn-model-choose').click();assert(await p.locator('#model-mode-section').isVisible());assert.equal(await p.locator('#model-mode-section').count(),1);await p.locator('[data-dock-tab=settings]').click();await p.locator('#btn-new-game').click();await p.keyboard.press('Escape');await p.locator('#btn-model-choose').click();assert(await p.locator('#model-mode-section').isVisible());
+ await p.locator('[data-dock-tab=log]').click();await p.mouse.move(1900,1000);await p.screenshot({path:join(artifacts,'tabletop-expanded.png')});
+ await p.locator('[data-dock-tab=settings]').click();await p.locator('.vtt-replay-settings summary').click();await p.locator('#btn-toggle-replay').click();assert(await p.evaluate(()=>window.__wb.isReplayMode));await p.locator('#btn-toggle-replay').click();assert(!(await p.evaluate(()=>window.__wb.isReplayMode)));
+ // Load the session's own replay through the real file input and scrub both ends.
+ const liveBeforeReplay=await snapshot();
+ const replay=await p.evaluate(()=>window.__wb.session.replay());
+ await p.locator('#input-replay-file').setInputFiles({name:'tabletop.tslog.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(replay))});
+ await p.waitForFunction(()=>window.__wb.isReplayMode && window.__wb.replaySteps.length>0);
+ await p.locator('#btn-rep-first').click();assert.equal(await p.evaluate(()=>window.__wb.replayCurrentStep),0);
+ await p.locator('#btn-rep-last').click();assert.equal(await p.evaluate(()=>window.__wb.replayCurrentStep),replay.steps.length-1);
+ assert.equal(await p.locator('.vtt-text-card:enabled').count(),0);
+ await p.locator('#btn-toggle-replay').click();assert.equal(await snapshot(),liveBeforeReplay);
+ // Finish the second headline/event using engine legal actions and verify the action-round marker.
+ let decisions=0;while(await p.evaluate(()=>window.__wb.state.current_phase!==2 && !window.__wb.state.is_terminal)){
+   await p.evaluate(()=>{const w=window.__wb;w.sendFlatAction(Array.from(w.engine.mask(false)).findIndex(Boolean),0)});assert(++decisions<50);
+ }
+ assert.equal(await p.locator('[data-track=action-round]').getAttribute('data-value'),String(await p.evaluate(()=>window.__wb.state.action_round)));
+ await p.evaluate(()=>window.__wb.cardsView.render({...window.__wb.shown,flags:['CONTAINMENT_ACTIVE','NATO_ACTIVE'],space:{US:0,USSR:0}}));
+ assert.deepEqual(await p.locator('.vtt-effect').allTextContents(),['1','2']);await p.locator('.vtt-effect').first().click();assert(await p.locator('#modal-container').isVisible());await p.keyboard.press('Escape');await p.evaluate(()=>window.__wb.renderState());
+ // Synthetic display-only snapshots exercise all printed track ranges without mutating engine state.
+ const tracks=await p.evaluate(()=>{const w=window.__wb,base=structuredClone(w.state);let count=0;for(let n=-20;n<=20;n++){const s={...base,victory_points:n,turn:(n+20)%10+1,defcon:(n+20)%5+1,current_phase:2,action_round:(n+20)%8+1,space:{US:(n+20)%9,USSR:(n+21)%9},mil_ops:{US:(n+20)%6,USSR:(n+21)%6}};w.mapView.render(s);for(const [name,value]of Object.entries({vp:s.victory_points,turn:s.turn,defcon:s.defcon,'action-round':s.action_round,'space-US':s.space.US,'space-USSR':s.space.USSR,'mil-ops-US':s.mil_ops.US,'mil-ops-USSR':s.mil_ops.USSR})){const el=document.querySelector(`[data-track="${name}"]`);if(Number(el?.getAttribute('data-value'))!==value)throw new Error(name+':'+value);count++}}w.renderState();return count});
+ const mobile=await browser.newPage({viewport:{width:375,height:812},isMobile:true,hasTouch:true});await mobile.goto(base+'/?lang=zh-CN&model=off&view=DEV');await mobile.waitForSelector('.board-country');assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth),375);await mobile.locator('[data-dock-tab=settings]').tap();assert(await mobile.locator('#decision-panel').isVisible());await mobile.screenshot({path:join(artifacts,'tabletop-mobile.png')});
+ const fallback=await browser.newPage();await fallback.route('**/personal/hanon-board.jpg',r=>r.fulfill({status:404,body:'missing'}));await fallback.goto(base+'/?model=off&view=DEV');await fallback.waitForSelector('.svg-country-node');assert.equal(await fallback.locator('.svg-country-node').count(),84);assert.equal(await fallback.locator('#board-tracks').count(),1);
+ assert.deepEqual(errors,[]);console.log(JSON.stringify({fourTools:true,dock:true,dragZoom:true,legalMoveUndo:true,debugTracks:true,spaceDialog:true,languageAndStyle:true,legalCardChoice:true,playerPrivacy:true,modelSlot:true,replayToggle:true,replayFileAndScrubbing:true,trackValues:tracks,actionRound:true,effects:true,mobile:true,fallback:true,errors}));
+} finally {await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});

@@ -38,6 +38,14 @@ that the packaged engine loads and steps; it does not replace browser E2E or rul
 Artifacts expire after seven days. Deployment runs after the build succeeds, and no build
 dependencies are installed on the Azure VM.
 
+The personal workflow runs `node deploy/azure/prepare-artwork.mjs` before bundling.
+It downloads the Hanon board and ten counter textures from Steam's CDN, verifying
+every file against `web/ui/src/board/counter-sources.json`. A failed download or
+changed hash stops the deployment. Artwork stays in the ignored `public/personal/`
+directory and in the deployed site; it is not committed to the source repository.
+Source-only builds retain the schematic fallback. The script also accepts an
+output directory as its first argument for testing a fresh download.
+
 ## Models, storage and persistence
 
 - Models continue to use the upstream Hugging Face catalogue or a locally imported compatible

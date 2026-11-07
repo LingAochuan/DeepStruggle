@@ -41,7 +41,11 @@ jobs:
       - name: Install the WebAssembly compiler
         run: bash tools/scripts/install_emsdk.sh
       - name: Build the engine and website
-        run: bash tools/scripts/build_web.sh
+        # Vite copies this optional pack into dist along with the engine.
+        # A failed/hash-mismatched download stops publication of an incomplete board.
+        run: |
+          node deploy/azure/prepare-artwork.mjs
+          bash tools/scripts/build_web.sh
       - name: Prepare Azure configuration
         run: cp deploy/azure/staticwebapp.config.json web/ui/dist/staticwebapp.config.json
       - name: Smoke test the packaged engine and check site size
@@ -58,9 +62,13 @@ jobs:
           if result.get("steps", 0) <= 0 or result.get("fingerprint") in (None, "", "unknown"):
               raise SystemExit(f"Engine smoke test failed: {result}")
           root = pathlib.Path("web/ui/dist")
-          for name in ("index.html", "engine/ts_engine.mjs", "engine/ts_engine.wasm", "staticwebapp.config.json"):
+          for name in ("index.html", "engine/ts_engine.mjs", "engine/ts_engine.wasm", "staticwebapp.config.json", "personal/hanon-board.jpg"):
               if not (root / name).is_file() or (root / name).stat().st_size == 0:
                   raise SystemExit(f"Missing or empty deployment file: {name}")
+          manifest = json.loads(pathlib.Path("web/ui/src/board/counter-sources.json").read_text())
+          for counter in manifest["assets"]:
+              if not (root / "personal" / "counters" / f"{counter}.png").is_file():
+                  raise SystemExit(f"Missing counter artwork: {counter}")
           files = [p for p in root.rglob("*") if p.is_file()]
           size = sum(p.stat().st_size for p in files)
           print(f"Engine smoke test: {result}")

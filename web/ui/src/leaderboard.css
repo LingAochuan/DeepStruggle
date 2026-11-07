@@ -1,22 +1,22 @@
 /* The leaderboard page (leaderboard.html): the workbench's colours, but a document that scrolls. */
 :root {
-  --bg-dark: #090D16;
-  --bg-panel-solid: #121A2B;
-  --bg-card: #1A2438;
+  --bg-dark: #333331;
+  --bg-panel-solid: #252422;
+  --bg-card: #383633;
   --border-color: rgba(255, 255, 255, 0.12);
-  --text-main: #F1F5F9;
-  --text-muted: #94A3B8;
-  --text-dim: #64748B;
-  --us-blue-light: #60A5FA;
-  --ussr-red-light: #F87171;
-  --gold: #F59E0B;
-  --accent: #A78BFA;
-  --hf: #34D399;
-  --site: #38BDF8;
-  --danger: #EF4444;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --text-main: #e7e2d9;
+  --text-muted: #bfb8ab;
+  --text-dim: #a59e92;
+  --us-blue-light: #90abc4;
+  --ussr-red-light: #d3a198;
+  --gold: #c5a06b;
+  --accent: #c5a06b;
+  --hf: #a5b597;
+  --site: #b5c2c4;
+  --danger: #c48479;
+  --font-sans: 'Segoe UI', 'Microsoft YaHei', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  --font-display: 'Cinzel', serif;
+  --font-display: 'Segoe UI', 'Microsoft YaHei', sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -31,14 +31,15 @@ body {
   font-size: 14px;
 }
 
-a { color: var(--us-blue-light); text-decoration: none; }
+a { color: var(--gold); text-decoration: none; }
 a:hover { text-decoration: underline; }
+input[type="radio"], input[type="checkbox"] { accent-color: var(--gold); }
 
 .disclaimer-bar {
   padding: 4px 16px;
   font-size: 11px;
   color: var(--text-dim);
-  background: #05080F;
+  background: #292824;
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -80,7 +81,7 @@ a:hover { text-decoration: underline; }
 .lb-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .lb-table tbody tr { cursor: pointer; }
 .lb-table tbody tr:hover { background: rgba(255, 255, 255, 0.04); }
-.lb-table tbody tr.selected { background: rgba(167, 139, 250, 0.12); }
+.lb-table tbody tr.selected { background: rgba(179, 149, 91, 0.16); }
 .lb-player { font-family: var(--font-mono); font-size: 12.5px; overflow-wrap: anywhere; }
 .lb-elo { font-weight: 700; }
 .lb-dim { color: var(--text-dim); }
@@ -131,4 +132,4 @@ a:hover { text-decoration: underline; }
 .lb-codes-line a code { color: var(--gold); }
 
 .locale-control { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 12px; }
-.locale-control select { color: inherit; background: #111827; border: 1px solid #475569; border-radius: 4px; padding: 4px; }
+.locale-control select { color: inherit; background: #252422; border: 1px solid #736b5c; border-radius: 4px; padding: 4px; }

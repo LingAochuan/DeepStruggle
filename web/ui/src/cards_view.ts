@@ -448,6 +448,7 @@ export class CardsView {
     this.renderAllCardsList(state);
 
     // Render Active Effects and Context Stack
+    this.renderTextChoices(state);
     this.renderFlags(state);
     this.renderTurnEffects(state);
     this.renderContextStack(state);
@@ -733,7 +734,7 @@ export class CardsView {
         effectCards.push({
           title: info.name,
           side: info.side,
-          badge: info.duration === "TURN" ? t("Turn Only") : (info.duration === "PERMANENT" ? "Permanent" : "Conditional"),
+          badge: info.duration === "TURN" ? "Turn Only" : (info.duration === "PERMANENT" ? "Permanent" : "Conditional"),
           desc: info.description
         });
       } else {
@@ -741,7 +742,7 @@ export class CardsView {
           title: escapeHtml(f.replace(/_ACTIVE|_PLAYED/, "")),
           side: "NEUTRAL",
           badge: "Active",
-          desc: t("Continuous effect for {0}", [escapeHtml(f)])
+          get desc() { return t("Continuous effect for {0}", [f]); }
         });
       }
     });
@@ -755,34 +756,74 @@ export class CardsView {
     // way (SpaceRace::has_animal_in_space and friends all require opp_track < box), so
     // testing only one's own track showed perks that were not actually in effect --
     // "US may attempt Space Race twice" with the USSR level with them, for instance.
-    if (usSpace >= 2 && ussrSpace < 2) effectCards.push({ title: t("US: Animal in Space (#2)"), side: "US", badge: t("Space Perk"), desc: t("US may attempt Space Race twice per turn.") });
-    if (usSpace >= 4 && ussrSpace < 4) effectCards.push({ title: t("US: Man in Earth Orbit (#4)"), side: "US", badge: t("Space Perk"), desc: t("USSR must select & reveal headline card before US chooses.") });
-    if (usSpace >= 6 && ussrSpace < 6) effectCards.push({ title: t("US: Eagle Has Landed (#6)"), side: "US", badge: t("Space Perk"), desc: t("US may discard 1 held card at end of turn.") });
-    if (usSpace >= 8 && ussrSpace < 8) effectCards.push({ title: t("US: Space Station (#8)"), side: "US", badge: t("Space Perk"), desc: t("US gains an 8th Action Round each turn.") });
+    if (usSpace >= 2 && ussrSpace < 2) effectCards.push({ title: "US: Animal in Space (#2)", side: "US", badge: "Space Perk", desc: "US may attempt Space Race twice per turn." });
+    if (usSpace >= 4 && ussrSpace < 4) effectCards.push({ title: "US: Man in Earth Orbit (#4)", side: "US", badge: "Space Perk", desc: "USSR must select & reveal headline card before US chooses." });
+    if (usSpace >= 6 && ussrSpace < 6) effectCards.push({ title: "US: Eagle Has Landed (#6)", side: "US", badge: "Space Perk", desc: "US may discard 1 held card at end of turn." });
+    if (usSpace >= 8 && ussrSpace < 8) effectCards.push({ title: "US: Space Station (#8)", side: "US", badge: "Space Perk", desc: "US gains an 8th Action Round each turn." });
 
-    if (ussrSpace >= 2 && usSpace < 2) effectCards.push({ title: t("USSR: Animal in Space (#2)"), side: "USSR", badge: t("Space Perk"), desc: t("USSR may attempt Space Race twice per turn.") });
-    if (ussrSpace >= 4 && usSpace < 4) effectCards.push({ title: t("USSR: Man in Earth Orbit (#4)"), side: "USSR", badge: t("Space Perk"), desc: t("US must select & reveal headline card before USSR chooses.") });
-    if (ussrSpace >= 6 && usSpace < 6) effectCards.push({ title: t("USSR: Bear Has Landed (#6)"), side: "USSR", badge: t("Space Perk"), desc: t("USSR may discard 1 held card at end of turn.") });
-    if (ussrSpace >= 8 && usSpace < 8) effectCards.push({ title: t("USSR: Space Station (#8)"), side: "USSR", badge: t("Space Perk"), desc: t("USSR gains an 8th Action Round each turn.") });
+    if (ussrSpace >= 2 && usSpace < 2) effectCards.push({ title: "USSR: Animal in Space (#2)", side: "USSR", badge: "Space Perk", desc: "USSR may attempt Space Race twice per turn." });
+    if (ussrSpace >= 4 && usSpace < 4) effectCards.push({ title: "USSR: Man in Earth Orbit (#4)", side: "USSR", badge: "Space Perk", desc: "US must select & reveal headline card before USSR chooses." });
+    if (ussrSpace >= 6 && usSpace < 6) effectCards.push({ title: "USSR: Bear Has Landed (#6)", side: "USSR", badge: "Space Perk", desc: "USSR may discard 1 held card at end of turn." });
+    if (ussrSpace >= 8 && usSpace < 8) effectCards.push({ title: "USSR: Space Station (#8)", side: "USSR", badge: "Space Perk", desc: "USSR gains an 8th Action Round each turn." });
 
     if (effectCards.length === 0) {
-      flagsContainer.innerHTML = `<div style="font-size: 11px; color: var(--text-dim); text-align: center; padding: 10px;">${t("No active continuous effects")}</div>`;
+      flagsContainer.replaceChildren();
       return;
     }
 
-    effectCards.forEach(eff => {
-      const cardEl = document.createElement("div");
-      const sideClass = eff.side.toLowerCase();
-      cardEl.className = `active-effect-card side-${sideClass}`;
-      cardEl.innerHTML = `
-        <div class="effect-header">
-          <span class="effect-title">${label(eff.title)}</span>
-          <span class="effect-badge badge-${sideClass}">${label(eff.badge)}</span>
-        </div>
-        <div class="effect-desc">${label(eff.desc)}</div>
-      `;
-      flagsContainer.appendChild(cardEl);
+    effectCards.forEach((eff, index) => {
+      const button = document.createElement("button");
+      button.className = `vtt-effect side-${eff.side.toLowerCase()}`;
+      button.textContent = String(index + 1);
+      button.title = `${label(eff.title)} · ${label(eff.badge)}\n${label(eff.desc)}`;
+      button.setAttribute("aria-label", label(eff.title));
+      button.addEventListener("click", () => this.showEffectDetails(eff));
+      flagsContainer.appendChild(button);
     });
+  }
+
+  private showEffectDetails(eff: { title: string; badge: string; desc: string }) {
+    setModalRenderer(() => this.showEffectDetails(eff));
+    document.getElementById("modal-title")!.textContent = label(eff.title);
+    const body = document.getElementById("modal-body")!;
+    body.replaceChildren();
+    const duration = document.createElement("p");
+    duration.className = "effect-detail-duration";
+    duration.textContent = label(eff.badge);
+    const description = document.createElement("p");
+    description.textContent = label(eff.desc);
+    body.append(duration, description);
+    document.getElementById("modal-container")!.classList.remove("hidden");
+  }
+
+  /** Temporary text-only card selection. The engine's redacted legal IDs are the only source. */
+  private renderTextChoices(state: GameState) {
+    const picker = document.getElementById("text-card-picker");
+    const list = document.getElementById("text-card-picker-list");
+    if (!picker || !list) return;
+    const ctx = state.decision_context;
+    const L = engineLayout();
+    const selectCard = !state.is_terminal && !state.view_hidden_decision && L && ctx
+      && num(ctx.decision_type) === L.decision_types.SELECT_CARD;
+    const ids = selectCard ? (state.legal_actions?.valid_ids ?? []).map(Number).filter(id => id >= 1 && id <= 110) : [];
+    picker.classList.toggle("hidden", ids.length === 0);
+    list.replaceChildren();
+    document.getElementById("text-card-picker-count")!.textContent = String(ids.length);
+    document.getElementById("text-card-picker-title")!.textContent = t("{0} · Choose a card", [label(String(ctx?.decision_player ?? ""))]);
+    for (const id of ids) {
+      const meta = this.cardsMeta.get(id);
+      if (!meta) continue;
+      const button = document.createElement("button");
+      button.className = `vtt-text-card card-item side-${meta.side.toLowerCase()}`;
+      button.dataset.cardId = String(id);
+      button.dataset.primary = String(id);
+      button.disabled = document.body.classList.contains("replay-view");
+      button.innerHTML = `<span class="vtt-card-number">#${id}</span><span class="vtt-card-name">${escapeHtml(meta.name)}</span><span class="vtt-card-ops">${t("{0} Ops", [meta.ops])}</span>`;
+      button.addEventListener("click", () => { this.hideTooltip(); this.onCardClick(id); });
+      button.addEventListener("mouseenter", ev => this.showCardTooltip(ev, id));
+      button.addEventListener("mouseleave", () => this.hideTooltip());
+      list.appendChild(button);
+    }
   }
 
   /**

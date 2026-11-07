@@ -18,6 +18,37 @@ export interface CardNames {
   idOf(name: string): number | undefined;
 }
 
+/** Add hover targets to already-rendered HUD text without replacing HTML or its handlers. */
+export function annotateCardRefs(root: HTMLElement, cards: CardNames): void {
+  const names = new Map<string, number>();
+  for (let id = 1; id <= 110; id++) for (const name of cards.namesOf(id)) {
+    if (name) names.set(name, id);
+  }
+  const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const pattern = new RegExp(`(?:Card|卡牌) #([0-9]{1,3})(?![0-9])|${[...names.keys()].sort((a, b) => b.length - a.length).map(escape).join('|')}`, 'g');
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const texts: Text[] = [];
+  while (walker.nextNode()) {
+    const text = walker.currentNode as Text;
+    if (!text.parentElement?.closest('[data-card-id], script, style, .trace-choice-badge')) texts.push(text);
+  }
+  for (const text of texts) {
+    const value = text.data;
+    const fragment = document.createDocumentFragment();
+    let end = 0;
+    for (const match of value.matchAll(pattern)) {
+      const id = match[1] ? Number(match[1]) : names.get(match[0]);
+      if (!id || !cards.namesOf(id).length) continue;
+      fragment.append(document.createTextNode(value.slice(end, match.index)));
+      const ref = document.createElement('span');
+      ref.className = 'log-card'; ref.dataset.cardId = String(id); ref.tabIndex = 0;
+      ref.textContent = match[0]; fragment.append(ref);
+      end = match.index! + match[0].length;
+    }
+    if (end) { fragment.append(document.createTextNode(value.slice(end))); text.replaceWith(fragment); }
+  }
+}
+
 /** `inner` is text, escaped here. */
 function span(id: number, inner: string): string {
   return `<span class="log-card" data-card-id="${id}">${escapeHtml(inner)}</span>`;
