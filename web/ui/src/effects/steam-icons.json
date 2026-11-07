@@ -1,0 +1,334 @@
+{
+  "source": "Installed Twilight Struggle / TwilightStruggle_Data; Unity Sprite export",
+  "flags": {
+    "VIETNAM_REVOLTS_ACTIVE": "Icon_VietnamRevolts01",
+    "WARSAW_PACT_PLAYED": "Icon_WarsawPact01",
+    "NATO_CANCELED_FRANCE": "Icon_DeGualle01",
+    "NATO_ACTIVE": "Icon_Nato01",
+    "MARSHALL_PLAN_PLAYED": "Icon_MarshallPlan01",
+    "CONTAINMENT_ACTIVE": "Icon_Containment01",
+    "US_JAPAN_PACT_ACTIVE": "Icon_USJapanPact01",
+    "PURGE_US_ACTIVE": "Icon_RedScare01",
+    "PURGE_USSR_ACTIVE": "Icon_RedScare01",
+    "FORMOSAN_RESOLUTION_ACTIVE": "Icon_FormosanResolution01",
+    "CMC_ACTIVE_US": "Icon_CubanMissleCrisis01",
+    "CMC_ACTIVE_USSR": "Icon_CubanMissleCrisis01",
+    "NUCLEAR_SUBS_ACTIVE": "Icon_NuclearSubs01",
+    "QUAGMIRE_ACTIVE": "Icon_Quagmire01",
+    "SALT_ACTIVE": "Icon_SaltNegotiations01",
+    "BEAR_TRAP_ACTIVE": "Icon_BearTrap01",
+    "WE_WILL_BURY_YOU_PENDING": "Icon_BuryYou01",
+    "BREZHNEV_DOCTRINE_ACTIVE": "Icon_BrezhnevDoctrine01",
+    "NATO_CANCELED_WEST_GERMANY": "Icon_WillyBrandt01",
+    "WILLY_BRANDT_PLAYED": "Icon_WillyBrandt01",
+    "FLOWER_POWER_ACTIVE": "Icon_FlowerPower01",
+    "U2_INCIDENT_ACTIVE": "Icon_U2Incident01",
+    "CAMP_DAVID_PLAYED": "Icon_CampDavidAccords01",
+    "JOHN_PAUL_II_PLAYED": "Icon_JohnPaul01",
+    "DEATH_SQUADS_US": "Icon_LatinDeathSquads01",
+    "DEATH_SQUADS_USSR": "Icon_LatinDeathSquads01",
+    "SHUTTLE_DIPLOMACY_ACTIVE": "Icon_ShuttleDiplomacy01",
+    "IRANIAN_HOSTAGE_CRISIS_PLAY": "Icon_IranianHostageCrisis01",
+    "IRON_LADY_PLAYED": "Icon_IronLady01",
+    "NORTH_SEA_OIL_ACTIVE": "Icon_NorthSeaOil01",
+    "NORTH_SEA_OIL_PLAYED": "Icon_NorthSeaOil01",
+    "THE_REFORMER_PLAYED": "Icon_TheReformer01",
+    "IRAN_CONTRA_ACTIVE": "Icon_IranContraScandal01",
+    "CHERNOBYL_ACTIVE": "Icon_Chernobyl01",
+    "TEAR_DOWN_THIS_WALL_PLAYED": "Icon_TearDown01",
+    "EVIL_EMPIRE_PLAYED": "Icon_AnEvilEmpire01",
+    "ALDRICH_AMES_ACTIVE": "Icon_AldrichAmesRemix01",
+    "NORAD_ACTIVE": "Icon_Norad01",
+    "YURI_AND_SAMANTHA_ACTIVE": "Icon_YuriSamantha01",
+    "AWACS_PLAYED": "Icon_AwacsSale01"
+  },
+  "space": {
+    "2": "SpaceRace_02",
+    "4": "SpaceRace_04",
+    "6": "SpaceRace_06",
+    "8": "SpaceRace_08"
+  },
+  "fallback": "Icon_Ask01",
+  "assets": {
+    "Icon_VietnamRevolts01": {
+      "sourceFile": "resources.assets",
+      "pathId": 581,
+      "width": 104,
+      "height": 120,
+      "sha256": "5b03e278310a8ed6514ada9b55459aa2501fe0af4e0e1e6506aedd823de2c819"
+    },
+    "Icon_WarsawPact01": {
+      "sourceFile": "resources.assets",
+      "pathId": 387,
+      "width": 118,
+      "height": 106,
+      "sha256": "667de162868cf8f7994a09bb0898d658481ef9ed6fb5fb8d0ef8ee0578523419"
+    },
+    "Icon_DeGualle01": {
+      "sourceFile": "resources.assets",
+      "pathId": 698,
+      "width": 117,
+      "height": 116,
+      "sha256": "b1ad07be927206aa41137992f06ba3c067e546c22eff99420f84cfcab0b287a5"
+    },
+    "Icon_Nato01": {
+      "sourceFile": "resources.assets",
+      "pathId": 952,
+      "width": 122,
+      "height": 123,
+      "sha256": "fd74b612a7f658dfee201d28d1a8c86a8e0604c8464458236606ac691e09ad1f"
+    },
+    "Icon_MarshallPlan01": {
+      "sourceFile": "resources.assets",
+      "pathId": 939,
+      "width": 116,
+      "height": 90,
+      "sha256": "32784ac1a97afc6bc11e92b81619347e41b85ae34bde6fa0919faea1c89e2495"
+    },
+    "Icon_Containment01": {
+      "sourceFile": "resources.assets",
+      "pathId": 464,
+      "width": 96,
+      "height": 96,
+      "sha256": "c85a831b3c8d2fc22eda3716968c792ca7c7f33d3cbaac7fd1de59401bce9fe7"
+    },
+    "Icon_USJapanPact01": {
+      "sourceFile": "resources.assets",
+      "pathId": 968,
+      "width": 116,
+      "height": 120,
+      "sha256": "f96547a65b38a9cd069dc7232333b861ea24b9b2d81b1d7c7805d5b8ad87aa0c"
+    },
+    "Icon_RedScare01": {
+      "sourceFile": "resources.assets",
+      "pathId": 459,
+      "width": 114,
+      "height": 88,
+      "sha256": "b20ffc1fe42c26acf10b5ba2951909716c5af9f988b9090beec46c0510e9224c"
+    },
+    "Icon_FormosanResolution01": {
+      "sourceFile": "resources.assets",
+      "pathId": 862,
+      "width": 116,
+      "height": 116,
+      "sha256": "b7a8e19750d662003e50d928abef68f8deb191407e3cc26bee9265c5dbe0a1dc"
+    },
+    "Icon_CubanMissleCrisis01": {
+      "sourceFile": "resources.assets",
+      "pathId": 410,
+      "width": 119,
+      "height": 114,
+      "sha256": "419e457136c78d50a1556fa92d8f9d9eb2fcef43340ff34868e66fd1dbbd75c0"
+    },
+    "Icon_NuclearSubs01": {
+      "sourceFile": "resources.assets",
+      "pathId": 612,
+      "width": 114,
+      "height": 103,
+      "sha256": "0764b3606c76eb7cf775494e1b9aac5d515035846cc8abe370a9ac533583b7b9"
+    },
+    "Icon_Quagmire01": {
+      "sourceFile": "resources.assets",
+      "pathId": 538,
+      "width": 118,
+      "height": 105,
+      "sha256": "acf0c35350d1991fd68ae786e7dd8cec37a7c68852ca6544efeb8802c9e60ab5"
+    },
+    "Icon_SaltNegotiations01": {
+      "sourceFile": "resources.assets",
+      "pathId": 498,
+      "width": 114,
+      "height": 110,
+      "sha256": "8c618b6bc2c82538156770ffbae4c8014b0c60366d3eef82c431f49ba27e4c4a"
+    },
+    "Icon_BearTrap01": {
+      "sourceFile": "resources.assets",
+      "pathId": 617,
+      "width": 113,
+      "height": 92,
+      "sha256": "6844888fda5453d83a2ba268d8482ffb3d10f417d11658a270d49de3489d607a"
+    },
+    "Icon_BuryYou01": {
+      "sourceFile": "resources.assets",
+      "pathId": 647,
+      "width": 128,
+      "height": 120,
+      "sha256": "f2d4bbea0a123540510b298a59e147b33d95b93495a011c6acc1310d9999baf5"
+    },
+    "Icon_BrezhnevDoctrine01": {
+      "sourceFile": "resources.assets",
+      "pathId": 772,
+      "width": 111,
+      "height": 119,
+      "sha256": "a41251525490ee6e42b6a361cdce0365859db561ca629c972a0f7b2fef70a263"
+    },
+    "Icon_WillyBrandt01": {
+      "sourceFile": "resources.assets",
+      "pathId": 513,
+      "width": 122,
+      "height": 122,
+      "sha256": "f3e65b2164b7b53ab0502fc23960a9ab48d79a0adcd39a60d4001b226bfb39b3"
+    },
+    "Icon_FlowerPower01": {
+      "sourceFile": "resources.assets",
+      "pathId": 447,
+      "width": 117,
+      "height": 116,
+      "sha256": "ceca0ac04621386f6aba878960f5c8d31cd0cc768f9c8f74d3d6cd19c8210c6c"
+    },
+    "Icon_U2Incident01": {
+      "sourceFile": "resources.assets",
+      "pathId": 442,
+      "width": 128,
+      "height": 127,
+      "sha256": "94d035131cbf683f11e9313ff4638a402c8d7d5aa3b055f197c1d3f531249d42"
+    },
+    "Icon_CampDavidAccords01": {
+      "sourceFile": "resources.assets",
+      "pathId": 977,
+      "width": 120,
+      "height": 118,
+      "sha256": "4095b577576074eb66b5ffec2ad9039e1005646a43d6ed81fab00bf14467fab0"
+    },
+    "Icon_JohnPaul01": {
+      "sourceFile": "resources.assets",
+      "pathId": 441,
+      "width": 115,
+      "height": 112,
+      "sha256": "5f7de5a15e7e54d98a0f0d6ec711d6d8a4e9da18bcbaaca1be633c5abf725fed"
+    },
+    "Icon_LatinDeathSquads01": {
+      "sourceFile": "resources.assets",
+      "pathId": 656,
+      "width": 72,
+      "height": 111,
+      "sha256": "4cdcff05e810081c6f4daaa5642ac5d5e1c029bf244595d31b57569d12818f5a"
+    },
+    "Icon_ShuttleDiplomacy01": {
+      "sourceFile": "resources.assets",
+      "pathId": 461,
+      "width": 118,
+      "height": 116,
+      "sha256": "b8c6a418c2ddacc5d357e3ab4916389dbd84d2bfc1ad994196504be74c32f820"
+    },
+    "Icon_IranianHostageCrisis01": {
+      "sourceFile": "resources.assets",
+      "pathId": 606,
+      "width": 116,
+      "height": 111,
+      "sha256": "bb560c1d61192991f0e5f450d0829e502174ec99a1781b66dffbaa16c13cc00c"
+    },
+    "Icon_IronLady01": {
+      "sourceFile": "resources.assets",
+      "pathId": 543,
+      "width": 118,
+      "height": 115,
+      "sha256": "c49ce71a9504eb6c476d8545df4ee04f44cb5b30a03e80bb7246efc7d9d774ba"
+    },
+    "Icon_NorthSeaOil01": {
+      "sourceFile": "resources.assets",
+      "pathId": 592,
+      "width": 112,
+      "height": 111,
+      "sha256": "73a4f0880cedca74c527bd37dfa676b34c18d77d27a85c30f66717f5e6a37a14"
+    },
+    "Icon_TheReformer01": {
+      "sourceFile": "resources.assets",
+      "pathId": 601,
+      "width": 128,
+      "height": 122,
+      "sha256": "5063aab92cd6b2269b86d447fc21211e120f27d8889b47c1c0072cbb541d5aed"
+    },
+    "Icon_IranContraScandal01": {
+      "sourceFile": "resources.assets",
+      "pathId": 565,
+      "width": 125,
+      "height": 122,
+      "sha256": "48c83bbb85bc5037f43e729b7da7f7d7e1f8810086b940b1928df8f444986a9e"
+    },
+    "Icon_Chernobyl01": {
+      "sourceFile": "resources.assets",
+      "pathId": 564,
+      "width": 86,
+      "height": 116,
+      "sha256": "bc039c8a5c29a836fe2b1f9e29a47d0bf57925f7b981f1aa166e63d1129abc1a"
+    },
+    "Icon_TearDown01": {
+      "sourceFile": "resources.assets",
+      "pathId": 579,
+      "width": 118,
+      "height": 94,
+      "sha256": "db243e0092455d8fc718b96eea50112a0f8d5104e3e4c1cfef9c89a6164be862"
+    },
+    "Icon_AnEvilEmpire01": {
+      "sourceFile": "resources.assets",
+      "pathId": 515,
+      "width": 102,
+      "height": 117,
+      "sha256": "959c93f4e80fa322a966ed65db49e993aa3c5dd5947bb7ec53eb44c3881f21d9"
+    },
+    "Icon_AldrichAmesRemix01": {
+      "sourceFile": "resources.assets",
+      "pathId": 891,
+      "width": 128,
+      "height": 112,
+      "sha256": "147be413ccf09e93fa200d28cb57d6f3a998718b2e7edf6d625f5f14787c7659"
+    },
+    "Icon_Norad01": {
+      "sourceFile": "resources.assets",
+      "pathId": 881,
+      "width": 126,
+      "height": 128,
+      "sha256": "fce1ddf2840225adcba7c09b3a5b2a459bb9177e40a8b3e61475fabbe063c2d2"
+    },
+    "Icon_YuriSamantha01": {
+      "sourceFile": "resources.assets",
+      "pathId": 568,
+      "width": 104,
+      "height": 105,
+      "sha256": "8865cc1d002743125bc5ccc68bc94822d161304ef419c65f2686a526f261218e"
+    },
+    "Icon_AwacsSale01": {
+      "sourceFile": "resources.assets",
+      "pathId": 693,
+      "width": 121,
+      "height": 99,
+      "sha256": "203baae03debdf62bf66e99785e419308b149f6a4f426c03c5d2bcb45e3b3886"
+    },
+    "SpaceRace_02": {
+      "sourceFile": "sharedassets2.assets",
+      "pathId": 328,
+      "width": 64,
+      "height": 64,
+      "sha256": "ee0d888483062d6293d4d1cab75446c0094bf70e98a78d780634f461c2684ea1"
+    },
+    "SpaceRace_04": {
+      "sourceFile": "sharedassets2.assets",
+      "pathId": 237,
+      "width": 64,
+      "height": 64,
+      "sha256": "246eb2c02a6a272054404ae5b6b4e6b1473727ac3f1713fc9c36311757019b98"
+    },
+    "SpaceRace_06": {
+      "sourceFile": "sharedassets2.assets",
+      "pathId": 208,
+      "width": 64,
+      "height": 64,
+      "sha256": "69603bd3a2842062e55f390c68f15d5a26ec1e1b8dd2f2605818b644b279b943"
+    },
+    "SpaceRace_08": {
+      "sourceFile": "sharedassets2.assets",
+      "pathId": 335,
+      "width": 64,
+      "height": 64,
+      "sha256": "9847f476682c5772da015b37789f50c76e6b900d85f07a40711cedc36909ba30"
+    },
+    "Icon_Ask01": {
+      "sourceFile": "resources.assets",
+      "pathId": 399,
+      "width": 94,
+      "height": 120,
+      "sha256": "9fc7b125ccdadd5ad507d890db1ddef976014dba1f7c9f66a776e4e691ac11dd"
+    }
+  }
+}

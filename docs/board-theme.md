@@ -53,7 +53,7 @@ influence placement and the opponent's turn; only legal card choices are clickab
 Manual minimization is preserved. A player sees their own hand, while developer
 view follows the decision player. Extra event choices are separate from hand cards.
 Developer-only undo/debug controls and
-numbered active effects occupy two left-edge columns. The debug editor remains a
+Steam icons for active effects occupy two left-edge columns. The debug editor remains a
 dialog. Settings house language, player/developer view, replay, analysis visibility,
 map style, registration and new-game controls. There are no zoom or region buttons.
 `fvtt_shell.ts` manages panel state and `fvtt_shell.css` supplies the dark translucent
@@ -109,3 +109,24 @@ With the optional counter pack installed, `node tests/web/tabletop_art.mjs <base
 checks texture loading, marker sizes, dice styling, all 32 panel-corner combinations
 (two panels, docked/floating, desktop/narrow viewport), missing-counter fallback,
 and the main panels' palette. Screenshots are written to `scratch/tabletop-art`.
+
+## Steam effect icons
+
+The approved icon set is exported from the installed game's Unity sprites, preserving
+transparency. `web/ui/src/effects/steam-icons.json` records the source asset file, Sprite
+path ID, dimensions and SHA-256 for 35 card icons, four space-track images and a question
+icon. Forty card-effect flags map to these images by stable key; the eight possible
+space perks use the four standard track images. Generic internal states use the question
+icon instead of an unconfirmed card association. Buttons retain their dark shell,
+side-coloured border, accessible title, tooltip and click/keyboard details.
+
+The reviewed PNG exports live in ignored `web/ui/public/personal/effects/`. The personal
+Azure workflow runs `deploy/azure/prepare-effects.py` to obtain the fork's separate
+`personal-steam-effects-v1` release pack, checking the archive and every PNG's SHA-256.
+Publication stops if the pack is missing or corrupt. A missing image falls back to a generic
+SVG question mark without disabling the effect button. Source contributions exclude
+the PNG artwork. The local review and pack live in the workspace's `reference` directory.
+
+`node tests/web/tabletop_effects.mjs <base-url>` verifies asset hashes, all card mappings,
+space-perk cancellation, keyboard details, unknown/missing-image fallbacks, narrow layout
+and unchanged engine state. Screenshots are written to `scratch/tabletop-effects`.

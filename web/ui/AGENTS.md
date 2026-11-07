@@ -598,8 +598,11 @@ the new-game modal and restored to `model-dock-slot` on close.
 
 Settings contain language, view, analysis visibility, board theme/registration,
 new game and the replay controls. Replay remains developer-only. The left undo/debug
-rail is hidden in player view; debug still opens an independent modal. Numbered
-ongoing-effect buttons open descriptions and will later accept artwork.
+rail is hidden in player view; debug still opens an independent modal. Ongoing-effect
+buttons use the reviewed Steam sprites and retain tooltips, accessible names and details.
+`effects/steam-icons.json` maps stable engine flags and space boxes to optional files
+in ignored `public/personal/effects/`; never use the effect's list index as its identity.
+Unknown states use the Steam question icon, and missing files use an SVG question mark.
 `CardsView.renderTextChoices` always shows the viewed hand (including the China card)
 in the bottom-left text list, even outside card decisions or while the opponent acts.
 Player views stay on their own hand; developer view follows the decision player.

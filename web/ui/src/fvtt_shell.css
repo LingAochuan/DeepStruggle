@@ -128,6 +128,8 @@ body.vtt-shell { background: #393a36; font-size: 13px; line-height: 1.4; }
 .vtt-leaderboard th:last-child { width: 48px; }
 .vtt-effects { position: fixed; left: 64px; top: 12px; z-index: 40; display: flex; flex-direction: column; gap: 7px; max-height: 55vh; overflow: auto; scrollbar-width: none; }
 .vtt-shell .vtt-effect { padding: 0; font-size: 17px; font-weight: 600; flex: none; }
+.vtt-effect-art { width: 28px; height: 28px; display: grid; place-items: center; pointer-events: none; }
+.vtt-effect-art img, .vtt-effect-art svg { width: 100%; height: 100%; object-fit: contain; }
 .vtt-effect.side-us { border-bottom-color: #7395b3; }
 .vtt-effect.side-ussr { border-bottom-color: #ad6f62; }
 body.player-view #vtt-dev-tools, body.player-view .vtt-dev-setting { display: none; }

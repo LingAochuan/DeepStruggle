@@ -45,6 +45,7 @@ jobs:
         # A failed/hash-mismatched download stops publication of an incomplete board.
         run: |
           node deploy/azure/prepare-artwork.mjs
+          python3 deploy/azure/prepare-effects.py
           bash tools/scripts/build_web.sh
       - name: Prepare Azure configuration
         run: cp deploy/azure/staticwebapp.config.json web/ui/dist/staticwebapp.config.json
@@ -55,6 +56,7 @@ jobs:
           node tests/web/wasm_parity.mjs web/ui/dist/engine/ts_engine.mjs selftest 10 > "$RUNNER_TEMP/wasm-selftest.json"
           python3 - "$RUNNER_TEMP/wasm-selftest.json" <<'PY'
           import json
+          import hashlib
           import pathlib
           import sys
 
@@ -70,6 +72,11 @@ jobs:
               if not (root / "personal" / "counters" / f"{counter}.png").is_file():
                   raise SystemExit(f"Missing counter artwork: {counter}")
           files = [p for p in root.rglob("*") if p.is_file()]
+          effects = json.loads(pathlib.Path("web/ui/src/effects/steam-icons.json").read_text())
+          for name, asset in effects["assets"].items():
+              icon = root / "personal" / "effects" / f"{name}.png"
+              if not icon.is_file() or hashlib.sha256(icon.read_bytes()).hexdigest() != asset["sha256"]:
+                  raise SystemExit(f"Missing or corrupt effect icon: {name}")
           size = sum(p.stat().st_size for p in files)
           print(f"Engine smoke test: {result}")
           print(f"Site: {len(files)} files, {size / 1_000_000:.1f} MB")

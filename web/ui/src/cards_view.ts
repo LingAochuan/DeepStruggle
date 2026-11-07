@@ -4,6 +4,7 @@ import { CARDS_METADATA, ENGLISH_CARDS_METADATA } from "./metadata";
 import { UNSEEN } from "./game/view";
 import { engineLayout } from "./engine/layout";
 import { escapeHtml, num } from "./html";
+import { effectIcon, flagIcon, spaceIcon } from './effects/icons';
 
 export interface EffectInfo {
   name: string;
@@ -214,6 +215,14 @@ export const EFFECT_INFO_MAP: Record<string, EffectInfo> = {
     side: "US",
     duration: "PERMANENT",
     description: "Prevents Arab-Israeli War from being played as an Event."
+  },
+  IRON_LADY_PLAYED: {
+    name: "The Iron Lady", cardId: 83, cardName: "The Iron Lady", side: "US", duration: "PERMANENT",
+    description: "Prevents #7 Socialist Governments from being played as an Event."
+  },
+  NORTH_SEA_OIL_PLAYED: {
+    name: "North Sea Oil", cardId: 86, cardName: "North Sea Oil", side: "US", duration: "PERMANENT",
+    description: "Prevents #61 OPEC from being played as an Event."
   },
   NORTH_SEA_OIL_ACTIVE: {
     name: "North Sea Oil",
@@ -725,13 +734,14 @@ export class CardsView {
 
     flagsContainer.innerHTML = "";
     const flags = state.flags || [];
-    const effectCards: Array<{ title: string; side: string; badge: string; desc: string }> = [];
+    const effectCards: Array<{ key: string; icon?: string; title: string; side: string; badge: string; desc: string }> = [];
 
     // 1. Check persistent flags
     flags.forEach(f => {
       const info = EFFECT_INFO_MAP[f];
       if (info) {
         effectCards.push({
+          key: f, icon: flagIcon(f),
           title: info.name,
           side: info.side,
           badge: info.duration === "TURN" ? "Turn Only" : (info.duration === "PERMANENT" ? "Permanent" : "Conditional"),
@@ -739,6 +749,7 @@ export class CardsView {
         });
       } else {
         effectCards.push({
+          key: f,
           title: escapeHtml(f.replace(/_ACTIVE|_PLAYED/, "")),
           side: "NEUTRAL",
           badge: "Active",
@@ -756,25 +767,26 @@ export class CardsView {
     // way (SpaceRace::has_animal_in_space and friends all require opp_track < box), so
     // testing only one's own track showed perks that were not actually in effect --
     // "US may attempt Space Race twice" with the USSR level with them, for instance.
-    if (usSpace >= 2 && ussrSpace < 2) effectCards.push({ title: "US: Animal in Space (#2)", side: "US", badge: "Space Perk", desc: "US may attempt Space Race twice per turn." });
-    if (usSpace >= 4 && ussrSpace < 4) effectCards.push({ title: "US: Man in Earth Orbit (#4)", side: "US", badge: "Space Perk", desc: "USSR must select & reveal headline card before US chooses." });
-    if (usSpace >= 6 && ussrSpace < 6) effectCards.push({ title: "US: Eagle Has Landed (#6)", side: "US", badge: "Space Perk", desc: "US may discard 1 held card at end of turn." });
-    if (usSpace >= 8 && ussrSpace < 8) effectCards.push({ title: "US: Space Station (#8)", side: "US", badge: "Space Perk", desc: "US gains an 8th Action Round each turn." });
+    if (usSpace >= 2 && ussrSpace < 2) effectCards.push({ key: 'space-US-2', icon: spaceIcon(2), title: "US: Animal in Space (#2)", side: "US", badge: "Space Perk", desc: "US may attempt Space Race twice per turn." });
+    if (usSpace >= 4 && ussrSpace < 4) effectCards.push({ key: 'space-US-4', icon: spaceIcon(4), title: "US: Man in Earth Orbit (#4)", side: "US", badge: "Space Perk", desc: "USSR must select & reveal headline card before US chooses." });
+    if (usSpace >= 6 && ussrSpace < 6) effectCards.push({ key: 'space-US-6', icon: spaceIcon(6), title: "US: Eagle Has Landed (#6)", side: "US", badge: "Space Perk", desc: "US may discard 1 held card at end of turn." });
+    if (usSpace >= 8 && ussrSpace < 8) effectCards.push({ key: 'space-US-8', icon: spaceIcon(8), title: "US: Space Station (#8)", side: "US", badge: "Space Perk", desc: "US gains an 8th Action Round each turn." });
 
-    if (ussrSpace >= 2 && usSpace < 2) effectCards.push({ title: "USSR: Animal in Space (#2)", side: "USSR", badge: "Space Perk", desc: "USSR may attempt Space Race twice per turn." });
-    if (ussrSpace >= 4 && usSpace < 4) effectCards.push({ title: "USSR: Man in Earth Orbit (#4)", side: "USSR", badge: "Space Perk", desc: "US must select & reveal headline card before USSR chooses." });
-    if (ussrSpace >= 6 && usSpace < 6) effectCards.push({ title: "USSR: Bear Has Landed (#6)", side: "USSR", badge: "Space Perk", desc: "USSR may discard 1 held card at end of turn." });
-    if (ussrSpace >= 8 && usSpace < 8) effectCards.push({ title: "USSR: Space Station (#8)", side: "USSR", badge: "Space Perk", desc: "USSR gains an 8th Action Round each turn." });
+    if (ussrSpace >= 2 && usSpace < 2) effectCards.push({ key: 'space-USSR-2', icon: spaceIcon(2), title: "USSR: Animal in Space (#2)", side: "USSR", badge: "Space Perk", desc: "USSR may attempt Space Race twice per turn." });
+    if (ussrSpace >= 4 && usSpace < 4) effectCards.push({ key: 'space-USSR-4', icon: spaceIcon(4), title: "USSR: Man in Earth Orbit (#4)", side: "USSR", badge: "Space Perk", desc: "US must select & reveal headline card before USSR chooses." });
+    if (ussrSpace >= 6 && usSpace < 6) effectCards.push({ key: 'space-USSR-6', icon: spaceIcon(6), title: "USSR: Bear Has Landed (#6)", side: "USSR", badge: "Space Perk", desc: "USSR may discard 1 held card at end of turn." });
+    if (ussrSpace >= 8 && usSpace < 8) effectCards.push({ key: 'space-USSR-8', icon: spaceIcon(8), title: "USSR: Space Station (#8)", side: "USSR", badge: "Space Perk", desc: "USSR gains an 8th Action Round each turn." });
 
     if (effectCards.length === 0) {
       flagsContainer.replaceChildren();
       return;
     }
 
-    effectCards.forEach((eff, index) => {
+    effectCards.forEach(eff => {
       const button = document.createElement("button");
       button.className = `vtt-effect side-${eff.side.toLowerCase()}`;
-      button.textContent = String(index + 1);
+      button.dataset.effect = eff.key;
+      button.append(effectIcon(eff.icon));
       button.title = `${label(eff.title)} · ${label(eff.badge)}\n${label(eff.desc)}`;
       button.setAttribute("aria-label", label(eff.title));
       button.addEventListener("click", () => this.showEffectDetails(eff));
