@@ -1,12 +1,4 @@
-/**
- * A region's scoring, side by side: the US's summary on the left, the USSR's on the right, the
- * rows between them -- standing, battlegrounds, the other countries, those next to the enemy
- * superpower, the total -- as the Playdek app's scoring screen lays it out. Shown on hovering a
- * region's badge and, pinned in the modal, on clicking (or tapping) it.
- *
- * Every number is the engine's (WasmEngine.regionScores): what the scoring counted and what it
- * awards. Nothing here adds up a score.
- */
+import { t, label } from "./i18n";
 import type { RegionScoreAudit } from "./map_view";
 import type { RegionalStatus, RegionSideScore } from "./types";
 import { escapeHtml } from "./html";
@@ -26,25 +18,25 @@ export type NetSide = "us" | "ussr" | "even";
 
 /** "+3 USSR", "+2 US", "even", or who wins outright -- in full, and as short as a map badge needs. */
 export function regionNet(a: RegionScoreAudit): { text: string; short: string; side: NetSide } {
-  if (a.wins === "US") return { text: "US wins the game", short: "US WINS", side: "us" };
-  if (a.wins === "USSR") return { text: "USSR wins the game", short: "USSR WINS", side: "ussr" };
+  if (a.wins === "US") return { text: t("US wins the game"), short: "US WINS", side: "us" };
+  if (a.wins === "USSR") return { text: t("USSR wins the game"), short: "USSR WINS", side: "ussr" };
   const vp = (text: string, side: NetSide) => ({ text, short: text, side });
-  if (a.netVpUs > 0) return vp(`+${a.netVpUs} US`, "us");
-  if (a.netVpUs < 0) return vp(`+${-a.netVpUs} USSR`, "ussr");
+  if (a.netVpUs > 0) return vp(t("+{0} US", [a.netVpUs]), "us");
+  if (a.netVpUs < 0) return vp(t("+{0} USSR", [-a.netVpUs]), "ussr");
   return vp("even", "even");
 }
 
-function row(label: string, us: string, ussr: string, cls = ""): string {
-  return `<div class="rs-row ${cls}"><span class="rs-us">${us}</span><span class="rs-label">${label}</span><span class="rs-ussr">${ussr}</span></div>`;
+function row(caption: string, us: string, ussr: string, cls = ""): string {
+  return `<div class="rs-row ${cls}"><span class="rs-us">${label(us)}</span><span class="rs-label">${label(caption)}</span><span class="rs-ussr">${label(ussr)}</span></div>`;
 }
 
 /** A count and the VP it brings: "2 · +2". */
-const counted = (n: number, vp: number): string => `${n}<small>${vp ? ` · +${vp}` : ""}</small>`;
+const counted = (n: number, vp: number): string => `${label(n)}<small>${label(vp ? ` · +${vp}` : "")}</small>`;
 
 /** A standing and what it alone is worth: "Domination · 7". */
 function standing(s: RegionSideScore): string {
   const name = STANDING_NAME[s.status ?? "NONE"];
-  return `${name}<small>${s.base_vp ? ` · ${s.base_vp}` : ""}</small>`;
+  return `${label(name)}<small>${label(s.base_vp ? ` · ${s.base_vp}` : "")}</small>`;
 }
 
 export function regionSummaryHtml(a: RegionScoreAudit): string {
@@ -53,30 +45,30 @@ export function regionSummaryHtml(a: RegionScoreAudit): string {
   if (a.southeastAsia) {
     // Southeast Asia Scoring has no standings: each country is worth its VP (Thailand 2).
     const worth = (s: RegionSideScore, vp: number) => s.controlled.filter(c => c.vp === vp).length;
-    rows = row("Countries (1 VP)", String(worth(a.us, 1)), String(worth(a.ussr, 1)))
-      + row("Thailand (2 VP)", worth(a.us, 2) ? "✓" : "—", worth(a.ussr, 2) ? "✓" : "—");
+    rows = row(t("Countries (1 VP)"), String(worth(a.us, 1)), String(worth(a.ussr, 1)))
+      + row(t("Thailand (2 VP)"), worth(a.us, 2) ? "✓" : "—", worth(a.ussr, 2) ? "✓" : "—");
   } else {
     const other = (s: RegionSideScore) => String(s.countries - s.battlegrounds);
     rows = row("Standing", standing(a.us), standing(a.ussr), "rs-standing")
-      + row(`Battlegrounds <small>of ${a.totalBattlegrounds}</small>`,
+      + row(`${t("Battlegrounds")} <small>${t("of {0}", [a.totalBattlegrounds])}</small>`,
             counted(a.us.battlegrounds, a.us.battlegrounds), counted(a.ussr.battlegrounds, a.ussr.battlegrounds))
-      + row("Other countries", other(a.us), other(a.ussr))
-      + row("Next to the enemy", counted(a.us.adjacent, a.us.adjacent), counted(a.ussr.adjacent, a.ussr.adjacent));
+      + row(t("Other countries"), other(a.us), other(a.ussr))
+      + row(t("Next to the enemy"), counted(a.us.adjacent, a.us.adjacent), counted(a.ussr.adjacent, a.ussr.adjacent));
   }
   rows += row("Total", String(a.us.vp), String(a.ussr.vp), "rs-total");
   const list = (names: string[]): string => escapeHtml(names.length ? names.join(", ") : "none");
   const uncounted = a.shuttleDiplomacy
-    ? `<div class="rs-foot">Shuttle Diplomacy: one USSR battleground is not counted in this scoring</div>`
+    ? `<div class="rs-foot">${t("Shuttle Diplomacy: one USSR battleground is not counted in this scoring")}</div>`
     : "";
   return `
     <div class="rs" style="--rs-accent: ${escapeHtml(a.color)}" data-region="${escapeHtml(a.regionName)}">
-      <div class="rs-head"><span class="rs-title">${escapeHtml(title(a.regionName))} Scoring</span><span class="rs-net rs-${net.side}">${net.text}</span></div>
-      <div class="rs-sides"><span class="rs-us">US</span><span></span><span class="rs-ussr">USSR</span></div>
-      ${rows}
-      <div class="rs-list"><span class="rs-us">US controls</span> ${list(a.usControlled)}</div>
-      <div class="rs-list"><span class="rs-ussr">USSR controls</span> ${list(a.ussrControlled)}</div>
-      ${uncounted}
-      <div class="rs-foot">${escapeHtml(a.scoringCardText)}</div>
-      <div class="rs-foot">${escapeHtml(a.scoringCardName)}: ${escapeHtml(a.scoringCard.where)}</div>
+      <div class="rs-head"><span class="rs-title">${t("{0} Scoring", [escapeHtml(title(a.regionName))])}</span><span class="rs-net rs-${net.side}">${label(net.text)}</span></div>
+      <div class="rs-sides"><span class="rs-us">${t("US")}</span><span></span><span class="rs-ussr">${t("USSR")}</span></div>
+      ${label(rows)}
+      <div class="rs-list"><span class="rs-us">${t("US controls")}</span> ${label(list(a.usControlled))}</div>
+      <div class="rs-list"><span class="rs-ussr">${t("USSR controls")}</span> ${label(list(a.ussrControlled))}</div>
+      ${label(uncounted)}
+      <div class="rs-foot">${label(escapeHtml(a.scoringCardText))}</div>
+      <div class="rs-foot">${`${escapeHtml(a.scoringCardName)}: ${escapeHtml(a.scoringCard.where)}`}</div>
     </div>`;
 }

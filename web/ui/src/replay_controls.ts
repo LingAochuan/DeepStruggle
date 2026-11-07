@@ -1,3 +1,4 @@
+import { t, label, onLocaleChange } from "./i18n";
 import { DieRollState, EventTrackState, GameState } from "./types";
 
 /** One legal action and the probability the policy put on it. */
@@ -98,6 +99,10 @@ export class ReplayControls {
     this.speedSelect = document.getElementById("rep-speed-select") as HTMLSelectElement;
     this.serverSelect = document.getElementById("rep-server-select") as HTMLSelectElement | null;
 
+    onLocaleChange(() => {
+      this.updateUI();
+      this.playBtn.textContent = t(this.isPlaying ? "⏸ Pause" : "▶ Play");
+    });
     this.setupListeners();
     this.fetchServerReplays();
   }
@@ -116,16 +121,16 @@ export class ReplayControls {
       const replays: Array<{ filename: string; game_id?: string; total_steps?: number; result?: { winner?: string } | null;
                              error?: string }> = await res.json();
 
-      this.serverSelect.innerHTML = "<option value=\"\">Local replays...</option>";
+      this.serverSelect.innerHTML = `<option value="">${t("Local replays...")}</option>`;
       replays.forEach(r => {
         const opt = document.createElement("option");
         opt.value = r.filename;
         if (r.error !== undefined) {
           opt.disabled = true;
-          opt.textContent = `${r.filename} (unreadable: ${r.error})`;
+          opt.textContent = label(t("{0} (unreadable: {1})", [r.filename, r.error]));
         } else {
-          const winner = r.result?.winner ? ` [Winner: ${r.result.winner}]` : "";
-          opt.textContent = `${r.game_id} (${r.total_steps} steps)${winner}`;
+          const winner = r.result?.winner ? t(" [Winner: {0}]", [r.result.winner]) : "";
+          opt.textContent = label(t("{0} ({1} steps){2}", [r.game_id, r.total_steps, winner]));
         }
         this.serverSelect?.appendChild(opt);
       });
@@ -167,7 +172,7 @@ export class ReplayControls {
         phase: l.phase || "ACTION",
         player: l.phasing_player || l.decision?.player || "SYSTEM",
         action: l.action_executed || {},
-        description: l.commentary || l.strategy || `Step ${i + 1}`,
+        description: l.commentary || l.strategy || t("Step {0}", [i + 1]),
         state_snapshot: l.state_snapshot || {}
       }));
     } else if (replayData.events && replayData.events.length > 0) {
@@ -183,7 +188,7 @@ export class ReplayControls {
           secondary_id: ev.secondary_id,
           flat_action: ev.flat_action,
         },
-        description: ev.description || `Action (type=${ev.decision_type}, flat=${ev.flat_action})`,
+        description: ev.description || t("Action (type={0}, flat={1})", [ev.decision_type, ev.flat_action]),
         state_snapshot: ev.state || ev.state_snapshot || {}
       }));
     } else {
@@ -235,7 +240,7 @@ export class ReplayControls {
           const json = JSON.parse(evt.target?.result as string);
           this.loadReplayData(json);
         } catch (err) {
-          alert("Failed to parse replay file.");
+          alert(t("Failed to parse replay file."));
         }
       };
       reader.readAsText(file);
@@ -264,7 +269,7 @@ export class ReplayControls {
   public play() {
     if (this.steps.length === 0) return;
     this.isPlaying = true;
-    this.playBtn.textContent = "⏸ Pause";
+    this.playBtn.textContent = label(t("⏸ Pause"));
     const interval = parseInt(this.speedSelect.value, 10) || 500;
     this.timer = window.setInterval(() => {
       if (this.currentStep >= this.steps.length - 1) {
@@ -277,7 +282,7 @@ export class ReplayControls {
 
   public stop() {
     this.isPlaying = false;
-    this.playBtn.textContent = "▶ Play";
+    this.playBtn.textContent = label(t("▶ Play"));
     if (this.timer !== null) {
       clearInterval(this.timer);
       this.timer = null;
@@ -285,7 +290,7 @@ export class ReplayControls {
   }
 
   private updateUI() {
-    this.labelEl.textContent = `Step ${this.currentStep} / ${Math.max(0, this.steps.length - 1)}`;
+    this.labelEl.textContent = label(t("Step {0} / {1}", [this.currentStep, Math.max(0, this.steps.length - 1)]));
   }
 
   /**
@@ -306,7 +311,7 @@ export class ReplayControls {
       name = `ts_workbench_${new Date().toISOString().replace(/[:.]/g, "-")}.tslog.json`;
     }
     if (!doc) {
-      alert("No replay data to export.");
+      alert(t("No replay data to export."));
       return;
     }
     const blob = new Blob([JSON.stringify(doc, null, 2)], { type: "application/json" });

@@ -565,3 +565,33 @@ PYTHONPATH=.:build/release .venv/bin/python -m pytest -q tests/web
 
 The TypeScript under test in node (`tests/web/js/*.ts`) is bundled with the esbuild that ships
 with Vite (`tests/web/js_runner.py`).
+
+
+## Display locales (English and Simplified Chinese)
+
+`src/i18n/index.ts` initializes the locale before component construction. English is the default;
+`?lang=en|zh-CN` overrides the saved `deepstruggle.locale.v1` preference. The language selectors
+change the display in place, preserving the engine, position, undo history and saved game. The
+shared modal renderer also preserves entered form values. Result submission state is retained.
+
+Use explicit `t("English source", [parameters])` for messages, `label` for exact display labels,
+and the ID-based `cardName` / `countryName` helpers for engine metadata. Static HTML opts in with
+`data-i18n` and the corresponding title/placeholder/aria-label attributes. Dynamic components own
+their labels: remove stale static bindings when a component replaces a label, and redraw on locale
+changes. Do not localize enum values, object keys, CSS classes, engine input, model metadata,
+recorded actions, saved games or logs used by grouping/redaction logic.
+
+`src/i18n/zh-CN/game.json` contains the reviewed 110 card names and event descriptions, countries,
+regions and community terminology; `messages.json` contains UI copy. `log-messages.json` and
+`errors.json` describe recognized whole-message templates. `localizeLog` adapts these only at
+render boundaries, with exact English and unknown-text fallbacks. Numeric log fields have bounded
+patterns so one side's influence or VP cannot consume the next field. Card references retain IDs;
+`game/card_refs.ts` recognizes both display languages and still escapes untrusted replay text.
+`CARDS_METADATA` has display-only name/description getters; `ENGLISH_CARDS_METADATA` is available
+for bilingual search and English log references. Raw map/rule metadata and gameplay stay intact.
+
+When adding UI copy, add a catalog entry and an explicit call; do not use DOM-wide replacement or
+MutationObserver translation. Preserve parameter sets except documented English-only plural or
+agreement suffixes. Validate `tsc --noEmit`, the localization test (`tests/web/i18n.mjs`), the
+existing English log/card-reference regressions, and a browser language round trip during a game.
+Check Chinese first load, open dialogs, persisted language, errors, and narrow-screen layout.

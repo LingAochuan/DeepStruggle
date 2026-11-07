@@ -1,12 +1,5 @@
-/**
- * The workbench: watch replays, test the engine by playing it, and play with a model.
- *
- * Everything runs in the page. The engine is the WebAssembly build of engine/ + bindings/
- * (engine/wasm_engine.ts), the game -- stepping, dice, undo, the action log -- is
- * game/session.ts, and models run as ONNX in onnxruntime-web (analysis/). A server is optional:
- * the local one (web/server/main.py) only lists this machine's checkpoints and replays, and the
- * same page works from GitHub Pages with models from Hugging Face or a dropped file.
- */
+import { localizeLog } from "./i18n/log";
+import { t, label } from "./i18n";
 import { GameState, MicroAction, RegionScores } from "./types";
 import { MapView } from "./map_view";
 import { TracksView } from "./tracks_view";
@@ -35,7 +28,8 @@ import { MoveHow, buildSubmission, sha256Hex, summarize } from "./game/record";
 import { loadStoredGame, storeGame } from "./game/saved_game";
 import { ResultDialog } from "./result_dialog";
 import { BUILD_COMMIT, BUILD_DIRTY } from "./build_info";
-import { CARDS_METADATA } from "./metadata";
+import { CARDS_METADATA, ENGLISH_CARDS_METADATA } from "./metadata";
+import { bindLanguageControls, onLocaleChange } from "./i18n";
 import { escapeHtml, num } from "./html";
 
 /** Pause before an auto-played move, long enough to see each one land. */
@@ -120,6 +114,7 @@ export class TSApp {
   private modelLabel: { text: string; status: "off" | "loading" | "ready" | "error" } = { text: "no model", status: "off" };
 
   constructor() {
+    bindLanguageControls();
     this.parseQueryParams();
 
     const tracksContainer = document.getElementById("global-tracks")!;
@@ -176,14 +171,28 @@ export class TSApp {
     this.setupGlobalControls();
     this.setupBottomResizer();
     this.setupFileDrop();
+    onLocaleChange(() => {
+      this.badge(...this.badgeState);
+      this.logCardNames = null;
+      this.renderState();
+      this.renderModelModeLabels();
+      const spec = this.rolloutChoice;
+      const specText = document.getElementById("mode-opponent-rollout-spec");
+      if (specText) specText.textContent = t("its top {0} move{1}, each played out in ", [spec.k, spec.k === 1 ? "" : "s"]) + t("{0} sampled world{1}", [spec.worlds, spec.worlds === 1 ? "" : "s"]);
+      if (this.isReplayMode) this.renderTrace();
+    });
     this.boot();
   }
 
+  private badgeState: [string, string, string] = ["LOADING ENGINE…", "", ""];
+
   private badge(text: string, cls: string, title = ""): void {
     const el = document.getElementById("connection-status")!;
-    el.textContent = text;
+    this.badgeState = [text, cls, title];
+    delete el.dataset.i18n;
+    el.textContent = localizeLog(text);
     el.className = `status-badge ${cls}`;
-    el.title = title;
+    el.title = localizeLog(title);
   }
 
   /**
@@ -194,7 +203,7 @@ export class TSApp {
       this.engine = await WasmEngine.load();
     } catch (e) {
       this.badge("NO ENGINE", "disconnected", String(e));
-      window.alert(String(e));
+      window.alert(localizeLog(e instanceof Error ? e.message : String(e)));
       return;
     }
     this.runner = new RolloutRunner();
@@ -205,7 +214,7 @@ export class TSApp {
         try {
           this.session.loadPosition(await decodePosition(this.urlPosition), this.urlPosition);
         } catch (e) {
-          window.alert(`Could not open the position in the link -- starting a new game instead.\n\n${e}`);
+          window.alert(t("Could not open the position in the link -- starting a new game instead.\n\n{0}", [localizeLog(e instanceof Error ? e.message : String(e))]));
         }
       }
     }
@@ -242,7 +251,7 @@ export class TSApp {
       const raw = withModel ? (await defaultHfCatalog()).defaultSearch : await fetchHfDefaultSearch();
       if (raw === null) return;
       const spec = parseSearchParam(raw);
-      if (spec === undefined) throw new Error(`${DEFAULT_HF_REPO}'s default search ${raw} is not a search= value`);
+      if (spec === undefined) throw new Error(t("{0}'s default search {1} is not a search= value", [DEFAULT_HF_REPO, raw]));
       this.defaultSearch = spec;
     } catch (e) {
       console.warn(`workbench: the default search could not be read, the built-in one stands: ${e instanceof Error ? e.message : e}`);
@@ -312,7 +321,7 @@ export class TSApp {
   /** The game's record for the stats database, with the result dialog's Playdek fields. */
   private submission(playdek: { login: string; rating: number }, note: string) {
     const s = this.session;
-    if (!s || !s.result || !this.engine) return Promise.reject(new Error("the game is not over"));
+    if (!s || !s.result || !this.engine) return Promise.reject(new Error(t("the game is not over")));
     return buildSubmission(s.record(), s.result, this.engine.saveJson(),
       { commit: BUILD_COMMIT, dirty: BUILD_DIRTY, engine_fingerprint: this.engine.fingerprint }, playdek, note);
   }
@@ -327,7 +336,7 @@ export class TSApp {
     this.resultDialog.open({
       winner: s.result.winner, margin: s.result.margin, endTurn: s.result.end_turn, reason: s.result.reason,
       summary, submitted: s.submitted,
-      model: model ? `${model.label}${search ? ` (${search === "policy" ? "policy" : `rollout root ${search.replace(/^rollout:/, "")}`})` : ""}` : "",
+      model: model ? `${model.label}${search ? ` (${search === "policy" ? "policy" : t("rollout root {0}", [search.replace(/^rollout:/, "")])})` : ""}` : "",
     });
   }
 
@@ -363,12 +372,12 @@ export class TSApp {
     const fp = this.engine!.fingerprint;
     try {
       const res = await fetch("/api/local/info");
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) throw new Error(t("HTTP {0}", [res.status]));
       const info = await res.json();
       if (info.engine_fingerprint !== fp) {
         this.badge("ENGINE STALE", "stale",
-          `The page's engine (${fp.slice(0, 12)}) is not what the sources here build (${String(info.engine_fingerprint).slice(0, 12)}). `
-          + "Rebuild it with tools/scripts/build_web.sh.");
+          t("The page's engine ({0}) is not what the sources here build ({1}). ", [fp.slice(0, 12), String(info.engine_fingerprint).slice(0, 12)])
+          + t("Rebuild it with tools/scripts/build_web.sh."));
         return;
       }
       this.badge(`ENGINE ${fp.slice(0, 8)}`, "connected", `engine fingerprint ${fp} -- matches the local sources`);
@@ -412,9 +421,9 @@ export class TSApp {
     if (!dialog) return;
     const note = document.getElementById("mode-dialog-note");
     if (note) {
-      note.textContent = reason === "new"
-        ? "A fresh deal follows your choice. Close to keep the game on the board."
-        : "You can change this any time in the Play mode select above.";
+      note.textContent = label(reason === "new"
+        ? t("A fresh deal follows your choice. Close to keep the game on the board.")
+        : t("You can change this any time in the Play mode select above."));
     }
     this.closeModelMode();
     this.moveModelSection("mode-model-slot");
@@ -520,7 +529,7 @@ export class TSApp {
   private setupSearchChoice() {
     const fill = (id: string, names: readonly string[]) => {
       const sel = document.getElementById(id) as HTMLSelectElement | null;
-      if (sel) sel.innerHTML = names.map(n => `<option value="${n}">${n.replace(/_/g, " ")}</option>`).join("");
+      if (sel) sel.innerHTML = names.map(n => `<option value="${n}">${label(n.replace(/_/g, " "))}</option>`).join("");
     };
     fill("ss-stop", STOPS);
     fill("ss-leaf", LEAVES);
@@ -565,11 +574,11 @@ export class TSApp {
     const spec = whole(belief) && whole(race) ? parseRolloutParam(text) : null;
     const error = document.getElementById("ss-error");
     if (!spec) {
-      if (error) error.textContent = "Not a search: k and worlds whole numbers of at least 1, the horizon and belief "
-        + "hands of at least 0, the race worlds 0 (off) or below the worlds, the rule argmax, z<x> or kl<t>.";
+      if (error) error.textContent = label(t("Not a search: k and worlds whole numbers of at least 1, the horizon and belief ")
+        + `${t("hands of at least 0, the race worlds 0 (off) or below the worlds, the rule argmax, z")}<x> ${t("or kl")}<t>.`);
       return;
     }
-    if (error) error.textContent = "";
+    if (error) error.textContent = label("");
     this.rolloutEdited = true;
     this.rolloutChoice = spec;
     this.chooseRollout();
@@ -595,8 +604,8 @@ export class TSApp {
     const spec = this.rolloutChoice;
     const specText = document.getElementById("mode-opponent-rollout-spec");
     if (specText) {
-      specText.textContent = `its top ${spec.k} move${spec.k === 1 ? "" : "s"}, each played out in `
-        + `${spec.worlds} sampled world${spec.worlds === 1 ? "" : "s"}`;
+      specText.textContent = label(t("its top {0} move{1}, each played out in ", [spec.k, spec.k === 1 ? "" : "s"])
+        + t("{0} sampled world{1}", [spec.worlds, spec.worlds === 1 ? "" : "s"]));
     }
     const set = (id: string, v: string) => { const el = document.getElementById(id) as HTMLInputElement | null; if (el) el.value = v; };
     const tick = (id: string, v: boolean) => { const el = document.getElementById(id) as HTMLInputElement | null; if (el) el.checked = v; };
@@ -612,10 +621,10 @@ export class TSApp {
     set("ss-belief", String(spec.belief));
     set("ss-race", String(spec.race));
     const code = document.getElementById("search-settings-code");
-    if (code) code.textContent = rolloutParam(spec);
+    if (code) code.textContent = label(rolloutParam(spec));
     const deflt = document.getElementById("ss-default") as HTMLButtonElement | null;
     const d = this.defaultSearch ?? DEFAULT_ROLLOUT;
-    if (deflt) deflt.title = `The default search: ${rolloutParam(d)}`;
+    if (deflt) deflt.title = label(t("The default search: {0}", [rolloutParam(d)]));
     this.renderModelModeLabels();
   }
 
@@ -630,19 +639,19 @@ export class TSApp {
    * the play-mode question's folded summary what its radios say.
    */
   private renderModelModeLabels() {
-    const modeName = (spec: RolloutSpec | null) => spec ? "Rollout root" : "Policy";
+    const modeName = (spec: RolloutSpec | null) => spec ? t("Rollout root") : "Policy";
     const { text, status } = this.modelLabel;
     const model = document.getElementById("model-mode-label-model");
     if (model) {
-      model.textContent = text;
+      model.textContent = label(text);
       model.className = `mm-model ${status}`;
     }
     const mode = document.getElementById("model-mode-label-mode");
-    if (mode) mode.textContent = modeName(this.searchSpec);
+    if (mode) mode.textContent = label(modeName(this.searchSpec));
     const btn = document.getElementById("btn-model-choose");
-    if (btn) btn.title = `${text} · ${modeName(this.searchSpec)} -- choose the model (a local checkpoint, a Hugging Face repo or an .onnx file) and how it plays`;
+    if (btn) btn.title = label(t("{0} · {1} -- choose the model (a local checkpoint, a Hugging Face repo or an .onnx file) and how it plays", [text, modeName(this.searchSpec)]));
     const summary = document.getElementById("mode-model-summary");
-    if (summary) summary.textContent = `${text} · ${modeName(this.searchChoice())}`;
+    if (summary) summary.textContent = label(`${text} · ${modeName(this.searchChoice())}`);
   }
 
   /**
@@ -765,7 +774,7 @@ export class TSApp {
       const b = document.getElementById(id) as HTMLButtonElement | null;
       if (!b) continue;
       b.disabled = opp !== null;
-      b.title = opp ? "Shows the full state -- switch to the Developer view to use it" : "";
+      b.title = label(opp ? t("Shows the full state -- switch to the Developer view to use it") : "");
     }
     if (!rerender) return;
     if (opp && this.isReplayMode) {
@@ -902,7 +911,7 @@ export class TSApp {
       }
       this.maybeAutoPlay();
     } catch (e) {
-      if (key === this.modelKey) this.analysisPanel.setError(`The model failed on this position: ${e}`);
+      if (key === this.modelKey) this.analysisPanel.setError(t("The model failed on this position: {0}", [e]));
     }
   }
 
@@ -975,7 +984,7 @@ export class TSApp {
           if (this.view !== "DEV") this.setView("DEV");
           this.replayControls.loadReplayData(JSON.parse(await f.text()));
         } catch (err) {
-          window.alert(`Not a replay: ${err}`);
+          window.alert(t("Not a replay: {0}", [localizeLog(err instanceof Error ? err.message : String(err))]));
         }
       }
     });
@@ -986,7 +995,7 @@ export class TSApp {
     this.replayControls.watching = on;
     const replayBtn = document.getElementById("btn-toggle-replay");
     if (replayBtn) {
-      replayBtn.textContent = on ? "Live Mode" : "Replay Mode";
+      replayBtn.textContent = label(on ? t("Live Mode") : t("Replay Mode"));
       replayBtn.className = on ? "btn btn-warning btn-sm" : "btn btn-primary btn-sm";
     }
     this.analysisPanel?.show(!on);
@@ -1049,7 +1058,7 @@ export class TSApp {
       const ids = new Map<string, number>();
       for (const c of CARDS_METADATA) {
         const engineName = this.engine?.cardName(c.id);
-        const all = [...new Set([engineName, c.name].filter((n): n is string => !!n))];
+        const all = [...new Set([engineName, c.name, ENGLISH_CARDS_METADATA.find(raw => raw.id === c.id)?.name].filter((n): n is string => !!n))];
         names.set(c.id, all);
         for (const n of all) ids.set(n, c.id);
       }
@@ -1122,8 +1131,8 @@ export class TSApp {
       // Never the live game's log in its place: a replay link opens on a new game, and its log
       // stood in until the replay file and the engine had both arrived.
       if (!this.engine || this.replaySteps.length === 0) {
-        logContainer.innerHTML = `<div class="log-empty-msg">Loading the replay…</div>`;
-        if (logCountBadge) logCountBadge.textContent = "";
+        logContainer.innerHTML = `<div class="log-empty-msg">${t("Loading the replay…")}</div>`;
+        if (logCountBadge) logCountBadge.textContent = label("");
         return;
       }
       if (this.replayEntries?.steps !== this.replaySteps) {
@@ -1142,15 +1151,15 @@ export class TSApp {
     const cardNames = this.cardNames();
 
     if (logCountBadge) {
-      logCountBadge.textContent = this.isVpFilterActive
-        ? `${includedIndices.length} filtered (${targetIndices.size} VP events)`
-        : replay ? `${this.replaySteps.length} steps (Current: #${this.replayCurrentStep + 1})` : `${entries.length} events`;
+      logCountBadge.textContent = label(this.isVpFilterActive
+        ? t("{0} filtered ({1} VP events)", [includedIndices.length, targetIndices.size])
+        : replay ? t("{0} steps (Current: #{1})", [this.replaySteps.length, this.replayCurrentStep + 1]) : t("{0} events", [entries.length]));
     }
 
     logContainer.innerHTML = "";
     if (includedIndices.length === 0) {
-      logContainer.innerHTML = `<div class="log-empty-msg">${replay
-        ? "No VP-affecting events found in replay." : "No VP-affecting events recorded yet."}</div>`;
+      logContainer.innerHTML = `<div class="log-empty-msg">${label(replay
+        ? t("No VP-affecting events found in replay.") : t("No VP-affecting events recorded yet."))}</div>`;
       return;
     }
 
@@ -1160,7 +1169,7 @@ export class TSApp {
         const gap = idx - includedIndices[k - 1] - 1;
         const sep = document.createElement("div");
         sep.className = "log-context-separator";
-        sep.textContent = `••• ${gap} entr${gap > 1 ? "ies" : "y"} skipped •••`;
+        sep.textContent = label(t("••• {0} entr{1} skipped •••", [gap, gap > 1 ? "ies" : "y"]));
         logContainer.appendChild(sep);
       }
 
@@ -1169,14 +1178,14 @@ export class TSApp {
       item.className = `log-item ${current ? "active-replay-step" : ""} ${targetIndices.has(idx) ? "vp-target-event" : ""}`;
 
       // A line that can be matched to one step says which (game/log_view.ts LogEntry.steps).
-      const stepTag = (n: number | null) => n === null ? "" : `<span class="log-line-step">#${n}</span> `;
+      const stepTag = (n: number | null) => n === null ? "" : `<span class="log-line-step">${`#${n}`}</span> `;
       const lines = e.lines.map((d, j) => {
         let lineClass = "log-detail-line";
         if (d.includes("🎲")) lineClass += " log-die-line";
         if (d.includes("Victory Points:") || /\(#\d+\): .*VP/.test(d)) lineClass += " log-vp-line";
         if (d.startsWith("  ▸ ")) lineClass += " log-sub-line";
         const n = e.steps[j];
-        return `<div class="${lineClass}"${n === null ? "" : ` data-step="${n}"`}>${stepTag(n)}${linkCardRefs(d, cardNames)}</div>`;
+        return `<div class="${lineClass}"${n === null ? "" : ` data-step="${n}"`}>${`${stepTag(n)}${linkCardRefs(localizeLog(d), cardNames)}`}</div>`;
       }).join("");
 
       // A replay's policy chips: every decision of the play, in order.
@@ -1186,21 +1195,21 @@ export class TSApp {
       let vpDeltaBadge = "";
       if (e.vp_delta !== 0) {
         const deltaClass = e.vp_delta > 0 ? "us" : "ussr";
-        vpDeltaBadge = `<span class="vp-delta-pill ${deltaClass}">${num(e.vp_delta) > 0 ? `+${num(e.vp_delta)}` : num(e.vp_delta)} VP</span>`;
+        vpDeltaBadge = `<span class="vp-delta-pill ${deltaClass}">${t("{0} VP", [num(e.vp_delta) > 0 ? `+${num(e.vp_delta)}` : num(e.vp_delta)])}</span>`;
       }
 
       item.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 6px;">
           <div>
-            ${e.step === null ? "" : `<span class="log-index" style="font-size: 10px; color: var(--text-dim);">#${num(e.step)}</span>`}
-            <span class="log-step">[T${num(e.turn)} AR${num(e.ar)}]</span>
-            <span class="log-player ${escapeHtml(e.player)}">${escapeHtml(e.player)}:</span>
-            <span class="log-main-text">${linkCardRefs(e.title, cardNames)}</span>
-            ${chips}
+            ${label(e.step === null ? "" : `<span class="log-index" style="font-size: 10px; color: var(--text-dim);">${`#${num(e.step)}`}</span>`)}
+            <span class="log-step">${t("[T{0} AR{1}]", [num(e.turn), num(e.ar)])}</span>
+            <span class="log-player ${escapeHtml(e.player)}">${`${escapeHtml(label(e.player))}:`}</span>
+            <span class="log-main-text">${linkCardRefs(localizeLog(e.title), cardNames)}</span>
+            ${label(chips)}
           </div>
-          ${vpDeltaBadge}
+          ${label(vpDeltaBadge)}
         </div>
-        ${lines}
+        ${label(lines)}
       `;
       if (replay) {
         item.addEventListener("click", () => this.replayControls.goToStep(e.last));
@@ -1267,9 +1276,9 @@ export class TSApp {
     const prev = { text: el.textContent, cls: el.className, title: el.title };
     this.badge("REFUSED", "disconnected", why);
     window.setTimeout(() => {
-      el.textContent = prev.text;
+      el.textContent = label(prev.text);
       el.className = prev.cls;
-      el.title = prev.title;
+      el.title = label(prev.title);
     }, 1500);
   }
 
@@ -1280,7 +1289,7 @@ export class TSApp {
   private sendAction(action: MicroAction) {
     if (this.isReplayMode || !this.session) return;
     if (this.hiddenSideToMove()) {
-      this.refused(`it is ${opponentOf(this.view)}'s move -- the model plays that side in this view`);
+      this.refused(t("it is {0}'s move -- the model plays that side in this view", [opponentOf(this.view)]));
       return;
     }
     this.noteSettings();
@@ -1310,7 +1319,7 @@ export class TSApp {
     if (this.isReplayMode || !this.session) return;
     // In a player's view only auto-play moves for the other side.
     if (!auto && this.hiddenSideToMove()) {
-      this.refused(`it is ${opponentOf(this.view)}'s move -- the model plays that side in this view`);
+      this.refused(t("it is {0}'s move -- the model plays that side in this view", [opponentOf(this.view)]));
       return;
     }
     this.noteSettings();

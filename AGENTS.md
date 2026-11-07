@@ -10,6 +10,12 @@ Per-directory guides: [`engine/AGENTS.md`](engine/AGENTS.md), [`bindings/AGENTS.
 [`web/ui/AGENTS.md`](web/ui/AGENTS.md); the CLIs are documented in [`tools/README.md`](tools/README.md)
 and the research record in [`research/README.md`](research/README.md).
 
+The web workbench has optional Simplified Chinese display resources under
+`web/ui/src/i18n/`; English is the default. Localize presentation, not engine enum
+values, rule metadata, model identifiers, stored action logs or saved-game schemas.
+See [`docs/i18n/UPSTREAM.md`](docs/i18n/UPSTREAM.md) for the source-patch boundary and
+`node tests/web/i18n.mjs` for language-resource checks in addition to `tests/web`.
+
 ---
 
 ## 1. Project Architecture & Components

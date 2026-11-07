@@ -6,6 +6,13 @@
 import mapJson from "../../../rules/map.json";
 import cardsJson from "../../../rules/cards.json";
 import { CardMetadata, MapMetadata } from "./types";
+import { cardName, cardDescription } from "./i18n";
 
 export const MAP_METADATA = mapJson as unknown as MapMetadata;
-export const CARDS_METADATA = cardsJson as unknown as CardMetadata[];
+/** Keep raw English names available for replay matching and bilingual search. */
+export const ENGLISH_CARDS_METADATA = cardsJson as unknown as CardMetadata[];
+export const CARDS_METADATA: CardMetadata[] = ENGLISH_CARDS_METADATA.map(card => ({
+  ...card,
+  get name() { return cardName(card.id, card.name); },
+  get description() { return cardDescription(card.id, card.description); },
+}));
