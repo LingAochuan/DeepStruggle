@@ -75,6 +75,14 @@ try {
   const play = i18n.localizeLog("US plays Card: Duck and Cover (#4)");
   assert.match(play, /卧倒与掩护/);
   assert.match(play, /#4/);
+  for (const mode of ["Influence", "Coup", "Realignment"]) {
+    const unMode = i18n.localizeLog(`Event, then Ops: ${mode}`);
+    assert(!/[A-Za-z]{3}/.test(unMode), `UN Intervention combined mode: ${unMode}`);
+  }
+  const unCard = i18n.localizeLog("  • US/Japan Mutual Defense Pact (#27) discarded");
+  assert.match(unCard, /美日共同防卫协定/);
+  assert.match(unCard, /已弃置/);
+  assert(!/[A-Za-z]{3}/.test(unCard));
   const headline = i18n.localizeLog("  ★ Headlines Simultaneously Revealed: US plays 'Duck and Cover' (#4, 3 Ops) vs USSR plays 'Fidel' (#8, 2 Ops)");
   assert.match(headline, /卧倒与掩护/);
   assert.match(headline, /#4/);

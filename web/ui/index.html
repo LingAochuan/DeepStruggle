@@ -4,9 +4,6 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title data-i18n="Twilight Struggle Engine Workbench">Twilight Struggle Engine Workbench</title>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;family=Cinzel:wght@700;900&amp;display=swap" rel="stylesheet"/>
 <link href="/src/style.css" rel="stylesheet"/>
   <link rel="stylesheet" href="/src/fvtt_shell.css">
 </head>
@@ -47,10 +44,7 @@
 <header class="vtt-panel-heading"><span id="vtt-dock-title"></span></header>
 <div id="vtt-dock-content">
 <section data-dock-page="log" hidden>
-<div class="vtt-log-options"><span class="log-count-badge" data-i18n="0 events" id="log-count">0 events</span><label class="log-filter-checkbox" data-i18n-title="Filter log to only show lines affecting VP and 2 context lines before and 2 context lines after" title="Filter log to only show lines affecting VP and 2 context lines before and 2 context lines after">
-<input id="chk-filter-vp" type="checkbox"/>
-<span data-i18n="🎯 VP Events (±2 Context)">🎯 VP Events (±2 Context)</span>
-</label></div>
+<div class="vtt-log-options"><span class="log-count-badge" data-i18n="0 events" id="log-count">0 events</span></div>
 <div class="log-messages" id="action-log-stream"></div>
 </section>
 <section data-dock-page="analysis" hidden>
@@ -61,7 +55,7 @@
 </div>
 <!-- The model itself is chosen in the technical bar (#tech-model); here is what it says. -->
 <div class="analysis-controls">
-<button class="btn btn-primary btn-sm" data-i18n="★ Play favourite" data-i18n-title="Play the model's most likely move (F)" disabled="" id="btn-play-favourite" title="Play the model's most likely move (F)">★ Play favourite</button>
+<button class="btn btn-primary btn-sm" data-i18n="Play favourite" data-i18n-title="Play the model's most likely move (F)" disabled="" id="btn-play-favourite" title="Play the model's most likely move (F)">Play favourite</button>
 <label class="analysis-autoplay" data-i18n-title="This side plays the model's favourite automatically; you play the other" title="This side plays the model's favourite automatically; you play the other">
 <span data-i18n="Auto-play">Auto-play</span>
 <select class="analysis-select" id="analysis-autoplay-select">
@@ -175,11 +169,11 @@
 <div class="vtt-setting-buttons"><button class="btn btn-secondary btn-sm" data-i18n="New Game" data-i18n-title="A new game with a fresh deal; asks for the play mode first" id="btn-new-game" title="A new game with a fresh deal; asks for the play mode first">New Game</button><button class="btn btn-primary btn-sm hidden" data-i18n="Result" data-i18n-title="The result, and adding the game to the stats database" id="btn-game-result" title="The result, and adding the game to the stats database">Result</button></div>
 <details class="vtt-replay-settings"><summary data-i18n="Game and replay">Game and replay</summary><button class="btn btn-primary btn-sm" data-i18n="Replay Mode" id="btn-toggle-replay">Replay Mode</button><div class="replay-toolbar" id="replay-toolbar">
 <div class="transport-controls">
-<button class="btn-icon" data-i18n-title="First Step" id="btn-rep-first" title="First Step">⏮</button>
-<button class="btn-icon" data-i18n-title="Previous Step" id="btn-rep-prev" title="Previous Step">◀</button>
-<button class="btn btn-primary btn-sm" data-i18n="▶ Play" id="btn-rep-play">▶ Play</button>
-<button class="btn-icon" data-i18n-title="Next Step" id="btn-rep-next" title="Next Step">▶</button>
-<button class="btn-icon" data-i18n-title="Last Step" id="btn-rep-last" title="Last Step">⏭</button>
+<button class="btn-icon" data-i18n-title="First Step" id="btn-rep-first" title="First Step"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14M19 5 9 12l10 7z"/></svg></button>
+<button class="btn-icon" data-i18n-title="Previous Step" id="btn-rep-prev" title="Previous Step"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m17 5-10 7 10 7z"/></svg></button>
+<button class="btn btn-primary btn-sm" data-i18n="Play replay" id="btn-rep-play">Play replay</button>
+<button class="btn-icon" data-i18n-title="Next Step" id="btn-rep-next" title="Next Step"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 5 10 7-10 7z"/></svg></button>
+<button class="btn-icon" data-i18n-title="Last Step" id="btn-rep-last" title="Last Step"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5v14M5 5l10 7-10 7z"/></svg></button>
 </div>
 <div class="timeline-container">
 <span data-i18n="Step 0 / 0" id="rep-step-label">Step 0 / 0</span>
@@ -225,7 +219,7 @@
 <div class="modal-content mode-dialog-content">
 <div class="modal-header">
 <h2 data-i18n="How do you want to play?" id="mode-dialog-title">How do you want to play?</h2>
-<button class="btn-icon" data-i18n-title="Keep the current mode (Esc)" id="mode-dialog-close" title="Keep the current mode (Esc)">✕</button>
+<button class="btn-icon" data-i18n-title="Keep the current mode (Esc)" id="mode-dialog-close" title="Keep the current mode (Esc)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
 </div>
 <div class="modal-body mode-dialog-body">
 <!-- The model & search section (#model-mode-section), folded: main.ts askMode moves it in
@@ -254,7 +248,7 @@
 <div class="modal-content result-dialog-content">
 <div class="modal-header">
 <h2 data-i18n="Game over" id="result-dialog-title">Game over</h2>
-<button class="btn-icon" data-i18n-title="Close (Esc)" id="result-dialog-close" title="Close (Esc)">✕</button>
+<button class="btn-icon" data-i18n-title="Close (Esc)" id="result-dialog-close" title="Close (Esc)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
 </div>
 <div class="modal-body result-dialog-body">
 <p class="result-outcome" id="result-dialog-outcome"></p>
@@ -282,7 +276,7 @@
 <div class="modal-content">
 <div class="modal-header">
 <h2 data-i18n="Modal Title" id="modal-title">Modal Title</h2>
-<button class="btn-icon" id="modal-close">✕</button>
+<button class="btn-icon" id="modal-close" title="Close (Esc)" aria-label="Close (Esc)" data-i18n-title="Close (Esc)" data-i18n-aria-label="Close (Esc)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
 </div>
 <div class="modal-body" id="modal-body"></div>
 </div>

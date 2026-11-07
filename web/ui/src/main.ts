@@ -7,7 +7,7 @@ import { CardsView } from "./cards_view";
 import { ActionHud } from "./action_hud";
 import { ReplayControls, ReplayStep } from "./replay_controls";
 import { DebugPanel } from "./debug_panel";
-import { decorateChoices, policyChipHtml, renderTracePanel, renderValueRibbon } from "./trace_view";
+import { decorateChoices, renderTracePanel, renderValueRibbon } from "./trace_view";
 import { AnalysisPanel, AutoSide, LiveAnalysis, ModelPick } from "./analysis_view";
 import { WasmEngine } from "./engine/wasm_engine";
 import { GameSession } from "./game/session";
@@ -22,15 +22,15 @@ import { RolloutRunner } from "./analysis/rollout_runner";
 import { ViewMode, opponentOf, redactState, viewFromParam, viewToParam } from "./game/view";
 import { lastTurnOf } from "./game/last_turn";
 import { recentRolls } from "./game/rolls";
-import { LogEntry, groupLog, replayItems } from "./game/log_view";
-import { CardNames, linkCardRefs, annotateCardRefs } from "./game/card_refs";
+import { replayItems } from "./game/log_view";
+import { resultLog, resultEntryHtml, type ResultEntry } from "./game/log_results";
+import { CardNames, annotateCardRefs } from "./game/card_refs";
 import { MoveHow, buildSubmission, sha256Hex, summarize } from "./game/record";
 import { loadStoredGame, storeGame } from "./game/saved_game";
 import { ResultDialog } from "./result_dialog";
 import { BUILD_COMMIT, BUILD_DIRTY } from "./build_info";
 import { CARDS_METADATA, ENGLISH_CARDS_METADATA } from "./metadata";
 import { bindLanguageControls, onLocaleChange } from "./i18n";
-import { escapeHtml, num } from "./html";
 
 /** Pause before an auto-played move, long enough to see each one land. */
 const AUTO_PLAY_DELAY_MS = 350;
@@ -44,7 +44,6 @@ export class TSApp {
   private isReplayMode: boolean = false;
   private replaySteps: ReplayStep[] = [];
   private replayCurrentStep: number = 0;
-  private isVpFilterActive: boolean = false;
 
   private mapView: MapView;
   private shell: TabletopShell;
@@ -56,7 +55,7 @@ export class TSApp {
 
   private engine: WasmEngine | null = null;
   /** A replay's log entries, built once per loaded replay. */
-  private replayEntries: { steps: ReplayStep[]; entries: LogEntry[] } | null = null;
+  private replayEntries: { steps: ReplayStep[]; entries: ResultEntry[] } | null = null;
   private session: GameSession | null = null;
   private model: Model | null = null;
   private modelKey = "";
@@ -1071,37 +1070,6 @@ export class TSApp {
     return this.logCardNames;
   }
 
-  private getFilteredIndices(
-    totalCount: number,
-    isVpChanging: (index: number) => boolean
-  ): { targetIndices: Set<number>; includedIndices: number[] } {
-    const targetIndices = new Set<number>();
-    for (let i = 0; i < totalCount; i++) {
-      if (isVpChanging(i)) {
-        targetIndices.add(i);
-      }
-    }
-
-    if (!this.isVpFilterActive) {
-      const all: number[] = [];
-      for (let i = 0; i < totalCount; i++) all.push(i);
-      return { targetIndices, includedIndices: all };
-    }
-
-    const includedSet = new Set<number>();
-    targetIndices.forEach(targetIdx => {
-      for (let offset = -2; offset <= 2; offset++) {
-        const idx = targetIdx + offset;
-        if (idx >= 0 && idx < totalCount) {
-          includedSet.add(idx);
-        }
-      }
-    });
-
-    const sorted = Array.from(includedSet).sort((a, b) => a - b);
-    return { targetIndices, includedIndices: sorted };
-  }
-
   /**
    * The replay-only views of the model's trace.
    *
@@ -1128,7 +1096,7 @@ export class TSApp {
     // One entry per play (game/log_view.ts): a replay's built from its steps, a live game's from
     // the log as the view may read it (game/view.ts has already redacted the other side's lines).
     const replay = this.isReplayMode;
-    let entries: LogEntry[];
+    let entries: ResultEntry[];
     if (replay) {
       // Never the live game's log in its place: a replay link opens on a new game, and its log
       // stood in until the replay file and the engine had both arrived.
@@ -1138,88 +1106,42 @@ export class TSApp {
         return;
       }
       if (this.replayEntries?.steps !== this.replaySteps) {
-        this.replayEntries = { steps: this.replaySteps, entries: groupLog(replayItems(this.engine, this.replaySteps)) };
+        this.replayEntries = { steps: this.replaySteps, entries: resultLog(replayItems(this.engine, this.replaySteps)) };
       }
       entries = this.replayEntries.entries;
     } else {
       if (!this.shown?.action_logs) return;
-      entries = groupLog(this.shown.action_logs);
+      entries = resultLog(this.shown.action_logs);
     }
-    const isVpEntry = (i: number): boolean => {
-      const e = entries[i];
-      return e.vp_delta !== 0 || e.lines.some(l => l.includes("Victory Points:") || l.includes(" VP"));
-    };
-    const { targetIndices, includedIndices } = this.getFilteredIndices(entries.length, isVpEntry);
     const cardNames = this.cardNames();
 
     if (logCountBadge) {
-      logCountBadge.textContent = label(this.isVpFilterActive
-        ? t("{0} filtered ({1} VP events)", [includedIndices.length, targetIndices.size])
-        : replay ? t("{0} steps (Current: #{1})", [this.replaySteps.length, this.replayCurrentStep + 1]) : t("{0} events", [entries.length]));
+      logCountBadge.textContent = replay
+        ? t("{0} steps (Current: #{1})", [this.replaySteps.length, this.replayCurrentStep + 1])
+        : t("{0} events", [entries.length]);
     }
-
     logContainer.innerHTML = "";
-    if (includedIndices.length === 0) {
-      logContainer.innerHTML = `<div class="log-empty-msg">${label(replay
-        ? t("No VP-affecting events found in replay.") : t("No VP-affecting events recorded yet."))}</div>`;
+    if (entries.length === 0) {
+      logContainer.innerHTML = `<div class="log-empty-msg">${t("No actions recorded yet.")}</div>`;
       return;
     }
-
-    includedIndices.forEach((idx, k) => {
-      const e = entries[idx];
-      if (k > 0 && idx > includedIndices[k - 1] + 1) {
-        const gap = idx - includedIndices[k - 1] - 1;
-        const sep = document.createElement("div");
-        sep.className = "log-context-separator";
-        sep.textContent = label(t("••• {0} entr{1} skipped •••", [gap, gap > 1 ? "ies" : "y"]));
-        logContainer.appendChild(sep);
-      }
-
+    entries.forEach(e => {
       const current = replay && e.first <= this.replayCurrentStep && this.replayCurrentStep <= e.last;
       const item = document.createElement("div");
-      item.className = `log-item ${current ? "active-replay-step" : ""} ${targetIndices.has(idx) ? "vp-target-event" : ""}`;
-
-      // A line that can be matched to one step says which (game/log_view.ts LogEntry.steps).
-      const stepTag = (n: number | null) => n === null ? "" : `<span class="log-line-step">${`#${n}`}</span> `;
-      const lines = e.lines.map((d, j) => {
-        let lineClass = "log-detail-line";
-        if (d.includes("🎲")) lineClass += " log-die-line";
-        if (d.includes("Victory Points:") || /\(#\d+\): .*VP/.test(d)) lineClass += " log-vp-line";
-        if (d.startsWith("  ▸ ")) lineClass += " log-sub-line";
-        const n = e.steps[j];
-        return `<div class="${lineClass}"${n === null ? "" : ` data-step="${n}"`}>${`${stepTag(n)}${linkCardRefs(localizeLog(d), cardNames)}`}</div>`;
-      }).join("");
-
-      // A replay's policy chips: every decision of the play, in order.
-      let chips = "";
-      if (replay) for (let s = e.first; s <= e.last; s++) chips += policyChipHtml(this.replaySteps, s);
-
-      let vpDeltaBadge = "";
-      if (e.vp_delta !== 0) {
-        const deltaClass = e.vp_delta > 0 ? "us" : "ussr";
-        vpDeltaBadge = `<span class="vp-delta-pill ${deltaClass}">${t("{0} VP", [num(e.vp_delta) > 0 ? `+${num(e.vp_delta)}` : num(e.vp_delta)])}</span>`;
-      }
-
-      item.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 6px;">
-          <div>
-            ${label(e.step === null ? "" : `<span class="log-index" style="font-size: 10px; color: var(--text-dim);">${`#${num(e.step)}`}</span>`)}
-            <span class="log-step">${t("[T{0} AR{1}]", [num(e.turn), num(e.ar)])}</span>
-            <span class="log-player ${escapeHtml(e.player)}">${`${escapeHtml(label(e.player))}:`}</span>
-            <span class="log-main-text">${linkCardRefs(localizeLog(e.title), cardNames)}</span>
-            ${label(chips)}
-          </div>
-          ${label(vpDeltaBadge)}
-        </div>
-        ${label(lines)}
-      `;
+      const side = e.player === "US" ? "us" : e.player === "USSR" ? "ussr" : "system";
+      item.className = `log-item result-card result-${side} ${current ? "active-replay-step" : ""}`;
+      item.innerHTML = resultEntryHtml(e, cardNames);
       if (replay) {
+        item.tabIndex = 0;
+        item.setAttribute("role", "button");
+        item.setAttribute("aria-label", t("View position after this play"));
         item.addEventListener("click", () => this.replayControls.goToStep(e.last));
-        // A replay's step numbers are its own (replayItems numbers them 1..n): a line goes to its step.
-        item.querySelectorAll<HTMLElement>("[data-step]").forEach(el => el.addEventListener("click", ev => {
-          ev.stopPropagation();
-          this.replayControls.goToStep(Number(el.dataset.step) - 1);
-        }));
+        item.addEventListener("keydown", ev => {
+          if (ev.target === item && (ev.key === "Enter" || ev.key === " ")) {
+            ev.preventDefault();
+            this.replayControls.goToStep(e.last);
+          }
+        });
       }
       logContainer.appendChild(item);
     });
@@ -1508,15 +1430,6 @@ export class TSApp {
         this.cardsView.showCardTooltip(new MouseEvent('mouseover', { clientX: box.left, clientY: box.bottom }), Number(ref.dataset.cardId));
       });
       logStream?.addEventListener('focusout', () => this.cardsView.hideTooltip());
-    }
-
-    // VP Filter Checkbox
-    const vpFilterCheckbox = document.getElementById("chk-filter-vp") as HTMLInputElement;
-    if (vpFilterCheckbox) {
-      vpFilterCheckbox.addEventListener("change", (e) => {
-        this.isVpFilterActive = (e.target as HTMLInputElement).checked;
-        this.renderLogStream();
-      });
     }
 
     // Modal Close button & ESC key. A hover text would outlive a modal closed under it.

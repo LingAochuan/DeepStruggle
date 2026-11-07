@@ -2,7 +2,8 @@
 import logTemplates from "./zh-CN/log-messages.json";
 import errorTemplates from "./zh-CN/errors.json";
 const templates = { ...logTemplates, ...errorTemplates };
-import { cardName, countryName, label, locale } from "./index";
+import { cardName, countryName, label, locale, t } from "./index";
+import { withoutEmoji } from "./plain_text";
 
 const escapePattern = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const patterns = Object.entries(templates).filter(([key]) => /[A-Za-z]/.test(key)).map(([key, zh]) => {
@@ -27,9 +28,39 @@ const patterns = Object.entries(templates).filter(([key]) => /[A-Za-z]/.test(key
     specificity: key.replace(/\{\d+\}/g, "").length };
 }).sort((a, b) => b.specificity - a.specificity);
 
+/** Complete mode grammar, including chained Ops -> opponent Event -> extra Ops.
+ * Parse every segment before translating so a generic "Ops: {0}" cannot swallow
+ * the remainder and leave a half-English subtitle. Unknown prose is not token-replaced.
+ */
+function actionModes(text: string): string | null {
+  const actions: Record<string, string> = {
+    influence: "Influence", "influence placement": "Influence", "place influence": "Influence",
+    coup: "Coup", "coup attempt": "Coup", realignment: "Realignment", realign: "Realignment",
+  };
+  const parts = text.split(/,\s*then\s+/i);
+  const translated = parts.map(part => {
+    if (/^event$/i.test(part)) return label("Event");
+    if (/^space race$/i.test(part)) return label("Space Race");
+    let m = /^(?:Ops?|Operations)(?::\s*(.+))?$/i.exec(part);
+    if (m) {
+      if (!m[1]) return label("Ops");
+      const action = actions[m[1].toLowerCase()];
+      return action ? t("Ops: {0}", [label(action)]) : null;
+    }
+    m = /^(USSR|US) Event first$/i.exec(part);
+    if (m) return t("{0} Event first", [m[1].toUpperCase()]);
+    m = /^the (USSR|US) Event$/i.exec(part);
+    if (m) return t("Resolve the {0} Event", [m[1].toUpperCase()]);
+    return null;
+  });
+  return translated.every(part => part !== null) ? translated.join(t(", then ")) : null;
+}
+
 function translate(text: string, depth: number): string {
   const exact = label(text);
   if (exact !== text || depth > 8) return exact;
+  const mode = actionModes(text);
+  if (mode !== null) return mode;
   const cardMove = /^  • (.+) \(#(\d{1,3})\) (.+)$/.exec(text);
   if (cardMove) {
     const movement = translate(cardMove[3], depth + 1);
@@ -79,9 +110,9 @@ function part(text: string, depth: number): string {
   return text;
 }
 
-/** Unknown text and English mode are exact pass-throughs; no page or stored text is rewritten. */
+/** Translate display text and remove historic pictographs; stored records stay unchanged. */
 export function localizeLog(text: string): string {
-  if (locale() === "en") return text;
-  if (text.startsWith("  ▸ ")) return "  ▸ " + translate(text.slice(4), 0);
-  return translate(text, 0);
+  if (locale() === "en") return withoutEmoji(text);
+  if (text.startsWith("  ▸ ")) return "  ▸ " + withoutEmoji(translate(text.slice(4), 0));
+  return withoutEmoji(translate(text, 0));
 }

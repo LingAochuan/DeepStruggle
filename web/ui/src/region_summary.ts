@@ -46,7 +46,7 @@ export function regionSummaryHtml(a: RegionScoreAudit): string {
     // Southeast Asia Scoring has no standings: each country is worth its VP (Thailand 2).
     const worth = (s: RegionSideScore, vp: number) => s.controlled.filter(c => c.vp === vp).length;
     rows = row(t("Countries (1 VP)"), String(worth(a.us, 1)), String(worth(a.ussr, 1)))
-      + row(t("Thailand (2 VP)"), worth(a.us, 2) ? "✓" : "—", worth(a.ussr, 2) ? "✓" : "—");
+      + row(t("Thailand (2 VP)"), worth(a.us, 2) ? t("Controlled") : "—", worth(a.ussr, 2) ? t("Controlled") : "—");
   } else {
     const other = (s: RegionSideScore) => String(s.countries - s.battlegrounds);
     rows = row("Standing", standing(a.us), standing(a.ussr), "rs-standing")

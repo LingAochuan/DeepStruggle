@@ -1,5 +1,5 @@
 import { localizeLog } from "./i18n/log";
-import { t, label } from "./i18n";
+import { t, label, cardName as localizedCardName } from "./i18n";
 import { GameState, MicroAction } from "./types";
 import { CARDS_METADATA } from "./metadata";
 import { branchMeta } from "./game/branches";
@@ -49,6 +49,7 @@ function cardChoiceButtons(state: GameState, ids: number[]): string {
  * deciding side, already HTML.
  */
 const CARD_CHOICE_PROMPTS: Record<string, (who: string) => string> = {
+  UN_INTERVENTION: who => `<strong>${who}:</strong> <em>${t("UN Intervention")}</em>${t(": Select an opponent event card. Its event is cancelled; use its Operations points:")}`,
   BLOCKADE: who => `<strong>${`${who}:`}</strong> <em>${t("Blockade")}</em> ${t("is resolving! Select and discard a card with")} <strong>${t("Operations ≥ 3")}</strong> ${t("from hand to maintain US influence in West Germany (or confirm/pass to forfeit influence):")}`,
   SALT_NEGOTIATIONS: who => `<strong>${`${who}:`}</strong> <em>${t("SALT Negotiations")}</em>${t(": Select a non-scoring card from the Discard Pile to return to hand:")}`,
   OUR_MAN_IN_TEHRAN: who => `<strong>${`${who}:`}</strong> <em>${t("Our Man in Tehran")}</em>${t(": these are the cards drawn from the deck. Discard any of them, one at a time;")} <em>${t("Done")}</em> ${t("returns the rest to the deck:")}`,
@@ -165,9 +166,9 @@ export class ActionHud {
       } else if (phaseName === "HEADLINE") {
         let oppHeadlineBanner = "";
         if (playerRaw === "US" && state.headline_ussr_card) {
-          oppHeadlineBanner = `<div class="headline-reveal-box" style="background: rgba(220,53,69,0.15); border: 1px solid rgba(220,53,69,0.4); padding: 6px 10px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;">📡 <strong>${t("Space Race Privilege (Box 4):")}</strong> ${t("USSR revealed Headline: Card #{0}", [num(state.headline_ussr_card)])}</div>`;
+          oppHeadlineBanner = `<div class="headline-reveal-box" style="background: rgba(220,53,69,0.15); border: 1px solid rgba(220,53,69,0.4); padding: 6px 10px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;"><strong>${t("Space Race Privilege (Box 4):")}</strong> ${t("USSR revealed Headline: Card #{0}", [num(state.headline_ussr_card)])}</div>`;
         } else if (playerRaw === "USSR" && state.headline_us_card) {
-          oppHeadlineBanner = `<div class="headline-reveal-box" style="background: rgba(13,110,253,0.15); border: 1px solid rgba(13,110,253,0.4); padding: 6px 10px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;">📡 <strong>${t("Space Race Privilege (Box 4):")}</strong> ${t("US revealed Headline: Card #{0}", [num(state.headline_us_card)])}</div>`;
+          oppHeadlineBanner = `<div class="headline-reveal-box" style="background: rgba(13,110,253,0.15); border: 1px solid rgba(13,110,253,0.4); padding: 6px 10px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;"><strong>${t("Space Race Privilege (Box 4):")}</strong> ${t("US revealed Headline: Card #{0}", [num(state.headline_us_card)])}</div>`;
         }
         promptText = `${label(oppHeadlineBanner)}<strong>${t("{0} Headline Phase:", [player])}</strong> ${t("Select a card from your hand to play as your Headline:")}`;
       } else {
@@ -183,14 +184,14 @@ export class ActionHud {
       // pile of events the US cannot trigger -- is left by passing, and without this button the
       // page had nothing to click.
       if (allowEarlyStop || validIds.includes(0)) {
-        const passLabel = resolvingCard === card("OUR_MAN_IN_TEHRAN") ? t("✓ Done — return the rest to the deck")
-          : resolvingCard === card("SALT_NEGOTIATIONS") ? t("✓ Take no card")
-          : !validIds.some(id => id >= 1 && id <= 110) ? t("✓ No card can be chosen — continue")
-          : t("✓ Pass / Confirm (Do not discard)");
+        const passLabel = resolvingCard === card("OUR_MAN_IN_TEHRAN") ? t("Done — return the rest to the deck")
+          : resolvingCard === card("SALT_NEGOTIATIONS") ? t("Take no card")
+          : !validIds.some(id => id >= 1 && id <= 110) ? t("No card can be chosen — continue")
+          : t("Pass / Confirm (Do not discard)");
         buttonsHtml += `<button class="btn btn-warning btn-block btn-hud-action" data-flags="128" data-primary="0" style="margin-top: 8px;">${label(passLabel)}</button>`;
       }
     } else if (dType === DT.SELECT_PLAY_MODE) {
-      const cardName = escapeHtml(ctx.pending_op_card_name || t("Card #{0}", [num(ctx.pending_op_card)]));
+      const cardName = escapeHtml(localizedCardName(ctx.pending_op_card, ctx.pending_op_card_name || t("Card #{0}", [num(ctx.pending_op_card)])));
       // Grain Sales to Soviets resolves the card it drew on this node: play it, or hand it back to
       // the USSR and conduct Grain Sales' own 2 Ops. The engine offers the return as CONFIRM_DONE
       // (allow_early_stop), outside the play modes in valid_ids -- so without the button below the
@@ -208,7 +209,7 @@ export class ActionHud {
         // grew. The engine's own name for it is still shown.
         const modeLabel = MODE_LABELS[modeNames[m] ?? ""];
         const cfg = modeLabel ? modeLabel(ops) : {
-          title: t("⚠ Unlabelled resolution mode {0} ({1})", [m, escapeHtml(modeNames[m] ?? "unknown")]),
+          title: t("Unlabelled resolution mode {0} ({1})", [m, escapeHtml(modeNames[m] ?? "unknown")]),
           desc: t("The viewer has no label for this mode — the engine's Resolution enum has changed and web/ui/src/action_hud.ts was not updated."),
           class: "btn-warning",
         };
@@ -226,7 +227,7 @@ export class ActionHud {
         // The engine's own decoding of this node's CONFIRM_DONE: primary 255, the done flag.
         buttonsHtml += `
           <button class="btn btn-warning btn-block btn-hud-action" data-primary="255" data-flags="128" style="margin-top: 4px; text-align: left; padding: 8px 12px;">
-            <div style="font-weight: bold; font-size: 13px;">${t("↩ Return {0} to the USSR", [cardName])}</div>
+            <div style="font-weight: bold; font-size: 13px;">${t("Return {0} to the USSR", [cardName])}</div>
             <div style="font-size: 11px; opacity: 0.85; margin-top: 2px;">${t("Hand the card back (the USSR knows you saw it) and conduct Grain Sales' 2 Ops instead.")}</div>
           </button>
         `;
@@ -235,7 +236,7 @@ export class ActionHud {
       // RETIRED by P17 and unreachable: on an opponent card, Resolution::EVENT *is* the
       // event-first branch, so no separate timing decision is ever emitted. Kept because
       // a replay recorded before P17 can still contain one.
-      const oppCardName = escapeHtml(ctx.pending_op_card_name || t("Card #{0}", [num(ctx.pending_op_card)]));
+      const oppCardName = escapeHtml(localizedCardName(ctx.pending_op_card, ctx.pending_op_card_name || t("Card #{0}", [num(ctx.pending_op_card)])));
       promptText = `<strong>${`${player}:`}</strong> ${t("Opponent card")} <em>${label(oppCardName)}</em> ${t("played for Ops. Choose execution order:")}`;
       if (validIds.includes(0)) {
         buttonsHtml += `
@@ -254,7 +255,8 @@ export class ActionHud {
         `;
       }
     } else if (dType === DT.SELECT_OP_MODE) {
-      promptText = `<strong>${`${player}:`}</strong> ${t("Select Operations action with")} <strong>${t("{0} Ops", [num(ctx.pending_ops_value)])}</strong> ${t("available:")}`;
+      const pending = localizedCardName(ctx.pending_op_card, ctx.pending_op_card_name || "");
+      promptText = `<strong>${player}:</strong> <em>${escapeHtml(pending)}</em> ${t("Choose an Operations action ({0} Ops):", [num(ctx.pending_ops_value)])}`;
       const opNames = namesByValue(L.op_modes);
       validIds.forEach(m => {
         const cfg = OP_MODE_LABELS[opNames[m] ?? ""] || { text: t("Op Mode {0}", [m]), desc: "", class: "btn-secondary" };
@@ -276,7 +278,7 @@ export class ActionHud {
         const region = playerRaw === "USSR" ? t("Eastern Europe") : t("Western Europe");
         promptText = `<strong>${t("{0} Setup Phase:", [player])}</strong> ${t("Click highlighted countries in {0} to place influence (", [region])}<strong>${t("{0} remaining", [remaining])}</strong>):`;
       } else if (resolving > 0) {
-        const resCard = escapeHtml(ctx.resolving_card_name || t("Card #{0}", [resolving]));
+        const resCard = escapeHtml(localizedCardName(resolving, ctx.resolving_card_name || t("Card #{0}", [resolving])));
         promptText = `<strong>${`${player}:`}</strong> ${t("Resolving event")} <em>${label(resCard)}</em>${t(". Select target country (")}<strong>${t("{0} remaining", [remaining])}</strong>):`;
         // An event's target may be rolled for (a war, a coup the event grants).
         showDieSelector = true;
@@ -305,7 +307,7 @@ export class ActionHud {
           targetsHtml += `
             <button class="btn btn-secondary btn-block btn-hud-action btn-target-card" data-primary="${cid}" data-secondary="${this.selectedDieRoll}" style="margin-bottom: 6px; text-align: left; padding: 8px 10px; border: 1px solid rgba(255,255,255,0.12);">
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-weight: bold; font-size: 13px;">${t("{0}{1} (Stab {2})", [isBg ? '★ ' : '', cName, cStab])}</span>
+                <span style="font-weight: bold; font-size: 13px;">${t("{0}{1} (Stab {2})", [isBg ? t("Battleground") + ' · ' : '', cName, cStab])}</span>
                 <span style="font-size: 11px; opacity: 0.85;">${t("US:")}<strong>${label(usInf)}</strong> ${t("/ USSR:")}<strong>${label(ussrInf)}</strong></span>
               </div>
             </button>
@@ -325,12 +327,12 @@ export class ActionHud {
       }
 
       if (allowEarlyStop) {
-        buttonsHtml += `<button class="btn btn-warning btn-block btn-hud-action" data-flags="128" data-primary="0" style="margin-top: 8px;">${t("✓ Done / Pass Remaining")}</button>`;
+        buttonsHtml += `<button class="btn btn-warning btn-block btn-hud-action" data-flags="128" data-primary="0" style="margin-top: 8px;">${t("Done / Pass Remaining")}</button>`;
       } else if (legal.can_confirm_done) {
         // No eligible target is left for what remains (the engine's flat mask offers only
         // CONFIRM_DONE): without this the panel was empty and the game could not go on.
         promptText += ` <em>${t("No eligible target is left.")}</em>`;
-        buttonsHtml += `<button class="btn btn-warning btn-block btn-hud-action" data-flags="128" data-primary="0" style="margin-top: 8px;">${t("✓ Done — no eligible target left")}</button>`;
+        buttonsHtml += `<button class="btn btn-warning btn-block btn-hud-action" data-flags="128" data-primary="0" style="margin-top: 8px;">${t("Done — no eligible target left")}</button>`;
       }
     } else if (dType === DT.CHOOSE_BRANCH) {
       const resolvingCardId = num(ctx.resolving_card || ctx.pending_op_card);
@@ -355,7 +357,7 @@ export class ActionHud {
       });
 
       if (allowEarlyStop) {
-        buttonsHtml += `<button class="btn btn-warning btn-block btn-hud-action" data-flags="128" data-primary="0" style="margin-top: 8px;">${t("✓ Confirm / Pass")}</button>`;
+        buttonsHtml += `<button class="btn btn-warning btn-block btn-hud-action" data-flags="128" data-primary="0" style="margin-top: 8px;">${t("Confirm / Pass")}</button>`;
       }
     } else if (dType === DT.NONE) {
       promptText = t("Simulation idle or transitioning.");
@@ -368,17 +370,17 @@ export class ActionHud {
       dieSelectorHtml = `
         <div class="die-roll-selector-container">
           <div class="die-roll-header">
-            <span>${t("🎲 Die Roll Input:")}</span>
+            <span>${t("Die Roll Input:")}</span>
             <span class="die-selected-text">${label(this.selectedDieRoll === 0 ? t("Auto Roll (PRNG)") : t("Manual: ") + this.selectedDieRoll)}</span>
           </div>
           <div class="die-buttons-row">
-            <button class="btn-die-opt ${this.selectedDieRoll === 0 ? "active" : ""}" data-roll="0">${t("🎲 Auto")}</button>
-            <button class="btn-die-opt ${this.selectedDieRoll === 1 ? "active" : ""}" data-roll="1">⚀ 1</button>
-            <button class="btn-die-opt ${this.selectedDieRoll === 2 ? "active" : ""}" data-roll="2">⚁ 2</button>
-            <button class="btn-die-opt ${this.selectedDieRoll === 3 ? "active" : ""}" data-roll="3">⚂ 3</button>
-            <button class="btn-die-opt ${this.selectedDieRoll === 4 ? "active" : ""}" data-roll="4">⚃ 4</button>
-            <button class="btn-die-opt ${this.selectedDieRoll === 5 ? "active" : ""}" data-roll="5">⚄ 5</button>
-            <button class="btn-die-opt ${this.selectedDieRoll === 6 ? "active" : ""}" data-roll="6">⚅ 6</button>
+            <button class="btn-die-opt ${this.selectedDieRoll === 0 ? "active" : ""}" data-roll="0">${t("Auto")}</button>
+            <button class="btn-die-opt ${this.selectedDieRoll === 1 ? "active" : ""}" data-roll="1">1</button>
+            <button class="btn-die-opt ${this.selectedDieRoll === 2 ? "active" : ""}" data-roll="2">2</button>
+            <button class="btn-die-opt ${this.selectedDieRoll === 3 ? "active" : ""}" data-roll="3">3</button>
+            <button class="btn-die-opt ${this.selectedDieRoll === 4 ? "active" : ""}" data-roll="4">4</button>
+            <button class="btn-die-opt ${this.selectedDieRoll === 5 ? "active" : ""}" data-roll="5">5</button>
+            <button class="btn-die-opt ${this.selectedDieRoll === 6 ? "active" : ""}" data-roll="6">6</button>
           </div>
         </div>
       `;

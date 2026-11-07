@@ -474,7 +474,7 @@ export class MapView {
       const card = CARD_META.get(cardId);
       const listed = (s: RegionSideScore) => s.controlled.map(c => {
         const star = se ? (c.vp ?? 0) > 1 : !!c.battleground;
-        return `${countryName(c.id, names.get(c.id) ?? `#${c.id}`)}${star ? " ★" : ""}`;
+        return `${countryName(c.id, names.get(c.id) ?? `#${c.id}`)}${star ? ` (${se ? t("{0} VP", [c.vp ?? 0]) : t("Battleground")})` : ""}`;
       });
       return {
         regionId: r.slot,

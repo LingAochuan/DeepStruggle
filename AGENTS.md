@@ -27,6 +27,16 @@ Ongoing effects use optional original Steam sprites mapped by stable flag keys i
 `effects/steam-icons.json`; unknown/missing icons keep accessible vector fallbacks.
 Personal Azure builds fetch and verify the separate release pack via
 `deploy/azure/prepare-effects.py`; artwork is not part of the MIT source patch.
+The tabletop action stream uses `game/log_results.ts`: one result card per play,
+coloured by the actor; a whole headline phase is one neutral card. Net changes are
+derived only from redacted logs, leaving saved records and replay steps unchanged.
+Log cards retain their content height in the scrolling stream, including long histories.
+The shell self-hosts Adobe Source Han Serif CN under its accompanying OFL license.
+Space details use one horizontal rail of eight stages with optional Steam sprites
+(`space/steam-track.json`). UI pictographs and the VP log filter are removed; saved
+English log records remain intact, with pictographs stripped only when displayed.
+`node tests/web/i18n_actions.mjs` audits generated mode chains and real WASM logs;
+translate complete sequences before generic log templates to avoid partial English.
 
 ---
 

@@ -101,7 +101,7 @@ export class ReplayControls {
 
     onLocaleChange(() => {
       this.updateUI();
-      this.playBtn.textContent = t(this.isPlaying ? "⏸ Pause" : "▶ Play");
+      this.playBtn.textContent = t(this.isPlaying ? "Pause replay" : "Play replay");
     });
     this.setupListeners();
     this.fetchServerReplays();
@@ -269,7 +269,7 @@ export class ReplayControls {
   public play() {
     if (this.steps.length === 0) return;
     this.isPlaying = true;
-    this.playBtn.textContent = label(t("⏸ Pause"));
+    this.playBtn.textContent = label(t("Pause replay"));
     const interval = parseInt(this.speedSelect.value, 10) || 500;
     this.timer = window.setInterval(() => {
       if (this.currentStep >= this.steps.length - 1) {
@@ -282,7 +282,7 @@ export class ReplayControls {
 
   public stop() {
     this.isPlaying = false;
-    this.playBtn.textContent = label(t("▶ Play"));
+    this.playBtn.textContent = label(t("Play replay"));
     if (this.timer !== null) {
       clearInterval(this.timer);
       this.timer = null;

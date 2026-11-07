@@ -2,6 +2,7 @@ import { t, label, setModalRenderer } from "./i18n";
 import { GameState } from './types';
 import { engineLayout } from './engine/layout';
 import { escapeHtml, num } from './html';
+import spaceArt from './space/steam-track.json';
 
 export interface SpaceBoxMetadata {
   box: number;
@@ -249,171 +250,51 @@ export class TracksView {
     const modalBody = document.getElementById('modal-body');
     if (!modalContainer || !modalTitle || !modalBody) return;
 
-    modalTitle.innerHTML = `🚀 <span>${t("DELUXE SPACE RACE TRACK & PERKS")}</span>`;
     modalContent?.classList.add('modal-lg');
 
-    const usSpace = num(state.space?.US ?? 0);
-    const ussrSpace = num(state.space?.USSR ?? 0);
-    const usTurnsUsed = num(state.space_turns_used?.US ?? 0);
-    const ussrTurnsUsed = num(state.space_turns_used?.USSR ?? 0);
-
-    const maxUsAttempts = (usSpace >= 2 && ussrSpace < 2) ? 2 : 1;
-    const maxUssrAttempts = (ussrSpace >= 2 && usSpace < 2) ? 2 : 1;
-
-    let leadText = t("TIED ON SPACE RACE TRACK");
-    let leadClass = "tie";
-    if (usSpace > ussrSpace) {
-      leadText = t("🔵 US LEADS BY {0} SPACES", [usSpace - ussrSpace]);
-      leadClass = "us";
-    } else if (ussrSpace > usSpace) {
-      leadText = t("🔴 USSR LEADS BY {0} SPACES", [ussrSpace - usSpace]);
-      leadClass = "ussr";
-    }
-
+    const positions: Record<string, number> = { US: num(state.space?.US ?? 0), USSR: num(state.space?.USSR ?? 0) };
+    const text = (s: string) => escapeHtml(label(s));
+    const active = (side: string, box: number) => positions[side] >= box && positions[side === 'US' ? 'USSR' : 'US'] < box;
+    const art: Record<string, { name: string }> = spaceArt.stages;
+    modalTitle.textContent = t("Space Race");
     modalBody.innerHTML = `
-      <div class="space-modal-container">
-        <!-- Summary Header Dashboard -->
-        <div class="space-modal-summary-header">
-          <!-- USSR Card -->
-          <div class="space-summary-card ussr-border">
-            <div class="card-header-row">
-              <h4 style="color: var(--ussr-red-light); margin: 0;">${t("🔴 USSR Space Program")}</h4>
-              <span class="badge ${ussrTurnsUsed >= maxUssrAttempts ? 'badge-danger' : 'badge-success'}">
-                ${label(ussrTurnsUsed >= maxUssrAttempts ? t("Max Attempts Used") : t("Attempt Available"))}
-              </span>
-            </div>
-            <div class="summary-stat-row">
-              <span>${t("Position:")}</span>
-              <strong>${t("Box #{0} — {1}", [ussrSpace, boxName(ussrSpace)])}</strong>
-            </div>
-            <div class="summary-stat-row">
-              <span>${t("Attempts this Turn:")}</span>
-              <strong>${t("{0} / {1} max", [ussrTurnsUsed, maxUssrAttempts])}</strong>
-            </div>
-            <div class="summary-stat-row">
-              <span>${t("Active Superpower Perks:")}</span>
-              <em class="perk-highlight">${label(this.getActivePerkSummary(ussrSpace, usSpace))}</em>
-            </div>
-          </div>
-
-          <!-- Center Lead Status -->
-          <div class="space-lead-indicator">
-            <span class="lead-badge ${leadClass}">${label(leadText)}</span>
-            <div class="lead-subtext">${t("Play card Ops ≥ Box requirement to attempt advance")}</div>
-          </div>
-
-          <!-- US Card -->
-          <div class="space-summary-card us-border">
-            <div class="card-header-row">
-              <h4 style="color: var(--us-blue-light); margin: 0;">${t("🔵 US Space Program")}</h4>
-              <span class="badge ${usTurnsUsed >= maxUsAttempts ? 'badge-danger' : 'badge-success'}">
-                ${label(usTurnsUsed >= maxUsAttempts ? t("Max Attempts Used") : t("Attempt Available"))}
-              </span>
-            </div>
-            <div class="summary-stat-row">
-              <span>${t("Position:")}</span>
-              <strong>${t("Box #{0} — {1}", [usSpace, boxName(usSpace)])}</strong>
-            </div>
-            <div class="summary-stat-row">
-              <span>${t("Attempts this Turn:")}</span>
-              <strong>${t("{0} / {1} max", [usTurnsUsed, maxUsAttempts])}</strong>
-            </div>
-            <div class="summary-stat-row">
-              <span>${t("Active Superpower Perks:")}</span>
-              <em class="perk-highlight">${label(this.getActivePerkSummary(usSpace, ussrSpace))}</em>
-            </div>
-          </div>
-        </div>
-
-        <!-- 9 Milestone Boxes Grid -->
-        <div class="space-ladder-grid">
-          ${label(spaceRaceBoxes().map(box => {
-            const isUsHere = usSpace === box.box;
-            const isUssrHere = ussrSpace === box.box;
-            let occupancyClass = "";
-            if (isUsHere && isUssrHere) occupancyClass = "occupied-both";
-            else if (isUsHere) occupancyClass = "occupied-us";
-            else if (isUssrHere) occupancyClass = "occupied-ussr";
-
-            const isPassedByUs = usSpace > box.box && box.box > 0;
-            const isPassedByUssr = ussrSpace > box.box && box.box > 0;
-
-            const isUsActivePerk = (box.box === 2 && usSpace >= 2 && ussrSpace < 2) ||
-                                  (box.box === 4 && usSpace >= 4 && ussrSpace < 4) ||
-                                  (box.box === 6 && usSpace >= 6 && ussrSpace < 6) ||
-                                  (box.box === 8 && usSpace >= 8 && ussrSpace < 8);
-
-            const isUssrActivePerk = (box.box === 2 && ussrSpace >= 2 && usSpace < 2) ||
-                                    (box.box === 4 && ussrSpace >= 4 && usSpace < 4) ||
-                                    (box.box === 6 && ussrSpace >= 6 && usSpace < 6) ||
-                                    (box.box === 8 && ussrSpace >= 8 && usSpace < 8);
-
-            return `
-              <div class="space-box-card ${occupancyClass}" data-box="${box.box}">
-                <div class="space-box-header">
-                  <div class="box-title-group">
-                    <span class="space-box-num">${t("BOX #{0}", [box.box])}</span>
-                    <span class="space-box-name">${label(box.name)}</span>
-                  </div>
-                  <div class="space-box-tokens">
-                    ${`${isUssrHere ? `<span class="space-player-token ussr">${t("🔴 USSR")}</span>` : ''}
-                    ${isUsHere ? `<span class="space-player-token us">${t("🔵 US")}</span>` : ''}`}
-                  </div>
-                </div>
-
-                <div class="space-box-details">
-                  <div class="detail-item">
-                    <span class="detail-label">${t("Required Ops:")}</span>
-                    <strong class="detail-val">${label(box.minOps > 0 ? t("≥ {0} Ops", [box.minOps]) : t("None"))}</strong>
-                  </div>
-                  <div class="detail-item">
-                    <span class="detail-label">${t("Roll to Advance:")}</span>
-                    <strong class="detail-val">${label(box.maxRoll > 0 ? `🎲 1–${box.maxRoll}` : t("None"))}</strong>
-                  </div>
-                  <div class="detail-item">
-                    <span class="detail-label">${t("1st Player VP:")}</span>
-                    <strong class="detail-val vp-first">${label(box.vpFirst > 0 ? t("+{0} VP", [box.vpFirst]) : '—')}</strong>
-                  </div>
-                  <div class="detail-item">
-                    <span class="detail-label">${t("2nd Player VP:")}</span>
-                    <strong class="detail-val vp-second">${label(box.vpSecond > 0 ? t("+{0} VP", [box.vpSecond]) : '—')}</strong>
-                  </div>
-                </div>
-
-                ${label(box.ability !== 'None' ? `
-                  <div class="space-box-ability ${(isUsActivePerk || isUssrActivePerk) ? 'active-privilege' : ''}">
-                    <div class="ability-title">${t("✨ Privilege (1st Player Only):")}</div>
-                    <div class="ability-desc">${label(box.ability)}</div>
-                    ${`${isUssrActivePerk ? `<div class="perk-holder ussr">${t("🔴 ACTIVE FOR USSR")}</div>` : ''}
-                    ${isUsActivePerk ? `<div class="perk-holder us">${t("🔵 ACTIVE FOR US")}</div>` : ''}
-                    ${(!isUsActivePerk && !isUssrActivePerk && usSpace >= box.box && ussrSpace >= box.box && box.box > 0) ? `<div class="perk-holder cancelled">${t("✕ CANCELLED (BOTH REACHED)")}</div>` : ''}`}
-                  </div>
-                ` : '')}
-
-                <div class="space-box-footer">
-                  <span class="${isUssrHere ? "status-current ussr" : (isPassedByUssr ? 'status-passed' : 'status-pending')}">
-                    ${t("USSR: {0}", [isUssrHere ? t("📍 HERE") : (isPassedByUssr ? t("✓ Cleared") : 'Pending')])}
-                  </span>
-                  <span class="${isUsHere ? "status-current us" : (isPassedByUs ? 'status-passed' : 'status-pending')}">
-                    ${t("US: {0}", [isUsHere ? t("📍 HERE") : (isPassedByUs ? t("✓ Cleared") : 'Pending')])}
-                  </span>
-                </div>
+      <section class="space-track-window" aria-label="${t("Space Race")}">
+        <div class="space-track-programs">${['USSR', 'US'].map(side => {
+          const attempts = side === 'US' ? state.space_turns_used?.US : state.space_turns_used?.USSR;
+          const maxAttempts = active(side, 2) ? 2 : 1;
+          return `<div class="space-program ${side.toLowerCase()}"><strong>${text(side)}</strong>
+            <span>${t("Box #{0} — {1}", [positions[side], boxName(positions[side])])}</span>
+            <span class="space-attempts">${t("Attempts this turn: {0}/{1}", [num(attempts ?? 0), maxAttempts])}</span></div>`;
+        }).join('')}</div>
+        <div class="space-track-scroll" tabindex="0" role="region" aria-label="${t("Space Race stages; scroll horizontally")}">
+          <ol class="space-track-stages">${spaceRaceBoxes().filter(b => b.box > 0 && b.box <= 8).map(box => {
+            const occupants = ['USSR', 'US'].filter(side => positions[side] === box.box);
+            const holder = box.ability === 'None' ? undefined : ['USSR', 'US'].find(side => active(side, box.box));
+            const cancelled = box.ability !== 'None' && positions.US >= box.box && positions.USSR >= box.box;
+            return `<li class="space-stage" data-box="${box.box}">
+              <header><span class="space-stage-number">${String(box.box).padStart(2, '0')}</span><h3>${text(box.name)}</h3></header>
+              <div class="space-stage-picture"><img src="${import.meta.env.BASE_URL}personal/space/${art[String(box.box)].name}.png" alt="${text(box.name)}" draggable="false"/><span class="space-art-fallback" hidden>${String(box.box).padStart(2, '0')}</span></div>
+              <div class="space-stage-positions">${occupants.map(side => `<span class="space-position ${side.toLowerCase()}">${text(side)}</span>`).join('')}</div>
+              <dl class="space-stage-values">
+                <div><dt>${t("Operations required")}</dt><dd>${box.minOps}+</dd></div>
+                <div><dt>${t("Advance on roll")}</dt><dd>1–${box.maxRoll}</dd></div>
+                <div><dt>${t("First arrival")}</dt><dd>${t("{0} VP", [box.vpFirst])}</dd></div>
+                <div><dt>${t("Second arrival")}</dt><dd>${t("{0} VP", [box.vpSecond])}</dd></div>
+              </dl>
+              <div class="space-stage-perk ${holder ? 'perk-held ' + holder.toLowerCase() : ''}">
+                <span class="space-perk-label">${t("Privilege")}</span>
+                <p>${box.ability === 'None' ? t("No special privilege") : text(box.ability)}</p>
+                ${holder ? `<strong>${t("Active for {0}", [holder])}</strong>` : cancelled ? `<span>${t("Cancelled: both players reached this stage")}</span>` : ''}
               </div>
-            `;
-          }).join(''))}
+            </li>`;
+          }).join('')}</ol>
         </div>
-      </div>
-    `;
-
+        <p class="space-track-scroll-hint">${t("Scroll horizontally to view all eight stages.")}</p>
+      </section>`;
+    modalBody.querySelectorAll<HTMLImageElement>('.space-stage-picture img').forEach(img => {
+      img.addEventListener('error', () => { img.hidden = true; (img.nextElementSibling as HTMLElement).hidden = false; });
+    });
     modalContainer.classList.remove('hidden');
   }
 
-  private getActivePerkSummary(myStep: number, oppStep: number): string {
-    const perks: string[] = [];
-    if (myStep >= 2 && oppStep < 2) perks.push(t("2 attempts/turn"));
-    if (myStep >= 4 && oppStep < 4) perks.push(t("Opponent reveals headline first"));
-    if (myStep >= 6 && oppStep < 6) perks.push(t("Discard held card at turn end"));
-    if (myStep >= 8 && oppStep < 8) perks.push(t("8th Action Round"));
-    return perks.length > 0 ? perks.join(", ") : t("None");
-  }
 }

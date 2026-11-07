@@ -548,7 +548,7 @@ export class AnalysisPanel {
           const lead = own ? "" : `${s.lead[i] >= 0 ? "+" : ""}${(s.lead[i] * 100).toFixed(1)} ± ${(s.lead_se[i] * 100).toFixed(1)}`;
           return `
             <div class="analysis-choice analysis-search-row${picked ? " favourite" : ""}" data-flat-idx="${idx}" title="${label(own ? t("the network's own move") : t("paired lead over the network's own move, in points of value, with its standard error"))}">
-              <span class="analysis-choice-name">${`${picked ? "★ " : ""}${name(idx)}${own ? ` <span class="analysis-info-dim">${t("(policy)")}</span>` : ""}`}</span>
+              <span class="analysis-choice-name">${`${name(idx)}${own ? ` <span class="analysis-info-dim">${t("(policy)")}</span>` : ""}`}</span>
               <span class="analysis-search-q" title="${t("mean value from the mover's side")}">${`${s.q[i] >= 0 ? "+" : ""}${s.q[i].toFixed(3)}`}</span>
               <span class="analysis-search-lead">${label(lead)}</span>
             </div>`;
@@ -578,7 +578,7 @@ export class AnalysisPanel {
         return `
           <div class="analysis-choice${isFav ? " favourite" : ""}" data-flat-idx="${c.idx}" title="${t("Click to play this move{0}", [c.composed ? t(" (applied as two steps: Ops for influence, then the placement)") : ""])}">
             <span class="analysis-choice-bar" style="width:${pct.toFixed(1)}%;background:${probColor(c.p)}"></span>
-            <span class="analysis-choice-name">${`${isFav ? "★ " : ""}${esc(localizeLog(c.name ?? "#" + c.idx))}`}</span>
+            <span class="analysis-choice-name">${esc(localizeLog(c.name ?? "#" + c.idx))}</span>
             <span class="analysis-choice-p" style="color:${probColor(c.p)}">${label(fmtP(c.p))}</span>
           </div>`;
       });

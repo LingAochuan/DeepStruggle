@@ -46,6 +46,7 @@ jobs:
         run: |
           node deploy/azure/prepare-artwork.mjs
           python3 deploy/azure/prepare-effects.py
+          python3 deploy/azure/prepare-space.py
           bash tools/scripts/build_web.sh
       - name: Prepare Azure configuration
         run: cp deploy/azure/staticwebapp.config.json web/ui/dist/staticwebapp.config.json
@@ -77,6 +78,16 @@ jobs:
               icon = root / "personal" / "effects" / f"{name}.png"
               if not icon.is_file() or hashlib.sha256(icon.read_bytes()).hexdigest() != asset["sha256"]:
                   raise SystemExit(f"Missing or corrupt effect icon: {name}")
+          stages = json.loads(pathlib.Path("web/ui/src/space/steam-track.json").read_text())["stages"]
+          for stage in stages.values():
+              icon = root / "personal" / "space" / f"{stage['name']}.png"
+              if not icon.is_file() or hashlib.sha256(icon.read_bytes()).hexdigest() != stage["sha256"]:
+                  raise SystemExit(f"Missing or corrupt space artwork: {stage['name']}")
+          font = root / "fonts/source-han-serif/SourceHanSerifCN-VF.otf.woff2"
+          if not font.is_file() or hashlib.sha256(font.read_bytes()).hexdigest() != "808cb3203bb9cdd6b166a8a656a0c7608a7dc2a31c41c2cd0374550cae445471":
+              raise SystemExit("Missing or corrupt Source Han Serif font")
+          if not (root / "fonts/source-han-serif/LICENSE.txt").is_file():
+              raise SystemExit("Missing font license")
           size = sum(p.stat().st_size for p in files)
           print(f"Engine smoke test: {result}")
           print(f"Site: {len(files)} files, {size / 1_000_000:.1f} MB")

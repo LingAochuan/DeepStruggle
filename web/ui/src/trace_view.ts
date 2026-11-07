@@ -182,7 +182,7 @@ export function policyChipHtml(steps: ReplayStep[], idx: number): string {
       + (offMode ? t(" -- not the mode") : "");
     parts.push(
       `<span class="trace-chip" style="border-color:${probColor(p)};color:${probColor(p)}" title="${label(title)}">`
-      + `${t("p={0}{1}", [p.toFixed(3), offMode ? " ✳" : ""])}</span>`);
+      + `${t("p={0}{1}", [p.toFixed(3), offMode ? " *" : ""])}</span>`);
   }
   const series = calibratedSeries(steps);
   const cur = series[idx];
@@ -296,9 +296,7 @@ export function clearDecorations(): void {
 }
 
 /**
- * How a badge is singled out: `played` is the move a replay went on to make (◀), `favourite`
- * the live model's own most likely move (★). Both get the same highlight -- it is the one to
- * compare everything else against -- and a different glyph, because they are different claims.
+ * Played and favourite moves share a border highlight; the tooltip explains which it is.
  */
 export type BadgeMark = "played" | "favourite" | null;
 
@@ -307,7 +305,7 @@ export function htmlBadge(p: number, mark: BadgeMark, note?: string): HTMLElemen
   span.className = "trace-choice-badge" + (mark ? " played" : "");
   span.style.color = probColor(p);
   span.style.borderColor = probColor(p);
-  span.textContent = label(fmtP(p) + (mark === "played" ? " ◀" : mark === "favourite" ? " ★" : ""));
+  span.textContent = fmtP(p);
   span.title = label(t("policy probability {0} (temperature 1)", [p])
     + (mark === "played" ? t(" -- the move it played") : mark === "favourite" ? t(" -- the model's favourite") : "")
     + (note ? `

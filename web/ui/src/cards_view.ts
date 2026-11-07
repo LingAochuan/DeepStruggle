@@ -419,12 +419,12 @@ export class CardsView {
     const china = state.china_card || { holder: "USSR", playable: true };
     const ussrCountEl = document.getElementById("ussr-hand-count");
     if (ussrCountEl) {
-      ussrCountEl.textContent = label(china.holder === "USSR" ? `${ussrCount} + 🇨🇳` : ussrCount.toString());
+      ussrCountEl.textContent = label(china.holder === "USSR" ? `${ussrCount} + ${t("The China Card")}` : ussrCount.toString());
     }
 
     const usCountEl = document.getElementById("us-hand-count");
     if (usCountEl) {
-      usCountEl.textContent = label(china.holder === "US" ? `${usCount} + 🇨🇳` : usCount.toString());
+      usCountEl.textContent = label(china.holder === "US" ? `${usCount} + ${t("The China Card")}` : usCount.toString());
     }
 
     const discardCountEl = document.getElementById("discard-count");
@@ -496,10 +496,10 @@ export class CardsView {
         <div class="card-item-era-bar era-early" style="background: #F59E0B;"></div>
         <div class="card-ops-badge neutral">4</div>
         <div class="card-name-single">
-          ${t("🇨🇳 #6 The China Card")}
+          ${t("#6 The China Card")}
         </div>
         <span class="china-status-pill ${china.playable ? "playable" : "face-down"}">
-          ${label(china.playable ? t("✓ Face Up") : t("✕ Face Down"))}
+          ${label(china.playable ? t("Face Up") : t("Face Down"))}
         </span>
       `;
 
@@ -571,7 +571,7 @@ export class CardsView {
     cardEl.innerHTML = `
       <div class="card-item-era-bar ${eraClass}"></div>
       <div class="card-ops-badge ${meta.side}">
-        ${`${meta.ops}${meta.one_time ? `<span class="card-star" title="${t("Remove after event")}">★</span>` : ''}`}
+        ${`${meta.ops}${meta.one_time ? `<span class="card-star" title="${t("Remove after event")}">*</span>` : ''}`}
       </div>
       <div class="card-name-single">
         ${`#${meta.id} ${meta.name}`}
@@ -658,7 +658,7 @@ export class CardsView {
         <div class="all-cards-item-left">
           <div class="card-ops-badge ${meta.side}">${label(meta.ops)}</div>
           <div class="all-cards-info">
-            <div class="card-name">${`#${meta.id} ${meta.name} ${meta.one_time ? "★" : ""}`}</div>
+            <div class="card-name">${`#${meta.id} ${meta.name}${meta.one_time ? " *" : ""}`}</div>
           </div>
         </div>
         <div class="card-loc-badge ${locBadgeClass}">${label(locLabel)}</div>
@@ -895,7 +895,7 @@ export class CardsView {
   private showTooltip(e: MouseEvent, meta: CardMetadata) {
     this.tooltipEl.innerHTML = `
       <div style="font-weight: bold; font-size: 13px; color: #F8FAFC; margin-bottom: 4px;">
-        ${`#${meta.id} ${meta.name} ${meta.one_time ? "★" : ""}`}
+        ${`#${meta.id} ${meta.name}${meta.one_time ? " *" : ""}`}
       </div>
       <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 8px;">
         ${t("{0} • {1} • {2} OPS", [meta.age.toUpperCase(), meta.side.toUpperCase(), meta.ops])}

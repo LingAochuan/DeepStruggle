@@ -271,6 +271,13 @@ class Board {
   }
 }
 
+/** Net results from already-redacted input. Unlike groupLog, never flush between Events. */
+export function boardResults(items: ActionLogItem[], implied: number[] = []): string[] {
+  const board = new Board();
+  for (const item of items) for (const line of item.details ?? []) board.take(line, item.step_index);
+  return board.lines(implied).map(([line]) => line);
+}
+
 function signed(v: number): string {
   return v > 0 ? `+${v}` : `${v}`;
 }

@@ -1,0 +1,69 @@
+{
+  "source": "Original installed Steam Unity sprites; standard SpaceRace_01 through SpaceRace_08",
+  "stages": {
+    "1": {
+      "name": "SpaceRace_01",
+      "sourceFile": "sharedassets2.assets",
+      "pathId": 268,
+      "width": 64,
+      "height": 64,
+      "sha256": "a39b4b61a848f44530814deeacb92c40a834e4692136b11133c97cf8caaf4eca"
+    },
+    "2": {
+      "name": "SpaceRace_02",
+      "sourceFile": "sharedassets2.assets",
+      "pathId": 328,
+      "width": 64,
+      "height": 64,
+      "sha256": "ee0d888483062d6293d4d1cab75446c0094bf70e98a78d780634f461c2684ea1"
+    },
+    "3": {
+      "name": "SpaceRace_03",
+      "sourceFile": "sharedassets2.assets",
+      "pathId": 263,
+      "width": 64,
+      "height": 64,
+      "sha256": "eb359b26ff4c3bd982c37cd35875ceff43d7c40ac477c70d917503dbb6184383"
+    },
+    "4": {
+      "name": "SpaceRace_04",
+      "sourceFile": "sharedassets2.assets",
+      "pathId": 237,
+      "width": 64,
+      "height": 64,
+      "sha256": "246eb2c02a6a272054404ae5b6b4e6b1473727ac3f1713fc9c36311757019b98"
+    },
+    "5": {
+      "name": "SpaceRace_05",
+      "sourceFile": "sharedassets2.assets",
+      "pathId": 381,
+      "width": 64,
+      "height": 64,
+      "sha256": "bf4467deb16232bf86b517d978bf07b3ed975eb526150c322e82e3fe56ca6946"
+    },
+    "6": {
+      "name": "SpaceRace_06",
+      "sourceFile": "sharedassets2.assets",
+      "pathId": 208,
+      "width": 64,
+      "height": 64,
+      "sha256": "69603bd3a2842062e55f390c68f15d5a26ec1e1b8dd2f2605818b644b279b943"
+    },
+    "7": {
+      "name": "SpaceRace_07",
+      "sourceFile": "sharedassets2.assets",
+      "pathId": 332,
+      "width": 64,
+      "height": 64,
+      "sha256": "e3ec19664b4732a721f15c115e8c6ce6abf96389267c1570b3983af77216cfe1"
+    },
+    "8": {
+      "name": "SpaceRace_08",
+      "sourceFile": "sharedassets2.assets",
+      "pathId": 335,
+      "width": 64,
+      "height": 64,
+      "sha256": "9847f476682c5772da015b37789f50c76e6b900d85f07a40711cedc36909ba30"
+    }
+  }
+}

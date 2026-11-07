@@ -130,3 +130,20 @@ the PNG artwork. The local review and pack live in the workspace's `reference` d
 `node tests/web/tabletop_effects.mjs <base-url>` verifies asset hashes, all card mappings,
 space-perk cancellation, keyboard details, unknown/missing-image fallbacks, narrow layout
 and unchanged engine state. Screenshots are written to `scratch/tabletop-effects`.
+
+## Space track window
+
+The detail window uses eight original Steam sprites (`SpaceRace_01` through
+`SpaceRace_08`), with provenance/hashes in `web/ui/src/space/steam-track.json`.
+These are the installed game's standard set, in its original numeric order.
+Local builds load the reviewed PNGs from ignored `web/ui/public/personal/space/`.
+The eight panels stay on one horizontal rail; a missing PNG leaves its stage number.
+Rule values still come from the engine. The image does not determine a rule or reward.
+
+The workspace reference pack is `reference/DeepStruggle-steam-space.zip`, 37,808 bytes,
+SHA-256 `094a2edebb8aa0971390053d694f42f529c3577f1b401e2512e3d2068e7a021c`.
+It contains `space/*.png` for extraction into `public/personal/`. The supplemental
+pack is published separately as the fork's `personal-steam-space-v1` release asset.
+The Azure build runs `deploy/azure/prepare-space.py`, verifies the archive and every
+PNG, and checks the packaged images and Source Han Serif font before publication.
+Do not include these Steam PNGs in the MIT source patch.

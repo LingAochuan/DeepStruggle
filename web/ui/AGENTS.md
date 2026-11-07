@@ -9,6 +9,21 @@ WebAssembly, models as ONNX -- so `dist/` works from GitHub Pages as well as fro
 
 ## 1. Architecture & Component Structure
 
+The tabletop stream now renders through `game/log_results.ts`. Ordinary plays and
+setup use the acting side's red/blue card, with the played card as the main heading,
+the mode below it, and net before/after results with SVG arrows. There is no process
+expander or policy-chip stream. One whole headline phase is a neutral system-colour
+card with both revealed card titles and combined net results; face-down cards remain
+redacted. The legacy `groupLog` and raw session/replay data remain unchanged. Clicking
+a replay result card seeks to its final step; the timeline still supports each step.
+`tests/web/log_results.mjs` checks aggregation, privacy, ownership and escaping;
+`tests/web/tabletop_log.mjs` checks browser rendering, font loading and replay.
+The log scrollport's children use `flex: 0 0 auto`: only the scrollport shrinks, never
+the result cards or filter separators. The browser check covers a 60-card history on
+desktop and narrow screens with the action panel both expanded and minimized.
+The shell uses the unmodified self-hosted Source Han Serif CN variable WOFF2 in
+`public/fonts/source-han-serif/`, including Adobe's OFL license and source/hash record.
+
 ```
 web/ui/
 ├── index.html                  # Fullscreen board with floating tabletop tools and right dock
@@ -49,7 +64,7 @@ web/ui/
 │   │                           # scoring badges, hover card, pan/pinch/zoom, region jump)
 │   ├── region_summary.ts       # A region's scoring summary, the two sides side by side
 │   ├── roll_tray.ts            # The map's roll tray: dice faces, modifiers, totals and outcomes
-│   ├── cards_view.ts           # Legal text-card picker and numbered ongoing effects (EFFECT_INFO_MAP)
+│   ├── cards_view.ts           # Persistent text-card picker and Steam effect sprites (EFFECT_INFO_MAP)
 │   ├── tracks_view.ts          # Space Race metadata and detail modal; board/tracks.ts draws track markers
 │   ├── action_hud.ts           # Decision HUD (branch choices worded by game/branches.ts) and dice selector
 │   ├── replay_controls.ts      # Replay timeline scrubber, playback engine, and server replay picker
@@ -146,7 +161,7 @@ web/ui/
      the next (the reply; the next turn's headline follows the last action round), after that
      they are the log's. The Olympic Games record holds the sponsor's die and its +2 apart
      (`roll1` = die, `mod1` = 2), like every other roll; until 2026-10-19 `roll1` was die + 2.
-   - **Ongoing effects** appear as numbered buttons in the second left tool column;
+   - **Ongoing effects** appear as Steam sprite buttons in the second left tool column;
      clicking a button opens its duration and description. Turn, permanent, conditional
      and Space Race effects share this one list, without a second strip above the map.
    - Pan and zoom through Pointer Events, one path for mouse and touch: drag to pan, two fingers
@@ -206,8 +221,24 @@ web/ui/
      0..8 space ladder. `spaceRaceBoxes()` reads Ops, rolls and VP from the engine; only
      box names and privilege descriptions are UI words. MapView keeps TracksView state
      for the detail modal without rendering a top status bar.
-   - Clicking the map's space track opens all nine boxes, their required Ops, rolls,
-     first/second VP awards and ongoing privileges in the shared modal.
+   - Clicking the map's space track opens eight stage panels in a single horizontal
+     row. Launchpad (0) stays in the compact player summaries. Required Ops, rolls
+     and first/second VP come from the engine. Both occupants and active/cancelled
+     privileges remain visible. Narrow screens scroll horizontally without wrapping.
+   - `space/steam-track.json` records the eight original Steam sprites, copied to
+     optional ignored `public/personal/space/`; absent art falls back to the stage
+     number. See `docs/board-theme.md` for the separate personal deployment pack.
+   - `tests/web/tabletop_space.mjs` checks all eight original hashes, engine values,
+     occupants, privilege cancellation, mobile scrolling, language and missing art.
+   - UI emoji/decorative pictographs are removed; necessary close/replay controls
+     use SVG. `i18n/plain_text.ts` removes pictographs from historic display text
+     without editing stored logs. The VP filter and its handler are removed.
+   - UN Intervention has a specific linked-card prompt; deferred Ops shows its
+     card name by ID. The log adapter translates composed modes and discarded cards.
+   - `i18n/log.ts` parses full mode sequences before generic templates: opponent
+     event first, Ops first, UN Intervention and chained extra Ops retain their order
+     and side. `tests/web/i18n_actions.mjs` checks 22 generated base modes, chained
+     variants, real game logs and branch/action labels; English records stay intact.
 6. **Interactive Action Stream & Replay Timeline (`replay_controls.ts`, `main.ts`)**:
    - Timeline scrubber with play/pause, step forward/backward, and server replay loading.
    - The right dock's Action Stream lists recorded game events with active-step highlighting (`.active-replay-step`) and click-to-scrub navigation.
