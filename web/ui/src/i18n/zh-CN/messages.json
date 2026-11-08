@@ -881,5 +881,7 @@
   "No special privilege": "无特殊特权",
   "Active for {0}": "{0}享有",
   "Cancelled: both players reached this stage": "双方均已到达，特权取消",
-  "Scroll horizontally to view all eight stages.": "横向滚动可查看全部八个阶段。"
+  "Scroll horizontally to view all eight stages.": "横向滚动可查看全部八个阶段。",
+  "{0} reveals their hand": "{0}展示手牌",
+  "No cards to reveal": "没有可展示的手牌"
 }

@@ -51,6 +51,15 @@ The optional 110 Hanon card faces are fetched by `prepare-cards.py` from the sep
 verified against `web/ui/src/cards/hanon-art.json`; the build checks all 110 packaged
 images again before upload. Card artwork remains outside the MIT source patch.
 
+The workflow caches `web/ui/public/personal` with a key derived from the four source
+manifests and preparation scripts. All preparation scripts still run and verify
+cached bytes. Failed preparation retries up to four times, waiting 15, 30 and 45
+seconds between attempts, in addition to each script's own download attempts.
+Exhausting retries or a persistent hash mismatch stops the build before deployment;
+the existing Azure site remains in place. Compilation is a separate step, so a
+compiler error is not retried as a download error. A cache miss needs the source
+servers to be reachable; the cache is not a replacement for those sources.
+
 ## Models, storage and persistence
 
 - Models continue to use the upstream Hugging Face catalogue or a locally imported compatible

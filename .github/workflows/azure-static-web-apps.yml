@@ -40,15 +40,32 @@ jobs:
           key: personal-azure-emsdk-${{ runner.os }}-${{ env.EMSDK_VERSION }}
       - name: Install the WebAssembly compiler
         run: bash tools/scripts/install_emsdk.sh
-      - name: Build the engine and website
-        # Vite copies this optional pack into dist along with the engine.
-        # A failed/hash-mismatched download stops publication of an incomplete board.
+      - name: Restore verified artwork cache
+        uses: actions/cache@v4
+        with:
+          path: web/ui/public/personal
+          key: personal-artwork-v1-${{ hashFiles('web/ui/src/board/counter-sources.json', 'web/ui/src/effects/steam-icons.json', 'web/ui/src/space/steam-track.json', 'web/ui/src/cards/hanon-art.json', 'deploy/azure/prepare-*') }}
+      - name: Prepare and verify artwork
+        # Recheck hashes on cache hits too. Never publish missing or mismatched art.
+        # GitHub release downloads can transiently return 504; space retries apart.
+        shell: bash
         run: |
-          node deploy/azure/prepare-artwork.mjs
-          python3 deploy/azure/prepare-effects.py
-          python3 deploy/azure/prepare-space.py
-          python3 deploy/azure/prepare-cards.py
-          bash tools/scripts/build_web.sh
+          set -euo pipefail
+          retry_artwork() {
+            for attempt in 1 2 3 4; do
+              if "$@"; then return 0; fi
+              if [ "$attempt" -eq 4 ]; then return 1; fi
+              delay=$((attempt * 15))
+              echo "::warning::Artwork preparation failed (attempt $attempt/4); retrying in ${delay}s."
+              sleep "$delay"
+            done
+          }
+          retry_artwork node deploy/azure/prepare-artwork.mjs
+          retry_artwork python3 deploy/azure/prepare-effects.py
+          retry_artwork python3 deploy/azure/prepare-space.py
+          retry_artwork python3 deploy/azure/prepare-cards.py
+      - name: Build the engine and website
+        run: bash tools/scripts/build_web.sh
       - name: Prepare Azure configuration
         run: cp deploy/azure/staticwebapp.config.json web/ui/dist/staticwebapp.config.json
       - name: Smoke test the packaged engine and check site size

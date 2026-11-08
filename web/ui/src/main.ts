@@ -4,6 +4,7 @@ import { GameState, MicroAction, RegionScores } from "./types";
 import { MapView } from "./map_view";
 import { TabletopShell } from "./fvtt_shell";
 import { CardsView } from "./cards_view";
+import { HandRevealDialog } from "./hand_reveal";
 import { ActionHud } from "./action_hud";
 import { ReplayControls, ReplayStep } from "./replay_controls";
 import { DebugPanel } from "./debug_panel";
@@ -48,6 +49,7 @@ export class TSApp {
   private mapView: MapView;
   private shell: TabletopShell;
   private cardsView: CardsView;
+  private handReveal: HandRevealDialog;
   private actionHud: ActionHud;
   public replayControls: ReplayControls;
   private debugPanel: DebugPanel;
@@ -121,6 +123,7 @@ export class TSApp {
     this.shell = new TabletopShell();
     this.mapView = new MapView(mapSvg, (countryId: number) => this.handleCountryClick(countryId));
     this.cardsView = new CardsView((cardId: number) => this.handleCardClick(cardId));
+    this.handReveal = new HandRevealDialog(() => this.maybeAutoPlay());
     this.actionHud = new ActionHud((action: MicroAction) => this.sendAction(action));
     this.debugPanel = new DebugPanel((override: any) => this.sendDebugOverride(override));
 
@@ -507,6 +510,7 @@ export class TSApp {
   /** A fresh deal in `mode`. The link then names the new position. */
   private newGame(mode: ViewMode) {
     if (!this.session) return;
+    this.handReveal.clear();
     if (mode !== this.view) this.setView(mode, false);
     this.session.newGame(Math.floor(Math.random() * 1_000_000));
     if (this.isReplayMode) this.setReplayMode(false);
@@ -759,6 +763,7 @@ export class TSApp {
    */
   private setView(v: ViewMode, rerender = true) {
     const changed = v !== this.view;
+    if (changed) this.handReveal.clear();
     this.view = v;
     const sel = document.getElementById("view-select") as HTMLSelectElement | null;
     if (sel) sel.value = v;
@@ -988,6 +993,8 @@ export class TSApp {
   }
 
   private setReplayMode(on: boolean) {
+    if (!on) this.replayControls.stop();
+    if (on) this.handReveal.clear();
     this.isReplayMode = on;
     document.body.classList.toggle("replay-view", on);
     this.replayControls.watching = on;
@@ -1212,19 +1219,21 @@ export class TSApp {
    * workbench's affordance for testing the engine, as it did on the server.
    */
   private sendAction(action: MicroAction) {
-    if (this.isReplayMode || !this.session) return;
+    if (this.isReplayMode || !this.session || this.handReveal.open) return;
     if (this.hiddenSideToMove()) {
       this.refused(t("it is {0}'s move -- the model plays that side in this view", [opponentOf(this.view)]));
       return;
     }
     this.noteSettings();
     const forcedDie = action.secondary_id ?? 0;
+    const before = redactState(this.session.state(), this.view);
     const why = this.session.apply(action, forcedDie, this.moveHow("human"));
     if (why) {
       this.refused(why);
       return;
     }
     this.afterOwnMove(forcedDie);
+    this.handReveal.observe(before, redactState(this.session.state(), this.view), this.engine!.layout);
     this.refresh();
   }
 
@@ -1241,7 +1250,7 @@ export class TSApp {
    * panel's list, or auto-play). A composed E4.1 action is applied as its two E4 steps.
    */
   private sendFlatAction(flatIdx: number, forcedDie: number = this.actionHud.selectedDieRoll, auto = false) {
-    if (this.isReplayMode || !this.session) return;
+    if (this.isReplayMode || !this.session || this.handReveal.open) return;
     // In a player's view only auto-play moves for the other side.
     if (!auto && this.hiddenSideToMove()) {
       this.refused(t("it is {0}'s move -- the model plays that side in this view", [opponentOf(this.view)]));
@@ -1249,12 +1258,14 @@ export class TSApp {
     }
     this.noteSettings();
     const how = this.moveHow(auto ? "auto" : "suggested");
+    const before = redactState(this.session.state(), this.view);
     const why = this.session.applyFlat(flatIdx, this.model?.meta.mergedInfluence ?? false, forcedDie, how);
     if (why) {
       this.refused(why);
       return;
     }
     if (!auto) this.afterOwnMove(forcedDie);
+    this.handReveal.observe(before, redactState(this.session.state(), this.view), this.engine!.layout);
     this.refresh();
   }
 
@@ -1268,13 +1279,13 @@ export class TSApp {
       window.clearTimeout(this.autoPlayTimer);
       this.autoPlayTimer = null;
     }
-    if (this.isReplayMode) return;
+    if (this.isReplayMode || this.handReveal.open) return;
     const idx = this.analysisPanel.autoPlayMove();
     if (idx === null) return;
     const version = this.version;
     this.autoPlayTimer = window.setTimeout(() => {
       this.autoPlayTimer = null;
-      if (this.isReplayMode || version !== this.version) return;
+      if (this.isReplayMode || this.handReveal.open || version !== this.version) return;
       // The view or the auto side may have changed since it was armed.
       if (this.analysisPanel.autoPlayMove() !== idx) return;
       // Always the engine's own die: the manual die selector is for the moves you make.
@@ -1289,6 +1300,7 @@ export class TSApp {
    */
   private cancelAction() {
     if (this.isReplayMode || !this.session || !this.engine) return;
+    this.handReveal.clear();
     if (this.autoPlayTimer !== null) {
       window.clearTimeout(this.autoPlayTimer);
       this.autoPlayTimer = null;
@@ -1340,7 +1352,7 @@ export class TSApp {
     // question, the model & search dialog or the result dialog is open: their Escape closes them,
     // and must not also take back a move.
     window.addEventListener("keydown", (e) => {
-      if (this.modeQuestionOpen) return;
+      if (this.modeQuestionOpen || this.handReveal.open) return;
       if (!document.getElementById("modal-container")?.classList.contains("hidden")) return;
       if (this.shell.isOpen && e.key === "Escape" && !this.resultDialog.isOpen) {
         this.shell.close();

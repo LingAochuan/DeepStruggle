@@ -73,7 +73,11 @@ export function resultLine(line: string, names: CardNames): string {
 }
 
 export function resultEntryHtml(e: ResultEntry, names: CardNames): string {
-  const cardTitle = (id: number) => `<span class="result-card-number">#${id}</span> <span class="log-card" tabindex="0" data-card-id="${id}">${escapeHtml(cardName(id, names.namesOf(id)[0] ?? ""))}</span>`;
+  // Replay JSON is untrusted: TypeScript's number annotation does not validate it.
+  const cardTitle = (id: number) => {
+    if (!Number.isSafeInteger(id) || id <= 0) return escapeHtml(String(id));
+    return `<span class="result-card-number">#${id}</span> <span class="log-card" tabindex="0" data-card-id="${id}">${escapeHtml(cardName(id, names.namesOf(id)[0] ?? ""))}</span>`;
+  };
   const title = e.card
     ? cardTitle(e.card)
     : linkCardRefs(localizeLog(e.title), names);

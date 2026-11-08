@@ -162,6 +162,7 @@ export class ReplayControls {
   }
 
   public loadReplayData(replayData: ReplayFile) {
+    this.stop();
     if (replayData.steps && replayData.steps.length > 0) {
       this.steps = replayData.steps;
     } else if (replayData.logs && replayData.logs.length > 0) {
@@ -267,11 +268,13 @@ export class ReplayControls {
   }
 
   public play() {
+    this.stop();
     if (this.steps.length === 0) return;
     this.isPlaying = true;
     this.playBtn.textContent = label(t("Pause replay"));
     const interval = parseInt(this.speedSelect.value, 10) || 500;
     this.timer = window.setInterval(() => {
+      if (!this.isPlaying) return;
       if (this.currentStep >= this.steps.length - 1) {
         this.stop();
         return;

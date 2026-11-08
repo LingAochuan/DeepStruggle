@@ -9,6 +9,20 @@ WebAssembly, models as ONNX -- so `dist/` works from GitHub Pages as well as fro
 
 ## 1. Architecture & Component Structure
 
+`hand_reveal.ts` and `hand_reveal.css` show a transient, centered horizontal card
+row when a live action reveals an opponent's hand (CIA Created, Lone Gunman,
+Aldrich Ames, or newly engine-revealed cards such as Cambridge Five). Both input
+states are redacted for the active viewer; hidden cards never reach the dialog.
+The localized Close button dismisses it, and Escape must not undo a move. Auto-play
+waits for dismissal. There is no permanent known-hand tab; changing views, games
+or entering replay clears it, and rerenders/locale changes do not retrigger it.
+Images fall back to localized card text when absent; narrow screens scroll one row.
+`tests/web/tabletop_reveal_replay.mjs` verifies the real CIA path, visibility,
+language, dismissal, missing art, and replay/security regressions.
+Replay timers stop on leaving replay and replacing a replay; repeated play calls
+cannot leave extra intervals running. `resultEntryHtml` checks replay card IDs at
+runtime before interpolating numeric references into HTML, including headlines.
+
 The tabletop stream now renders through `game/log_results.ts`. Ordinary plays and
 setup use the acting side's red/blue card, with the played card as the main heading,
 the mode below it, and net before/after results with SVG arrows. There is no process

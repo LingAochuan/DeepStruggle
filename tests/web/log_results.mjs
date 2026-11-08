@@ -52,6 +52,13 @@ assert(html.includes('<svg class="result-arrow"')); assert(html.includes('data-c
 assert(!html.includes('rolls')); assert(!html.includes('data-step='));
 const malicious = resultEntryHtml({ ...resultLog(logs)[0], card: undefined, title: '<img src=x onerror=alert(1)>' }, names);
 assert(!malicious.includes('<img')); assert(malicious.includes('&lt;img'));
+for (const id of ['17</span><img src=x onerror=alert(1)>', '17" onmouseover="alert(1)', { bad: '<svg onload=alert(1)>' }]) {
+  for (const extra of [{ card: id }, { card: undefined, headlines: [{ player: 'US', card: id }] }]) {
+    const rendered = resultEntryHtml({ ...resultLog(logs)[0], ...extra }, names);
+    assert(!rendered.includes('<img')); assert(!rendered.includes('<svg onload'));
+    assert(!rendered.includes('data-card-id='));
+  }
+}
 globalThis.document = { documentElement: { lang: 'en' }, querySelectorAll: () => [], getElementById: () => null };
 setLocale('zh-CN');
 const chinese = resultEntryHtml(resultLog(logs)[0], names);

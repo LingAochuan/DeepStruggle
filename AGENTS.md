@@ -44,6 +44,16 @@ side-colored names and a separate fixed-right image preview after 100 ms of dwel
 See `node tests/web/tabletop_card_art.mjs` and `docs/board-theme.md` for validation
 and the personal artwork boundary.
 
+Hand-reveal events use `web/ui/src/hand_reveal.ts`: a one-time modal row of the
+viewer's engine-revealed cards, with a localized Close button and no permanent
+opponent-hand tab. Only live actions trigger it; ordinary renders do not. Auto-play
+waits for dismissal, and changing games/views clears the reveal. Replay playback
+stops when leaving replay, replacing a replay or starting playback again. Imported
+result-log card IDs are runtime-checked before becoming HTML attributes.
+`tests/web/tabletop_reveal_replay.mjs` covers these regressions with the real CIA event.
+Azure artwork preparation caches optional assets by source manifests, rechecks all
+hashes on hits and retries failures with delays; exhausted retries still fail deployment.
+
 ---
 
 ## 1. Project Architecture & Components

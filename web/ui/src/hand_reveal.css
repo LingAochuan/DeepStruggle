@@ -1,0 +1,51 @@
+.hand-reveal-dialog {
+  width: min(1680px, calc(100vw - 48px));
+  max-width: none;
+  max-height: calc(100dvh - 48px);
+  box-sizing: border-box;
+  margin: auto;
+  padding: 22px;
+  color: #e8e0d0;
+  background: rgba(35, 32, 28, .97);
+  border: 1px solid #817766;
+  border-radius: 5px;
+  box-shadow: 0 12px 48px #0009;
+  text-align: center;
+  font: inherit;
+}
+.hand-reveal-dialog::backdrop { background: #0007; }
+.hand-reveal-dialog h2 { font-size: 20px; margin: 0 0 6px; }
+.hand-reveal-source { color: #c0b5a2; margin: 0 0 16px; }
+.hand-reveal-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 2px 14px;
+}
+.hand-reveal-card {
+  flex: 0 0 clamp(130px, calc((100vw - 104px) / var(--revealed-count) - 12px), 190px);
+  margin: 0;
+  min-width: 0;
+}
+.hand-reveal-card:first-child { margin-left: auto; }
+.hand-reveal-card:last-child { margin-right: auto; }
+.hand-reveal-card img { display: block; width: 100%; height: auto; border-radius: 4px; }
+.hand-reveal-card figcaption { margin-top: 8px; font-size: 12px; line-height: 1.5; }
+.hand-reveal-fallback { font-size: 12px; padding: 10px; background: #ffffff0b; text-align: left; }
+.hand-reveal-fallback[hidden] { display: none; }
+.hand-reveal-close {
+  display: block;
+  margin: 14px auto 0;
+  padding: 7px 30px;
+  color: inherit;
+  font: inherit;
+  border: 1px solid #817766;
+  border-radius: 3px;
+  background: #ffffff0b;
+  cursor: pointer;
+}
+.hand-reveal-close:hover, .hand-reveal-close:focus-visible { background: #ffffff20; outline: 1px solid #c9b795; }
+@media (max-width: 600px) {
+  .hand-reveal-dialog { width: calc(100vw - 20px); padding: 14px; max-height: calc(100dvh - 20px); }
+}

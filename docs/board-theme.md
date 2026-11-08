@@ -18,6 +18,12 @@ board and all counters against the recorded SHA-256 hashes. See the
 
 ## Registration
 
+Live hand reveals open a one-time, centered row of card faces with a localized Close
+button. The row reads only the viewer's redacted hand knowledge, pauses automatic
+moves until dismissed, and scrolls horizontally on narrow screens. It does not add
+an opponent-hand tab or change the engine's knowledge/record formats. Missing faces
+fall back to localized card text. See `tests/web/tabletop_reveal_replay.mjs`.
+
 Source: Hanon's Workshop item 2793711137, table image UGC
 1848173365184640946/F3465B72EC0E8DFFAD3F6DF08AA722234C3251EE, 9182 by 5940 pixels.
 
