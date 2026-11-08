@@ -31,8 +31,12 @@
 </nav>
 <div id="active-flags-container" class="vtt-effects" role="group" aria-label="Active effects" data-i18n-aria-label="Active effects"></div>
 <section id="text-card-picker" class="vtt-glass hidden" aria-label="Choose a card">
-<header class="vtt-panel-heading"><span id="text-card-picker-title"></span><span id="text-card-picker-count"></span><button class="vtt-panel-toggle" data-collapse-panel aria-controls="text-card-picker-list" type="button">‹</button></header>
-<div id="text-card-picker-list"></div>
+<header class="vtt-panel-heading"><div class="vtt-card-tabs" role="tablist">
+<button id="text-card-picker-title" data-card-pile="hand" role="tab" aria-controls="text-card-picker-list" aria-selected="true" type="button"></button>
+<button id="text-card-tab-discard" data-card-pile="discard" role="tab" aria-controls="text-card-picker-list" aria-selected="false" tabindex="-1" type="button"></button>
+<button id="text-card-tab-removed" data-card-pile="removed" role="tab" aria-controls="text-card-picker-list" aria-selected="false" tabindex="-1" type="button"></button>
+</div><span id="text-card-picker-count"></span><button class="vtt-panel-toggle" data-collapse-panel aria-controls="text-card-picker-list" type="button">‹</button></header>
+<div id="text-card-picker-list" role="tabpanel" aria-labelledby="text-card-picker-title"></div>
 </section>
 <nav id="vtt-right-tools" class="vtt-tool-column" aria-label="Game tools" data-i18n-aria-label="Game tools">
 <button data-dock-tab="log" class="vtt-tool" title="Action log" aria-label="Action log" data-i18n-title="Action log" data-i18n-aria-label="Action log" aria-expanded="false" aria-controls="vtt-dock"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg></button>

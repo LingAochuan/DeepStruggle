@@ -406,8 +406,15 @@ body.vtt-dock-open .map-rolls { right: 440px; }
 }
 
 /* Compact hand with a stable reading area; other card hovers share its image size. */
-.vtt-shell #text-card-picker:not(.vtt-minimized) { width: min(320px, calc(100vw - 88px)); }
-.vtt-shell #text-card-picker:not(.vtt-minimized) .vtt-panel-heading { min-height: 34px; padding: 5px 10px; font-size: 13px; }
+.vtt-shell #text-card-picker:not(.vtt-minimized) { width: min(320px, calc(100vw - 88px)); height: 250px; max-height: calc(100dvh - 24px); }
+.vtt-shell #text-card-picker:not(.vtt-minimized) .vtt-panel-heading { height: 38px; min-height: 38px; padding: 5px 10px; font-size: 13px; }
+.vtt-shell #text-card-picker-list { flex: 1; min-height: 0; padding: 0; scrollbar-gutter: stable; }
+.vtt-card-tabs { display: flex; flex: 1; min-width: 0; gap: 3px; align-self: stretch; }
+.vtt-shell .vtt-card-tabs button { flex: 1; min-width: 0; padding: 4px 3px; border: 0; border-bottom: 2px solid transparent; border-radius: 2px 2px 0 0; background: transparent; color: var(--text-muted); font: inherit; font-size: 12px; line-height: 1.4; cursor: pointer; overflow-wrap: anywhere; }
+.vtt-shell .vtt-card-tabs button:hover { background: #b4a18413; color: var(--text-main); }
+.vtt-shell .vtt-card-tabs button[aria-selected="true"] { color: #e9e1d2; border-bottom-color: #b3955b; background: #b4a18413; }
+.vtt-shell .vtt-card-tabs button:focus-visible { outline: 1px solid #b3955b; outline-offset: -1px; }
+.vtt-shell #text-card-picker-count { flex: none; font-size: 11px; }
 .vtt-shell #text-card-picker .vtt-text-card {
   min-height: 30px; padding: 4px 10px; gap: 5px; font-size: 13px;
   grid-template-columns: 24px minmax(0, 1fr) auto;
@@ -420,14 +427,23 @@ body.vtt-dock-open .map-rolls { right: 440px; }
 .vtt-shell #text-card-picker .side-ussr .vtt-card-name { color: #d39187; }
 .vtt-shell #text-card-picker .side-neutral .vtt-card-name { color: var(--text-main); }
 .vtt-shell #text-card-picker .previewing { background: #b4a18413; }
+@media (min-width: 701px) {
+  .vtt-shell #text-card-picker .vtt-text-card { height: 30px; }
+  .vtt-shell #text-card-picker .vtt-card-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
 .hand-card-preview { position: fixed; z-index: 50; padding-left: 12px; box-sizing: border-box; }
 .hand-card-preview img { display: block; width: 100%; height: 100%; border-radius: 3px; box-shadow: 0 8px 28px #000b; }
 .hand-card-fallback { height: 100%; overflow: auto; padding: 12px; background: #24231ff5; border: 1px solid #b4a18466; border-radius: 4px; font-size: 12px; box-shadow: 0 8px 28px #000b; }
 .hand-card-fallback p { margin: 8px 0 0; }
 @media (max-width: 700px) {
-  .vtt-shell #text-card-picker:not(.vtt-minimized) { width: min(320px, calc((100vw - 32px) * .56)); }
+  .vtt-shell #text-card-picker:not(.vtt-minimized) { width: min(320px, calc((100vw - 32px) * .56)); max-height: 32vh; }
+  .vtt-shell #text-card-picker:not(.vtt-minimized) .vtt-panel-heading { height: auto; }
   .vtt-shell #text-card-picker .vtt-text-card { padding-inline: 7px; grid-template-columns: 20px minmax(0, 1fr); }
   .vtt-shell #text-card-picker .vtt-card-ops { grid-column: 2; }
   .vtt-shell #text-card-picker .vtt-text-card:has(.trace-choice-badge) { grid-template-columns: 20px minmax(0, 1fr) 40px; }
   .vtt-shell #text-card-picker .trace-choice-badge { grid-column: 3; grid-row: 1 / 3; }
+}
+@media (max-width: 580px) {
+  .vtt-shell #text-card-picker:not(.vtt-minimized) { max-height: 27vh; }
+  .vtt-shell.vtt-dock-open #text-card-picker:not(.vtt-minimized) { max-height: 24vh; }
 }

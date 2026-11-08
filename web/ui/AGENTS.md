@@ -663,7 +663,19 @@ buttons use the reviewed Steam sprites and retain tooltips, accessible names and
 in ignored `public/personal/effects/`; never use the effect's list index as its identity.
 Unknown states use the Steam question icon, and missing files use an SVG question mark.
 `CardsView.renderTextChoices` always shows the viewed hand (including the China card)
-in the bottom-left text list, even outside card decisions or while the opponent acts.
+in the bottom-left hand tab, even outside card decisions or while the opponent acts.
+The same header switches between the hand, public discard pile and removed pile.
+Pile tabs read only the redacted state's `discard_pile`/`removed_pile`, remain readonly,
+and reuse hand typography, side colors and the fixed-right 100ms image preview.
+Keep the last hand preview size when browsing a short pile. Switching tabs hides
+pending previews, resets list scrolling and calls `onRerender` to restore analysis
+badges on return to the hand; readonly pile rows omit `card-item` and `data-primary`.
+The active tab survives state/locale updates and panel collapse.
+The expanded desktop panel has a fixed 250px height: a 38px header, seven 30px
+rows and borders. The list scrolls internally; empty/short piles keep the same frame.
+Narrow viewports cap this height to preserve room for current actions.
+Check `tests/web/tabletop_piles.mjs` for browsing, updates, hover, legal-choice isolation,
+replay, language and narrow-screen behavior.
 Player views stay on their own hand; developer view follows the decision player.
 Only redacted legal SELECT_CARD IDs are enabled. Extra event choices from other piles
 are listed separately below the hand. Manual minimization survives phase changes;

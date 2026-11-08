@@ -178,6 +178,11 @@ previous image remains until the replacement loads. Narrow viewports reduce both
 list and image width. Collapse, rerender and locale changes invalidate pending loads;
 missing artwork falls back to localized text. Readonly visible hands remain
 previewable, while hidden hands and legal-play permissions remain unchanged.
+The selector header includes hand, discard-pile and removed-from-game tabs. Public
+piles use the same text rows and image preview, retaining the hand's image size even
+for short piles. Pile rows are readonly; event card choices stay in the hand tab.
+Selection survives refresh, locale changes and collapse; counts follow the active pile.
 Validate with `tests/web/tabletop_hand_preview.mjs`, `tests/web/tabletop_hand.mjs`
-and `tests/web/tabletop_card_art.mjs`. The earlier overlap prototype was rejected;
+and `tests/web/tabletop_card_art.mjs`; `tests/web/tabletop_piles.mjs` covers pile tabs.
+The earlier overlap prototype was rejected;
 the accepted reference is `reference/hand-list-preview/compact.html`.

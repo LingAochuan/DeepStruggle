@@ -68,11 +68,13 @@ export class HandPreview {
   /** Share the hand's card size with other hovers, even while the hand is collapsed. */
   imageWidth(): number {
     const box = this.panel.getBoundingClientRect();
-    if (box.height > 0 && !this.panel.matches('.hidden, .vtt-minimized')) {
+    const expanded = box.height > 0 && !this.panel.matches('.hidden, .vtt-minimized');
+    if (expanded && (!this.panel.dataset.cardPileView || this.panel.dataset.cardPileView === 'hand')) {
       this.lastImageWidth = Math.max(0, Math.min((box.height + 22) / 1.401,
         window.innerWidth - box.right - 20, (window.innerHeight - 16) / 1.401));
     }
     return Math.max(0, Math.min(this.lastImageWidth, window.innerWidth - 24,
+      expanded ? window.innerWidth - box.right - 20 : Infinity,
       (window.innerHeight - 16) / 1.401));
   }
 

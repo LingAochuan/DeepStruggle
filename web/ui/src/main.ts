@@ -149,6 +149,7 @@ export class TSApp {
     this.analysisPanel.setAutoSide(this.urlAuto);
     this.analysisPanel.show(!this.isReplayMode);
     this.actionHud.onRerender = () => this.redecorate();
+    this.cardsView.onRerender = () => this.redecorate();
     this.resultDialog = new ResultDialog(
       (playdek, note) => this.submission(playdek, note),
       () => {
