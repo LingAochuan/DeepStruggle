@@ -51,7 +51,15 @@ The optional 110 Hanon card faces are fetched by `prepare-cards.py` from the sep
 verified against `web/ui/src/cards/hanon-art.json`; the build checks all 110 packaged
 images again before upload. Card artwork remains outside the MIT source patch.
 
-The workflow caches `web/ui/public/personal` with a key derived from the four source
+`prepare-english-artwork.py` fetches the separate `personal-english-art-v1` asset
+pack (about 5.95 MB). Its 113 files contain the Payne English map, turn/DEFCON
+textures and 110 Scripted (EN) card faces. The archive and individual files are
+SHA-256 verified against `web/ui/src/artwork/english-sources.json`; packaged images
+are checked again before upload. This is a deployment resource pack, not a game
+release or part of the MIT source patch. The script accepts an output directory
+as its first argument to verify a clean installation.
+
+The workflow caches `web/ui/public/personal` with a key derived from the five source
 manifests and preparation scripts. All preparation scripts still run and verify
 cached bytes. Failed preparation retries up to four times, waiting 15, 30 and 45
 seconds between attempts, in addition to each script's own download attempts.

@@ -600,7 +600,7 @@ They use `data-locale-button` and the same saved locale as the Settings selector
 the dialog open and does not choose a mode or restart the game. Keep the language
 names and bilingual group label readable regardless of the current locale.
 
-The local bilingual artwork preview uses `src/artwork/english-sources.json` for
+The bilingual artwork uses `src/artwork/english-sources.json` for
 English board/counter/card URLs, hashes, crops and the board affine transform.
 `cards/art.ts` selects by locale for every consumer, including CIA hand reveals.
 English resources are optional ignored files under `public/personal/`; missing
@@ -608,7 +608,8 @@ resources use localized text/vector/diagram fallbacks rather than Chinese art.
 The map clips the English image's extra deck column into the shared Hanon bounds;
 country and track geometry stay unchanged. Async locale loads must preserve the
 camera and reject stale callbacks. Check `tests/web/tabletop_art_locales.mjs`.
-English assets are locally prepared only; the Azure download pack is not yet updated.
+Azure prepares the English pack with `deploy/azure/prepare-english-artwork.py`,
+verifying its archive and all 113 image hashes before building and uploading.
 
 The optional personal classic board is documented in `../../docs/board-theme.md`.
 `src/board/hanon-layout.json` maps all 84 engine country IDs to artwork rectangles;

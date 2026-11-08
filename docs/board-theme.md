@@ -8,7 +8,7 @@ unchanged. The original diagram is still available from the map-style selector.
 Place the personal artwork at `web/ui/public/personal/hanon-board.jpg`. This folder
 is git-ignored and is not part of a source contribution. Without it, the page falls
 back to the diagram. The selected style is saved as `deepstruggle.map-style.v1`.
-The local bilingual preview selects original artwork with the interface locale.
+The bilingual board selects original artwork with the interface locale.
 Chinese uses `hanon-board.jpg` and `cards/001.webp` through `110.webp`; English uses
 `board-en.jpg` and `cards/en/001.webp` through `110.webp`. English turn and DEFCON
 textures live in `counters/en/turn.png` and `counters/en/defcon.png`. Other counters
@@ -24,10 +24,10 @@ nested SVG clips its extra left-hand deck column. No country or track coordinate
 change. Locale swaps preserve the camera and reject stale image-load callbacks.
 All card consumers, including the one-time hand reveal, use `cards/art.ts`.
 
-This English pack is currently supplied locally and is git-ignored, like the
-Chinese art. The Azure preparation scripts still prepare the previously published
-Chinese packs; distributing/preparing the English pack for Azure is a separate
-deployment step, not performed by the local preview build.
+The English pack is git-ignored, like the Chinese art. Azure fetches the separate
+`personal-english-art-v1` asset release using `prepare-english-artwork.py`, checks
+the archive and all 113 image hashes, and checks packaged files again before
+uploading. Source-only builds retain the optional-artwork fallbacks.
 
 The personal Azure workflow prepares this optional pack using
 `node deploy/azure/prepare-artwork.mjs` before Vite builds. The script verifies the
