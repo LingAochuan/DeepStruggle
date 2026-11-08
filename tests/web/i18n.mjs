@@ -59,8 +59,11 @@ try {
     }
   }
   for (const c of countries) assert.equal(i18n.countryName(c.id, c.name), zh.countries[String(c.id)]);
-  assert.equal(i18n.cardName(4, "Duck and Cover"), "卧倒与掩护");
-  assert.equal(i18n.cardName(42, "Quagmire"), "困境", "Do not adopt a rejected alternative");
+  const adoptedNames = JSON.parse(await readFile(join(root, "docs/i18n/hanon-card-names.json"), "utf8"));
+  assert.deepEqual(adoptedNames.entries.map(c => c.id), cards.map(c => c.id));
+  for (const c of adoptedNames.entries) assert.equal(i18n.cardName(c.id, c.en), c.hanonZh, "Card names follow the adopted Hanon artwork");
+  assert.equal(i18n.cardName(4, "Duck and Cover"), "卧倒并掩护");
+  assert.equal(i18n.cardName(42, "Quagmire"), "泥潭");
   assert.equal(i18n.cardName(59, "Flower Power"), "花朵力量");
   assert.equal(i18n.term("Operations / Ops"), "行动点数");
   assert.equal(i18n.cardName(999, "Unknown card"), "Unknown card");
@@ -73,7 +76,7 @@ try {
   assert.match(start, /苏联/);
   assert(!start.includes("USSR setup"));
   const play = i18n.localizeLog("US plays Card: Duck and Cover (#4)");
-  assert.match(play, /卧倒与掩护/);
+  assert.match(play, /卧倒并掩护/);
   assert.match(play, /#4/);
   for (const mode of ["Influence", "Coup", "Realignment"]) {
     const unMode = i18n.localizeLog(`Event, then Ops: ${mode}`);
@@ -84,12 +87,12 @@ try {
   assert.match(unCard, /已弃置/);
   assert(!/[A-Za-z]{3}/.test(unCard));
   const headline = i18n.localizeLog("  ★ Headlines Simultaneously Revealed: US plays 'Duck and Cover' (#4, 3 Ops) vs USSR plays 'Fidel' (#8, 2 Ops)");
-  assert.match(headline, /卧倒与掩护/);
+  assert.match(headline, /卧倒并掩护/);
   assert.match(headline, /#4/);
   assert.match(headline, /#8/);
   for (const cards of ["Duck and Cover (#4), Fidel (#8)", "Duck and Cover (#4, 3 Ops), Fidel (#8, 2 Ops)"]) {
     const deal = i18n.localizeLog(`  • US draws 2 cards: ${cards}`);
-    assert.match(deal, /卧倒与掩护/);
+    assert.match(deal, /卧倒并掩护/);
     assert.match(deal, /菲德尔·卡斯特罗/);
     assert.deepEqual(deal.match(/#\d+/g), ["#4", "#8"], "A numbered card list must not collapse to its last card");
   }

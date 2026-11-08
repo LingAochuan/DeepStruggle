@@ -903,6 +903,7 @@ export class MapView {
                              state: GameState, lc: LastTurnCountry | undefined) {
     if (!this.tooltipEl) return;
     // Numbers, as a replay's snapshot may say anything.
+    this.tooltipEl.classList.remove('hanon-card-preview', 'region-tip');
     const us = Number(sc?.us_influence ?? 0), ussr = Number(sc?.ussr_influence ?? 0);
     const ctrl = sc?.controlled_by ?? "NONE";
     const lines = [controlLine("US", us, ussr, c.stability, ctrl), controlLine("USSR", ussr, us, c.stability, ctrl)];
@@ -1042,6 +1043,7 @@ export class MapView {
 
   private showRegionTooltip(e: MouseEvent, audit: RegionScoreAudit) {
     if (!this.tooltipEl) return;
+    this.tooltipEl.classList.remove('hanon-card-preview');
     this.tooltipEl.innerHTML = regionSummaryHtml(audit);
     this.tooltipEl.classList.add("region-tip");
     this.tooltipEl.classList.remove("hidden");

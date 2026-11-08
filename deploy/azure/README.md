@@ -46,6 +46,11 @@ directory and in the deployed site; it is not committed to the source repository
 Source-only builds retain the schematic fallback. The script also accepts an
 output directory as its first argument for testing a fresh download.
 
+The optional 110 Hanon card faces are fetched by `prepare-cards.py` from the separate
+`personal-hanon-cards-v1` release. The 10.9 MB archive and every WebP are SHA-256
+verified against `web/ui/src/cards/hanon-art.json`; the build checks all 110 packaged
+images again before upload. Card artwork remains outside the MIT source patch.
+
 ## Models, storage and persistence
 
 - Models continue to use the upstream Hugging Face catalogue or a locally imported compatible

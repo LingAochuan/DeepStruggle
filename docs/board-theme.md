@@ -147,3 +147,37 @@ pack is published separately as the fork's `personal-steam-space-v1` release ass
 The Azure build runs `deploy/azure/prepare-space.py`, verifies the archive and every
 PNG, and checks the packaged images and Source Han Serif font before publication.
 Do not include these Steam PNGs in the MIT source patch.
+
+## Hanon card-face previews
+
+Card references display optional Hanon Chinese artwork. The four
+reviewed 10-by-7 atlases cover standard cards 1–110: early 1–35 plus 103, mid 36–81,
+late 82–102, optional 104–110. Source hashes, cell indices, exact crop rectangles
+and per-file hashes are in `web/ui/src/cards/hanon-art.json`. Original pixels are
+extracted at native dimensions, then encoded as WebP quality 92 (no redrawing).
+The 110 individual files total 10,889,082 bytes and are loaded on demand, rather
+than decoding all four large atlases in the game. Files live under the ignored
+`web/ui/public/personal/cards/` directory; source-only builds fall back to text.
+
+The reference extraction script is `reference/extract-hanon-cards.mjs` in the parent
+workspace. The separate `personal-hanon-cards-v1` release contains
+`DeepStruggle-hanon-cards-v1.zip`. The Azure workflow runs
+`deploy/azure/prepare-cards.py`, verifying the archive and all 110 image hashes before
+writing files; it checks every packaged card again before deployment. Do not commit
+the images into the MIT source patch.
+
+Log/action card references, card lists outside the hand and ongoing-effect icons
+share the image preview, using the hand preview's compact size, retained on collapse.
+Effects resolve through `EFFECT_INFO_MAP.cardId`; space perks retain their own
+explanations. Clicked effects still show their current-state
+explanations. The hand keeps a compact 320px text selector with US blue, USSR red
+and neutral default names. Its separate image preview appears after 100ms of dwell,
+12px to the right, bottom-aligned and 22px taller than the selector when space allows.
+Moving into the image keeps it readable; rapid passes do not switch images, and the
+previous image remains until the replacement loads. Narrow viewports reduce both
+list and image width. Collapse, rerender and locale changes invalidate pending loads;
+missing artwork falls back to localized text. Readonly visible hands remain
+previewable, while hidden hands and legal-play permissions remain unchanged.
+Validate with `tests/web/tabletop_hand_preview.mjs`, `tests/web/tabletop_hand.mjs`
+and `tests/web/tabletop_card_art.mjs`. The earlier overlap prototype was rejected;
+the accepted reference is `reference/hand-list-preview/compact.html`.

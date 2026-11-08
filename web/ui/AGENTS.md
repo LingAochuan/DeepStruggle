@@ -609,6 +609,34 @@ patterns so one side's influence or VP cannot consume the next field. Card refer
 `CARDS_METADATA` has display-only name/description getters; `ENGLISH_CARDS_METADATA` is available
 for bilingual search and English log references. Raw map/rule metadata and gameplay stay intact.
 
+The user's 2026-11-08 naming decision supersedes the initial glossary: all 110 Chinese
+card titles match Hanon's printed card titles. `docs/i18n/hanon-card-names.json` records
+the original names, adopted names, atlas positions and source hashes. Keep card-name
+references in descriptions, ongoing effects and log templates consistent; do not copy
+the printed rule text over the engine-aligned descriptions. The original review archive
+is retained, and English names, IDs and saved-game data are unchanged.
+
+Outside the hand, card-reference hovers use the optional Hanon faces in
+`public/personal/cards/001.webp` through `110.webp`. `cards/hanon-art.json` records
+the source atlas hashes, grid cells, extraction rectangles and output hashes;
+`cards/art.ts` resolves URLs under Vite's base. The shared `#card-tooltip` switches
+to `.hanon-card-preview` for log/action references and card-associated effects.
+These shared previews take their width from `HandPreview.imageWidth()`, preserving
+the last expanded hand size while the hand is collapsed; do not restore oversized hovers.
+Effect identities come from `EFFECT_INFO_MAP.cardId`; space perks have no card image.
+Image errors fall back to the localized engine-aligned text, with stale-request
+guards. Country/region text tooltips must clear the image sizing class.
+The hand uses a compact 320px text selector with US blue, USSR red and neutral
+default names. `cards/hand_preview.ts` owns a separate `#hand-card-preview`: 100ms
+dwell, fixed to the hand's right, bottom-aligned and 22px taller when space permits.
+Keep the old image until its replacement loads, allow pointer travel into the
+preview, and invalidate pending loads on render, collapse, locale or focus changes.
+Bind only rendered visible cards; readonly hands remain previewable without making
+them playable. Check `tests/web/tabletop_hand_preview.mjs` for timing, positioning,
+colors, stale loads, fallback, mobile and state preservation, and
+`tests/web/tabletop_card_art.mjs` for image hashes, real UN Intervention references,
+keyboard, public-reference fallbacks and viewport bounds.
+
 When adding UI copy, add a catalog entry and an explicit call; do not use DOM-wide replacement or
 MutationObserver translation. Preserve parameter sets except documented English-only plural or
 agreement suffixes. Validate `tsc --noEmit`, the localization test (`tests/web/i18n.mjs`), the
@@ -639,7 +667,7 @@ in the bottom-left text list, even outside card decisions or while the opponent 
 Player views stay on their own hand; developer view follows the decision player.
 Only redacted legal SELECT_CARD IDs are enabled. Extra event choices from other piles
 are listed separately below the hand. Manual minimization survives phase changes;
-an empty hand retains its panel. No card image area is implemented yet. Never expose
+an empty hand retains its panel. The fixed-right hover preview uses visible rows only. Never expose
 a hidden opponent decision. Replays disable text-card actions. Existing engine, AI, saved game and replay handlers stay
 in TSApp. Model leaderboard data uses the published JSON, not recomputed ratings.
 

@@ -47,6 +47,7 @@ jobs:
           node deploy/azure/prepare-artwork.mjs
           python3 deploy/azure/prepare-effects.py
           python3 deploy/azure/prepare-space.py
+          python3 deploy/azure/prepare-cards.py
           bash tools/scripts/build_web.sh
       - name: Prepare Azure configuration
         run: cp deploy/azure/staticwebapp.config.json web/ui/dist/staticwebapp.config.json
@@ -84,6 +85,13 @@ jobs:
               if not icon.is_file() or hashlib.sha256(icon.read_bytes()).hexdigest() != stage["sha256"]:
                   raise SystemExit(f"Missing or corrupt space artwork: {stage['name']}")
           font = root / "fonts/source-han-serif/SourceHanSerifCN-VF.otf.woff2"
+          cards = json.loads(pathlib.Path("web/ui/src/cards/hanon-art.json").read_text())["cards"]
+          if set(cards) != {str(i) for i in range(1, 111)}:
+              raise SystemExit("Incomplete card artwork manifest")
+          for card_id, asset in cards.items():
+              face = root / "personal" / "cards" / asset["file"]
+              if not face.is_file() or hashlib.sha256(face.read_bytes()).hexdigest() != asset["sha256"]:
+                  raise SystemExit(f"Missing or corrupt card artwork: {card_id}")
           if not font.is_file() or hashlib.sha256(font.read_bytes()).hexdigest() != "808cb3203bb9cdd6b166a8a656a0c7608a7dc2a31c41c2cd0374550cae445471":
               raise SystemExit("Missing or corrupt Source Han Serif font")
           if not (root / "fonts/source-han-serif/LICENSE.txt").is_file():

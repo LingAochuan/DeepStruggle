@@ -37,6 +37,12 @@ Space details use one horizontal rail of eight stages with optional Steam sprite
 English log records remain intact, with pictographs stripped only when displayed.
 `node tests/web/i18n_actions.mjs` audits generated mode chains and real WASM logs;
 translate complete sequences before generic log templates to avoid partial English.
+Non-hand card hovers use optional Hanon card-face files with source/crop/hash records
+in `web/ui/src/cards/hanon-art.json`; missing art falls back to localized text.
+Effect hovers use stable card IDs. The live hand keeps a compact text selector with
+side-colored names and a separate fixed-right image preview after 100 ms of dwell.
+See `node tests/web/tabletop_card_art.mjs` and `docs/board-theme.md` for validation
+and the personal artwork boundary.
 
 ---
 

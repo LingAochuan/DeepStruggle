@@ -11,8 +11,12 @@ redraws the interface without starting a new game or modifying the current posit
   messages and display-name helpers. Translation calls are explicit; static markup
   opts in with `data-i18n` attributes.
 - `web/ui/src/i18n/zh-CN/game.json` contains all 110 card names and event descriptions,
-  84 country names, regions and shared terminology. Card names follow the reviewed
-  glossary; event descriptions were translated from this project's English metadata.
+  84 country names, regions and shared terminology. Card names now follow the user's
+  2026-11-08 decision to match the Hanon Chinese artwork, documented by ID in
+  `docs/i18n/hanon-card-names.json` (75 unchanged names, 34 wording changes, one
+  punctuation change). Original review names remain in that comparison record.
+  Event descriptions were translated from this project's English metadata; only
+  their card-name references change, not the rules text or engine behavior.
 - `web/ui/src/i18n/zh-CN/messages.json` contains interface messages. English source
   text is the key; numbered placeholders allow Chinese word order without changing
   values. Missing keys fall back to English.

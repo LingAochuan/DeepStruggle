@@ -1,10 +1,12 @@
-import { t, label, setModalRenderer } from "./i18n";
+import { t, label, setModalRenderer, onLocaleChange } from "./i18n";
 import { GameState, CardMetadata } from "./types";
 import { CARDS_METADATA, ENGLISH_CARDS_METADATA } from "./metadata";
 import { UNSEEN } from "./game/view";
 import { engineLayout } from "./engine/layout";
 import { escapeHtml, num } from "./html";
 import { effectIcon, flagIcon, spaceIcon } from './effects/icons';
+import { cardArtwork } from './cards/art';
+import { HandPreview } from './cards/hand_preview';
 
 export interface EffectInfo {
   name: string;
@@ -344,6 +346,7 @@ export class CardsView {
   private cardsMeta: Map<number, CardMetadata> = new Map();
   private onCardClick: (cardId: number) => void;
   private tooltipEl: HTMLElement;
+  private readonly handPreview: HandPreview;
   private locationFilter: string = "ALL";
   private searchFilter: string = "";
   private lastState: GameState | null = null;
@@ -351,6 +354,10 @@ export class CardsView {
   constructor(onCardClick: (cardId: number) => void) {
     this.onCardClick = onCardClick;
     this.tooltipEl = document.getElementById("card-tooltip")!;
+    this.handPreview = new HandPreview(() => this.tooltipEl.classList.add('hidden'));
+    onLocaleChange(() => this.hideTooltip());
+    window.addEventListener('resize', () => this.hideTooltip());
+    window.addEventListener('scroll', () => this.tooltipEl.classList.add('hidden'), true);
     this.fetchMetadata();
     this.setupTabs();
     this.setupFilters();
@@ -664,10 +671,10 @@ export class CardsView {
         <div class="card-loc-badge ${locBadgeClass}">${label(locLabel)}</div>
       `;
 
-      // No description here -- neither an era/side line nor the hover tooltip the hand tabs
-      // show: the list is for finding a card and where it is. Its text is one click away.
-      itemEl.title = label(t("Click for the card's text"));
+      itemEl.addEventListener('mouseenter', e => this.showCardTooltip(e, id));
+      itemEl.addEventListener('mouseleave', () => this.hideTooltip());
       itemEl.addEventListener("click", () => {
+        this.hideTooltip();
         this.showPileModal(() => t("Card #{0}: {1}", [meta.id, meta.name]), [id]);
       });
 
@@ -734,14 +741,14 @@ export class CardsView {
 
     flagsContainer.innerHTML = "";
     const flags = state.flags || [];
-    const effectCards: Array<{ key: string; icon?: string; title: string; side: string; badge: string; desc: string }> = [];
+    const effectCards: Array<{ key: string; icon?: string; cardId?: number; title: string; side: string; badge: string; desc: string }> = [];
 
     // 1. Check persistent flags
     flags.forEach(f => {
       const info = EFFECT_INFO_MAP[f];
       if (info) {
         effectCards.push({
-          key: f, icon: flagIcon(f),
+          key: f, icon: flagIcon(f), cardId: info.cardId,
           title: info.name,
           side: info.side,
           badge: info.duration === "TURN" ? "Turn Only" : (info.duration === "PERMANENT" ? "Permanent" : "Conditional"),
@@ -787,9 +794,20 @@ export class CardsView {
       button.className = `vtt-effect side-${eff.side.toLowerCase()}`;
       button.dataset.effect = eff.key;
       button.append(effectIcon(eff.icon));
-      button.title = `${label(eff.title)} · ${label(eff.badge)}\n${label(eff.desc)}`;
+      if (eff.cardId) {
+        const cardId = eff.cardId;
+        button.addEventListener('mouseenter', e => this.showCardTooltip(e, cardId));
+        button.addEventListener('mouseleave', () => this.hideTooltip());
+        button.addEventListener('focus', () => {
+          const box = button.getBoundingClientRect();
+          this.showCardTooltip(new MouseEvent('mouseover', { clientX: box.right, clientY: box.top }), cardId);
+        });
+        button.addEventListener('blur', () => this.hideTooltip());
+      } else {
+        button.title = `${label(eff.title)} · ${label(eff.badge)}\n${label(eff.desc)}`;
+      }
       button.setAttribute("aria-label", label(eff.title));
-      button.addEventListener("click", () => this.showEffectDetails(eff));
+      button.addEventListener("click", () => { this.hideTooltip(); this.showEffectDetails(eff); });
       flagsContainer.appendChild(button);
     });
   }
@@ -813,6 +831,7 @@ export class CardsView {
     const picker = document.getElementById("text-card-picker");
     const list = document.getElementById("text-card-picker-list");
     if (!picker || !list) return;
+    this.handPreview.hide();
     const ctx = state.decision_context;
     const L = engineLayout();
     const selectCard = !state.is_terminal && !state.view_hidden_decision && L && ctx
@@ -852,8 +871,7 @@ export class CardsView {
       button.disabled = !legal.has(id) || document.body.classList.contains("replay-view");
       button.innerHTML = `<span class="vtt-card-number">#${id}</span><span class="vtt-card-name">${escapeHtml(meta.name)}</span><span class="vtt-card-ops">${t("{0} Ops", [meta.ops])}</span>`;
       button.addEventListener("click", () => { if (!button.disabled) { this.hideTooltip(); this.onCardClick(id); } });
-      button.addEventListener("mouseenter", ev => this.showCardTooltip(ev, id));
-      button.addEventListener("mouseleave", () => this.hideTooltip());
+      this.handPreview.bind(button, meta);
       list.appendChild(button);
     }
   }
@@ -893,6 +911,8 @@ export class CardsView {
   }
 
   private showTooltip(e: MouseEvent, meta: CardMetadata) {
+    this.handPreview.hide();
+    this.tooltipEl.classList.remove('hanon-card-preview', 'region-tip');
     this.tooltipEl.innerHTML = `
       <div style="font-weight: bold; font-size: 13px; color: #F8FAFC; margin-bottom: 4px;">
         ${`#${meta.id} ${meta.name}${meta.one_time ? " *" : ""}`}
@@ -906,22 +926,48 @@ export class CardsView {
     `;
 
     this.tooltipEl.classList.remove("hidden");
-    const x = Math.min(window.innerWidth - 300, e.clientX + 15);
-    // Below the pointer, or above it where the card would run off the bottom (the action log).
-    const h = this.tooltipEl.offsetHeight;
-    const y = e.clientY + 15 + h <= window.innerHeight ? e.clientY + 15 : Math.max(8, e.clientY - 15 - h);
-    this.tooltipEl.style.left = `${x}px`;
-    this.tooltipEl.style.top = `${y}px`;
+    this.positionTooltip(e);
   }
 
-  /** A card's tooltip by its id (the action log's card names, main.ts). */
+  private positionTooltip(e: MouseEvent) {
+    const w = this.tooltipEl.offsetWidth, h = this.tooltipEl.offsetHeight;
+    const x = Math.max(8, Math.min(window.innerWidth - w - 8,
+      e.clientX + 16 + w <= window.innerWidth - 8 ? e.clientX + 16 : e.clientX - w - 16));
+    const y = Math.max(8, Math.min(window.innerHeight - h - 8,
+      e.clientY + 16 + h <= window.innerHeight - 8 ? e.clientY + 16 : e.clientY - h - 16));
+    this.tooltipEl.style.left = `${x}px`;
+    this.tooltipEl.style.top = `${y}px`;
+    this.tooltipEl.style.setProperty('--card-preview-x', `${x}px`);
+    this.tooltipEl.style.setProperty('--card-preview-y', `${y}px`);
+  }
+
+  /** Public references use artwork; the hand has its own fixed preview area. */
   public showCardTooltip(e: MouseEvent, cardId: number) {
+    this.handPreview.hide();
     const meta = this.cardsMeta.get(cardId);
-    if (meta) this.showTooltip(e, meta);
+    if (!meta) { this.hideTooltip(); return; }
+    const art = cardArtwork(cardId);
+    if (!art) { this.showTooltip(e, meta); return; }
+    const img = document.createElement('img');
+    img.alt = `#${cardId} ${meta.name}`;
+    img.width = art.width; img.height = art.height; img.draggable = false;
+    img.addEventListener('error', () => {
+      // An old asynchronous request must not replace another card or a country tooltip.
+      if (this.tooltipEl.contains(img) && !this.tooltipEl.classList.contains('hidden')) this.showTooltip(e, meta);
+    }, { once: true });
+    this.tooltipEl.classList.remove('region-tip');
+    this.tooltipEl.classList.add('hanon-card-preview');
+    this.tooltipEl.style.setProperty('--card-preview-width', `${this.handPreview.imageWidth()}px`);
+    this.tooltipEl.replaceChildren(img);
+    this.tooltipEl.classList.remove('hidden');
+    img.src = art.src;
+    this.positionTooltip(e);
   }
 
   public hideTooltip() {
+    this.handPreview.hide();
     this.tooltipEl.classList.add("hidden");
+    this.tooltipEl.classList.remove('hanon-card-preview');
   }
 
   public showPileModal(title: string | (() => string), cardIds: number[]) {
@@ -950,6 +996,8 @@ export class CardsView {
           <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; line-height: 1.35;">${label(meta.description)}</div>
         `;
         bodyEl.appendChild(row);
+        row.addEventListener('mouseenter', e => this.showCardTooltip(e, id));
+        row.addEventListener('mouseleave', () => this.hideTooltip());
       });
     }
 

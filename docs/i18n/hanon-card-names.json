@@ -1,0 +1,1156 @@
+{
+  "schemaVersion": 1,
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/?id=2793711137",
+  "adoptedOn": "2026-11-08",
+  "basis": "用户要求：卡名统一采用 Hanon 中文牌面版本。",
+  "extraction": "逐张读取牌面标题，按印刷卡号对照；长标题放大复核。去除换行、字间排版空格及移出游戏星号；斜杠和拉丁字母连字符按网页格式统一。省略号保留为单个 …。",
+  "archive": {
+    "file": "DeepStruggle-中文术语核对-2026-11-07.json",
+    "sha256": "e69ea69820c263c4b18fcd409e724e64f0173574b5f8d539eb296df6a1a9eb44"
+  },
+  "counts": {
+    "same": 75,
+    "punctuation": 1,
+    "wording": 34
+  },
+  "sources": [
+    {
+      "id": "early",
+      "url": "https://images.steamusercontent.com/ugc/1844797164154890488/0C9E75958711FC181A7A6B1D343B8BF97289E646/",
+      "sha256": "05140441d02338deea74f82d53a0d597f5b9f5dd2d7010793fc9ac4aeda17c9d",
+      "grid": [
+        10,
+        7
+      ]
+    },
+    {
+      "id": "mid",
+      "url": "https://images.steamusercontent.com/ugc/1844797164154890744/20E03A58297421A7B313B0FCEED19CF304842E05/",
+      "sha256": "b5313c04a72db500c82b2aaa0c035b16d9be74e39bb004362f76be185fc02f49",
+      "grid": [
+        10,
+        7
+      ]
+    },
+    {
+      "id": "late",
+      "url": "https://images.steamusercontent.com/ugc/1843673943731782687/1419334A311B8706800027623898DF6B1A4509D5/",
+      "sha256": "759855e347a7d6fb073215bf3f30cb4a50b421e258dea05fbf577212468bc730",
+      "grid": [
+        10,
+        7
+      ]
+    },
+    {
+      "id": "optional",
+      "url": "https://images.steamusercontent.com/ugc/1844797164154888286/C97AA664621B9DC9722E40FA13CA30FD31B67F48/",
+      "sha256": "63d7e7a37e572e0f54e8fa7a3c6496f451c3fa6a525bd9d007bbfc270f107239",
+      "grid": [
+        10,
+        7
+      ]
+    }
+  ],
+  "entries": [
+    {
+      "id": 1,
+      "en": "Asia Scoring",
+      "archiveZh": "亚洲计分",
+      "previousZh": "亚洲计分",
+      "hanonZh": "亚洲计分",
+      "comparison": "same",
+      "source": "early",
+      "index": 0
+    },
+    {
+      "id": 2,
+      "en": "Europe Scoring",
+      "archiveZh": "欧洲计分",
+      "previousZh": "欧洲计分",
+      "hanonZh": "欧洲计分",
+      "comparison": "same",
+      "source": "early",
+      "index": 1
+    },
+    {
+      "id": 3,
+      "en": "Middle East Scoring",
+      "archiveZh": "中东计分",
+      "previousZh": "中东计分",
+      "hanonZh": "中东计分",
+      "comparison": "same",
+      "source": "early",
+      "index": 2
+    },
+    {
+      "id": 4,
+      "en": "Duck and Cover",
+      "archiveZh": "卧倒与掩护",
+      "previousZh": "卧倒与掩护",
+      "hanonZh": "卧倒并掩护",
+      "comparison": "wording",
+      "source": "early",
+      "index": 3
+    },
+    {
+      "id": 5,
+      "en": "Five Year Plan",
+      "archiveZh": "五年计划",
+      "previousZh": "五年计划",
+      "hanonZh": "五年计划",
+      "comparison": "same",
+      "source": "early",
+      "index": 4
+    },
+    {
+      "id": 6,
+      "en": "The China Card",
+      "archiveZh": "中国牌",
+      "previousZh": "中国牌",
+      "hanonZh": "中国牌",
+      "comparison": "same",
+      "source": "early",
+      "index": 5
+    },
+    {
+      "id": 7,
+      "en": "Socialist Governments",
+      "archiveZh": "社会主义政府",
+      "previousZh": "社会主义政府",
+      "hanonZh": "社会主义政府",
+      "comparison": "same",
+      "source": "early",
+      "index": 6
+    },
+    {
+      "id": 8,
+      "en": "Fidel",
+      "archiveZh": "菲德尔·卡斯特罗",
+      "previousZh": "菲德尔·卡斯特罗",
+      "hanonZh": "菲德尔·卡斯特罗",
+      "comparison": "same",
+      "source": "early",
+      "index": 7
+    },
+    {
+      "id": 9,
+      "en": "Vietnam Revolts",
+      "archiveZh": "越南起义",
+      "previousZh": "越南起义",
+      "hanonZh": "越南起义",
+      "comparison": "same",
+      "source": "early",
+      "index": 8
+    },
+    {
+      "id": 10,
+      "en": "Blockade",
+      "archiveZh": "封锁",
+      "previousZh": "封锁",
+      "hanonZh": "封锁",
+      "comparison": "same",
+      "source": "early",
+      "index": 9
+    },
+    {
+      "id": 11,
+      "en": "Korean War",
+      "archiveZh": "朝鲜战争",
+      "previousZh": "朝鲜战争",
+      "hanonZh": "朝鲜战争",
+      "comparison": "same",
+      "source": "early",
+      "index": 10
+    },
+    {
+      "id": 12,
+      "en": "Romanian Abdication",
+      "archiveZh": "罗马尼亚国王退位",
+      "previousZh": "罗马尼亚国王退位",
+      "hanonZh": "罗马尼亚颠覆",
+      "comparison": "wording",
+      "source": "early",
+      "index": 11
+    },
+    {
+      "id": 13,
+      "en": "Arab-Israeli War",
+      "archiveZh": "阿以战争",
+      "previousZh": "阿以战争",
+      "hanonZh": "阿拉伯—以色列战争",
+      "comparison": "wording",
+      "source": "early",
+      "index": 12
+    },
+    {
+      "id": 14,
+      "en": "Comecon",
+      "archiveZh": "经济互助委员会",
+      "previousZh": "经济互助委员会",
+      "hanonZh": "经济互助委员会",
+      "comparison": "same",
+      "source": "early",
+      "index": 13
+    },
+    {
+      "id": 15,
+      "en": "Nasser",
+      "archiveZh": "埃及总统纳赛尔",
+      "previousZh": "埃及总统纳赛尔",
+      "hanonZh": "纳赛尔",
+      "comparison": "wording",
+      "source": "early",
+      "index": 14
+    },
+    {
+      "id": 16,
+      "en": "Warsaw Pact Formed",
+      "archiveZh": "华沙条约组织成立",
+      "previousZh": "华沙条约组织成立",
+      "hanonZh": "华沙条约组织成立",
+      "comparison": "same",
+      "source": "early",
+      "index": 15
+    },
+    {
+      "id": 17,
+      "en": "De Gaulle Leads France",
+      "archiveZh": "戴高乐领导法国",
+      "previousZh": "戴高乐领导法国",
+      "hanonZh": "戴高乐领导法国",
+      "comparison": "same",
+      "source": "early",
+      "index": 16
+    },
+    {
+      "id": 18,
+      "en": "Captured Nazi Scientist",
+      "archiveZh": "逮捕纳粹科学家",
+      "previousZh": "逮捕纳粹科学家",
+      "hanonZh": "逮捕纳粹科学家",
+      "comparison": "same",
+      "source": "early",
+      "index": 17
+    },
+    {
+      "id": 19,
+      "en": "Truman Doctrine",
+      "archiveZh": "杜鲁门主义",
+      "previousZh": "杜鲁门主义",
+      "hanonZh": "杜鲁门主义",
+      "comparison": "same",
+      "source": "early",
+      "index": 18
+    },
+    {
+      "id": 20,
+      "en": "Olympic Games",
+      "archiveZh": "奥运会",
+      "previousZh": "奥运会",
+      "hanonZh": "奥运会",
+      "comparison": "same",
+      "source": "early",
+      "index": 19
+    },
+    {
+      "id": 21,
+      "en": "NATO",
+      "archiveZh": "北大西洋公约组织",
+      "previousZh": "北大西洋公约组织",
+      "hanonZh": "北大西洋公约组织",
+      "comparison": "same",
+      "source": "early",
+      "index": 20
+    },
+    {
+      "id": 22,
+      "en": "Independent Reds",
+      "archiveZh": "独立的红色",
+      "previousZh": "独立的红色",
+      "hanonZh": "独立的红色",
+      "comparison": "same",
+      "source": "early",
+      "index": 21
+    },
+    {
+      "id": 23,
+      "en": "Marshall Plan",
+      "archiveZh": "马歇尔计划",
+      "previousZh": "马歇尔计划",
+      "hanonZh": "马歇尔计划",
+      "comparison": "same",
+      "source": "early",
+      "index": 22
+    },
+    {
+      "id": 24,
+      "en": "Indo-Pakistani War",
+      "archiveZh": "印巴战争",
+      "previousZh": "印巴战争",
+      "hanonZh": "印度—巴基斯坦战争",
+      "comparison": "wording",
+      "source": "early",
+      "index": 23
+    },
+    {
+      "id": 25,
+      "en": "Containment",
+      "archiveZh": "遏制政策",
+      "previousZh": "遏制政策",
+      "hanonZh": "遏制政策",
+      "comparison": "same",
+      "source": "early",
+      "index": 24
+    },
+    {
+      "id": 26,
+      "en": "CIA Created",
+      "archiveZh": "建立中情局",
+      "previousZh": "建立中情局",
+      "hanonZh": "中情局成立",
+      "comparison": "wording",
+      "source": "early",
+      "index": 25
+    },
+    {
+      "id": 27,
+      "en": "US/Japan Mutual Defense Pact",
+      "archiveZh": "美日共同防卫协定",
+      "previousZh": "美日共同防卫协定",
+      "hanonZh": "美日共同防卫协定",
+      "comparison": "same",
+      "source": "early",
+      "index": 26
+    },
+    {
+      "id": 28,
+      "en": "Suez Crisis",
+      "archiveZh": "苏伊士运河危机",
+      "previousZh": "苏伊士运河危机",
+      "hanonZh": "苏伊士运河危机",
+      "comparison": "same",
+      "source": "early",
+      "index": 27
+    },
+    {
+      "id": 29,
+      "en": "East European Unrest",
+      "archiveZh": "东欧剧变",
+      "previousZh": "东欧剧变",
+      "hanonZh": "东欧剧变",
+      "comparison": "same",
+      "source": "early",
+      "index": 28
+    },
+    {
+      "id": 30,
+      "en": "Decolonization",
+      "archiveZh": "反殖民化",
+      "previousZh": "反殖民化",
+      "hanonZh": "去殖民地化",
+      "comparison": "wording",
+      "source": "early",
+      "index": 29
+    },
+    {
+      "id": 31,
+      "en": "Red Scare/Purge",
+      "archiveZh": "红色恐怖/大清洗",
+      "previousZh": "红色恐怖/大清洗",
+      "hanonZh": "红色恐怖/清洗",
+      "comparison": "wording",
+      "source": "early",
+      "index": 30
+    },
+    {
+      "id": 32,
+      "en": "UN Intervention",
+      "archiveZh": "联合国干预",
+      "previousZh": "联合国干预",
+      "hanonZh": "联合国干预",
+      "comparison": "same",
+      "source": "early",
+      "index": 31
+    },
+    {
+      "id": 33,
+      "en": "De-Stalinization",
+      "archiveZh": "去斯大林化",
+      "previousZh": "去斯大林化",
+      "hanonZh": "去斯大林化",
+      "comparison": "same",
+      "source": "early",
+      "index": 32
+    },
+    {
+      "id": 34,
+      "en": "Nuclear Test Ban",
+      "archiveZh": "禁止核试验",
+      "previousZh": "禁止核试验",
+      "hanonZh": "禁止核试验",
+      "comparison": "same",
+      "source": "early",
+      "index": 33
+    },
+    {
+      "id": 35,
+      "en": "Formosan Resolution",
+      "archiveZh": "台湾决议",
+      "previousZh": "台湾决议",
+      "hanonZh": "台湾决议",
+      "comparison": "same",
+      "source": "early",
+      "index": 34
+    },
+    {
+      "id": 36,
+      "en": "Brush War",
+      "archiveZh": "局部战争",
+      "previousZh": "局部战争",
+      "hanonZh": "局部战争",
+      "comparison": "same",
+      "source": "mid",
+      "index": 0
+    },
+    {
+      "id": 37,
+      "en": "Central America Scoring",
+      "archiveZh": "中美洲计分",
+      "previousZh": "中美洲计分",
+      "hanonZh": "中美洲计分",
+      "comparison": "same",
+      "source": "mid",
+      "index": 1
+    },
+    {
+      "id": 38,
+      "en": "Southeast Asia Scoring",
+      "archiveZh": "东南亚计分",
+      "previousZh": "东南亚计分",
+      "hanonZh": "东南亚计分",
+      "comparison": "same",
+      "source": "mid",
+      "index": 2
+    },
+    {
+      "id": 39,
+      "en": "Arms Race",
+      "archiveZh": "军备竞赛",
+      "previousZh": "军备竞赛",
+      "hanonZh": "军备竞赛",
+      "comparison": "same",
+      "source": "mid",
+      "index": 3
+    },
+    {
+      "id": 40,
+      "en": "Cuban Missile Crisis",
+      "archiveZh": "古巴导弹危机",
+      "previousZh": "古巴导弹危机",
+      "hanonZh": "古巴导弹危机",
+      "comparison": "same",
+      "source": "mid",
+      "index": 4
+    },
+    {
+      "id": 41,
+      "en": "Nuclear Subs",
+      "archiveZh": "核潜艇",
+      "previousZh": "核潜艇",
+      "hanonZh": "核潜艇",
+      "comparison": "same",
+      "source": "mid",
+      "index": 5
+    },
+    {
+      "id": 42,
+      "en": "Quagmire",
+      "archiveZh": "困境",
+      "previousZh": "困境",
+      "hanonZh": "泥潭",
+      "comparison": "wording",
+      "source": "mid",
+      "index": 6
+    },
+    {
+      "id": 43,
+      "en": "SALT Negotiations",
+      "archiveZh": "限制战略核武器条约",
+      "previousZh": "限制战略核武器条约",
+      "hanonZh": "战略武器限制谈判",
+      "comparison": "wording",
+      "source": "mid",
+      "index": 7
+    },
+    {
+      "id": 44,
+      "en": "Bear Trap",
+      "archiveZh": "捕熊陷阱",
+      "previousZh": "捕熊陷阱",
+      "hanonZh": "捕熊陷阱",
+      "comparison": "same",
+      "source": "mid",
+      "index": 8
+    },
+    {
+      "id": 45,
+      "en": "Summit",
+      "archiveZh": "峰会",
+      "previousZh": "峰会",
+      "hanonZh": "首脑峰会",
+      "comparison": "wording",
+      "source": "mid",
+      "index": 9
+    },
+    {
+      "id": 46,
+      "en": "How I Learned to Stop Worrying",
+      "archiveZh": "我如何学会不再担忧",
+      "previousZh": "我如何学会不再担忧",
+      "hanonZh": "我如何学会不再担忧",
+      "comparison": "same",
+      "source": "mid",
+      "index": 10
+    },
+    {
+      "id": 47,
+      "en": "Junta",
+      "archiveZh": "军人集团",
+      "previousZh": "军人集团",
+      "hanonZh": "军政府",
+      "comparison": "wording",
+      "source": "mid",
+      "index": 11
+    },
+    {
+      "id": 48,
+      "en": "Kitchen Debates",
+      "archiveZh": "厨房辩论",
+      "previousZh": "厨房辩论",
+      "hanonZh": "厨房辩论",
+      "comparison": "same",
+      "source": "mid",
+      "index": 12
+    },
+    {
+      "id": 49,
+      "en": "Missile Envy",
+      "archiveZh": "导弹嫉妒",
+      "previousZh": "导弹嫉妒",
+      "hanonZh": "导弹嫉妒",
+      "comparison": "same",
+      "source": "mid",
+      "index": 13
+    },
+    {
+      "id": 50,
+      "en": "“We Will Bury You”",
+      "archiveZh": "“我们要埋葬你们”",
+      "previousZh": "“我们要埋葬你们”",
+      "hanonZh": "“我们会埋葬你们”",
+      "comparison": "wording",
+      "source": "mid",
+      "index": 14
+    },
+    {
+      "id": 51,
+      "en": "Brezhnev Doctrine",
+      "archiveZh": "勃列日涅夫主义",
+      "previousZh": "勃列日涅夫主义",
+      "hanonZh": "勃列日涅夫主义",
+      "comparison": "same",
+      "source": "mid",
+      "index": 15
+    },
+    {
+      "id": 52,
+      "en": "Portuguese Empire Crumbles",
+      "archiveZh": "葡萄牙帝国瓦解",
+      "previousZh": "葡萄牙帝国瓦解",
+      "hanonZh": "葡萄牙帝国崩溃",
+      "comparison": "wording",
+      "source": "mid",
+      "index": 16
+    },
+    {
+      "id": 53,
+      "en": "South African Unrest",
+      "archiveZh": "南非动荡",
+      "previousZh": "南非动荡",
+      "hanonZh": "南非动荡",
+      "comparison": "same",
+      "source": "mid",
+      "index": 17
+    },
+    {
+      "id": 54,
+      "en": "Allende",
+      "archiveZh": "智利总统阿连德",
+      "previousZh": "智利总统阿连德",
+      "hanonZh": "阿连德",
+      "comparison": "wording",
+      "source": "mid",
+      "index": 18
+    },
+    {
+      "id": 55,
+      "en": "Willy Brandt",
+      "archiveZh": "维利·勃兰特",
+      "previousZh": "维利·勃兰特",
+      "hanonZh": "维利·勃兰特",
+      "comparison": "same",
+      "source": "mid",
+      "index": 19
+    },
+    {
+      "id": 56,
+      "en": "Muslim Revolution",
+      "archiveZh": "伊斯兰革命",
+      "previousZh": "伊斯兰革命",
+      "hanonZh": "穆斯林革命",
+      "comparison": "wording",
+      "source": "mid",
+      "index": 20
+    },
+    {
+      "id": 57,
+      "en": "ABM Treaty",
+      "archiveZh": "反弹道导弹条约",
+      "previousZh": "反弹道导弹条约",
+      "hanonZh": "反弹道导弹条约",
+      "comparison": "same",
+      "source": "mid",
+      "index": 21
+    },
+    {
+      "id": 58,
+      "en": "Cultural Revolution",
+      "archiveZh": "文化大革命",
+      "previousZh": "文化大革命",
+      "hanonZh": "文化大革命",
+      "comparison": "same",
+      "source": "mid",
+      "index": 22
+    },
+    {
+      "id": 59,
+      "en": "Flower Power",
+      "archiveZh": "花朵力量",
+      "previousZh": "花朵力量",
+      "hanonZh": "花朵力量",
+      "comparison": "same",
+      "source": "mid",
+      "index": 23
+    },
+    {
+      "id": 60,
+      "en": "U-2 Incident",
+      "archiveZh": "U-2事件",
+      "previousZh": "U-2事件",
+      "hanonZh": "U-2击坠事件",
+      "comparison": "wording",
+      "source": "mid",
+      "index": 24
+    },
+    {
+      "id": 61,
+      "en": "OPEC",
+      "archiveZh": "石油输出国组织",
+      "previousZh": "石油输出国组织",
+      "hanonZh": "石油输出国组织",
+      "comparison": "same",
+      "source": "mid",
+      "index": 25
+    },
+    {
+      "id": 62,
+      "en": "“Lone Gunman”",
+      "archiveZh": "“孤胆枪手”",
+      "previousZh": "“孤胆枪手”",
+      "hanonZh": "“孤胆枪手”",
+      "comparison": "same",
+      "source": "mid",
+      "index": 26
+    },
+    {
+      "id": 63,
+      "en": "Colonial Rear Guards",
+      "archiveZh": "殖民残余",
+      "previousZh": "殖民残余",
+      "hanonZh": "殖民地殿后部队",
+      "comparison": "wording",
+      "source": "mid",
+      "index": 27
+    },
+    {
+      "id": 64,
+      "en": "Panama Canal Returned",
+      "archiveZh": "归还巴拿马运河",
+      "previousZh": "归还巴拿马运河",
+      "hanonZh": "归还巴拿马运河",
+      "comparison": "same",
+      "source": "mid",
+      "index": 28
+    },
+    {
+      "id": 65,
+      "en": "Camp David Accords",
+      "archiveZh": "戴维营协议",
+      "previousZh": "戴维营协议",
+      "hanonZh": "戴维营协议",
+      "comparison": "same",
+      "source": "mid",
+      "index": 29
+    },
+    {
+      "id": 66,
+      "en": "Puppet Governments",
+      "archiveZh": "傀儡政府",
+      "previousZh": "傀儡政府",
+      "hanonZh": "傀儡政府",
+      "comparison": "same",
+      "source": "mid",
+      "index": 30
+    },
+    {
+      "id": 67,
+      "en": "Grain Sales to Soviets",
+      "archiveZh": "向苏联出售谷物",
+      "previousZh": "向苏联出售谷物",
+      "hanonZh": "向苏联出售谷物",
+      "comparison": "same",
+      "source": "mid",
+      "index": 31
+    },
+    {
+      "id": 68,
+      "en": "John Paul II Elected Pope",
+      "archiveZh": "约翰·保罗二世当选教皇",
+      "previousZh": "约翰·保罗二世当选教皇",
+      "hanonZh": "约翰·保罗二世当选教皇",
+      "comparison": "same",
+      "source": "mid",
+      "index": 32
+    },
+    {
+      "id": 69,
+      "en": "Latin American Death Squads",
+      "archiveZh": "拉美敢死队",
+      "previousZh": "拉美敢死队",
+      "hanonZh": "拉丁美洲敢死队",
+      "comparison": "wording",
+      "source": "mid",
+      "index": 33
+    },
+    {
+      "id": 70,
+      "en": "OAS Founded",
+      "archiveZh": "建立美洲国家组织",
+      "previousZh": "建立美洲国家组织",
+      "hanonZh": "美洲国家组织成立",
+      "comparison": "wording",
+      "source": "mid",
+      "index": 34
+    },
+    {
+      "id": 71,
+      "en": "Nixon Plays the China Card",
+      "archiveZh": "尼克松打出中国牌",
+      "previousZh": "尼克松打出中国牌",
+      "hanonZh": "尼克松打出中国牌",
+      "comparison": "same",
+      "source": "mid",
+      "index": 35
+    },
+    {
+      "id": 72,
+      "en": "Sadat Expels Soviets",
+      "archiveZh": "萨达特驱逐苏维埃",
+      "previousZh": "萨达特驱逐苏维埃",
+      "hanonZh": "萨达特驱逐苏联",
+      "comparison": "wording",
+      "source": "mid",
+      "index": 36
+    },
+    {
+      "id": 73,
+      "en": "Shuttle Diplomacy",
+      "archiveZh": "穿梭外交",
+      "previousZh": "穿梭外交",
+      "hanonZh": "穿梭外交",
+      "comparison": "same",
+      "source": "mid",
+      "index": 37
+    },
+    {
+      "id": 74,
+      "en": "The Voice of America",
+      "archiveZh": "美国之音",
+      "previousZh": "美国之音",
+      "hanonZh": "美国之音",
+      "comparison": "same",
+      "source": "mid",
+      "index": 38
+    },
+    {
+      "id": 75,
+      "en": "Liberation Theology",
+      "archiveZh": "解放神学",
+      "previousZh": "解放神学",
+      "hanonZh": "解放神学",
+      "comparison": "same",
+      "source": "mid",
+      "index": 39
+    },
+    {
+      "id": 76,
+      "en": "Ussuri River Skirmish",
+      "archiveZh": "乌苏里江冲突",
+      "previousZh": "乌苏里江冲突",
+      "hanonZh": "乌苏里江冲突",
+      "comparison": "same",
+      "source": "mid",
+      "index": 40
+    },
+    {
+      "id": 77,
+      "en": "“Ask Not What Your Country Can Do For You…”",
+      "archiveZh": "“不要问你的祖国能为你做什么……”",
+      "previousZh": "“不要问你的祖国能为你做什么……”",
+      "hanonZh": "“不要问你的国家能为你做什么”",
+      "comparison": "wording",
+      "source": "mid",
+      "index": 41
+    },
+    {
+      "id": 78,
+      "en": "Alliance for Progress",
+      "archiveZh": "美洲进步同盟",
+      "previousZh": "美洲进步同盟",
+      "hanonZh": "美洲进步同盟",
+      "comparison": "same",
+      "source": "mid",
+      "index": 42
+    },
+    {
+      "id": 79,
+      "en": "Africa Scoring",
+      "archiveZh": "非洲计分",
+      "previousZh": "非洲计分",
+      "hanonZh": "非洲计分",
+      "comparison": "same",
+      "source": "mid",
+      "index": 43
+    },
+    {
+      "id": 80,
+      "en": "“One Small Step…”",
+      "archiveZh": "“一小步……”",
+      "previousZh": "“一小步……”",
+      "hanonZh": "“一小步…”",
+      "comparison": "punctuation",
+      "source": "mid",
+      "index": 44
+    },
+    {
+      "id": 81,
+      "en": "South America Scoring",
+      "archiveZh": "南美洲计分",
+      "previousZh": "南美洲计分",
+      "hanonZh": "南美洲计分",
+      "comparison": "same",
+      "source": "mid",
+      "index": 45
+    },
+    {
+      "id": 82,
+      "en": "Iranian Hostage Crisis",
+      "archiveZh": "伊朗人质危机",
+      "previousZh": "伊朗人质危机",
+      "hanonZh": "伊朗人质危机",
+      "comparison": "same",
+      "source": "late",
+      "index": 0
+    },
+    {
+      "id": 83,
+      "en": "The Iron Lady",
+      "archiveZh": "铁娘子",
+      "previousZh": "铁娘子",
+      "hanonZh": "铁娘子",
+      "comparison": "same",
+      "source": "late",
+      "index": 1
+    },
+    {
+      "id": 84,
+      "en": "Reagan Bombs Libya",
+      "archiveZh": "里根轰炸利比亚",
+      "previousZh": "里根轰炸利比亚",
+      "hanonZh": "里根轰炸利比亚",
+      "comparison": "same",
+      "source": "late",
+      "index": 2
+    },
+    {
+      "id": 85,
+      "en": "Star Wars",
+      "archiveZh": "星球大战",
+      "previousZh": "星球大战",
+      "hanonZh": "星球大战",
+      "comparison": "same",
+      "source": "late",
+      "index": 3
+    },
+    {
+      "id": 86,
+      "en": "North Sea Oil",
+      "archiveZh": "北海石油",
+      "previousZh": "北海石油",
+      "hanonZh": "北海油田",
+      "comparison": "wording",
+      "source": "late",
+      "index": 4
+    },
+    {
+      "id": 87,
+      "en": "The Reformer",
+      "archiveZh": "改革家",
+      "previousZh": "改革家",
+      "hanonZh": "改革家",
+      "comparison": "same",
+      "source": "late",
+      "index": 5
+    },
+    {
+      "id": 88,
+      "en": "Marine Barracks Bombing",
+      "archiveZh": "海军陆战队兵营爆炸事件",
+      "previousZh": "海军陆战队兵营爆炸事件",
+      "hanonZh": "贝鲁特军营炸弹袭击",
+      "comparison": "wording",
+      "source": "late",
+      "index": 6
+    },
+    {
+      "id": 89,
+      "en": "Soviets Shoot Down KAL-007",
+      "archiveZh": "苏联击落KAL-007班机",
+      "previousZh": "苏联击落KAL-007班机",
+      "hanonZh": "苏联击落大韩航空007号班机",
+      "comparison": "wording",
+      "source": "late",
+      "index": 7
+    },
+    {
+      "id": 90,
+      "en": "Glasnost",
+      "archiveZh": "开放",
+      "previousZh": "开放",
+      "hanonZh": "开放政策",
+      "comparison": "wording",
+      "source": "late",
+      "index": 8
+    },
+    {
+      "id": 91,
+      "en": "Ortega Elected in Nicaragua",
+      "archiveZh": "奥尔特加当选尼加拉瓜总统",
+      "previousZh": "奥尔特加当选尼加拉瓜总统",
+      "hanonZh": "奥尔特加当选尼加拉瓜总统",
+      "comparison": "same",
+      "source": "late",
+      "index": 9
+    },
+    {
+      "id": 92,
+      "en": "Terrorism",
+      "archiveZh": "恐怖主义",
+      "previousZh": "恐怖主义",
+      "hanonZh": "恐怖主义",
+      "comparison": "same",
+      "source": "late",
+      "index": 10
+    },
+    {
+      "id": 93,
+      "en": "Iran-Contra Scandal",
+      "archiveZh": "伊朗门丑闻",
+      "previousZh": "伊朗门丑闻",
+      "hanonZh": "伊朗门丑闻",
+      "comparison": "same",
+      "source": "late",
+      "index": 11
+    },
+    {
+      "id": 94,
+      "en": "Chernobyl",
+      "archiveZh": "切尔诺贝利",
+      "previousZh": "切尔诺贝利",
+      "hanonZh": "切尔诺贝利",
+      "comparison": "same",
+      "source": "late",
+      "index": 12
+    },
+    {
+      "id": 95,
+      "en": "Latin American Debt Crisis",
+      "archiveZh": "拉美债务危机",
+      "previousZh": "拉美债务危机",
+      "hanonZh": "拉丁美洲债务危机",
+      "comparison": "wording",
+      "source": "late",
+      "index": 13
+    },
+    {
+      "id": 96,
+      "en": "Tear Down this Wall",
+      "archiveZh": "推倒柏林墙",
+      "previousZh": "推倒柏林墙",
+      "hanonZh": "推倒这堵墙",
+      "comparison": "wording",
+      "source": "late",
+      "index": 14
+    },
+    {
+      "id": 97,
+      "en": "“An Evil Empire”",
+      "archiveZh": "“邪恶帝国”",
+      "previousZh": "“邪恶帝国”",
+      "hanonZh": "“邪恶帝国”",
+      "comparison": "same",
+      "source": "late",
+      "index": 15
+    },
+    {
+      "id": 98,
+      "en": "Aldrich Ames Remix",
+      "archiveZh": "奥德里奇·艾姆斯泄密",
+      "previousZh": "奥德里奇·艾姆斯泄密",
+      "hanonZh": "奥德里奇·艾姆斯",
+      "comparison": "wording",
+      "source": "late",
+      "index": 16
+    },
+    {
+      "id": 99,
+      "en": "Pershing II Deployed",
+      "archiveZh": "部署潘兴II导弹",
+      "previousZh": "部署潘兴II导弹",
+      "hanonZh": "部署潘兴II型导弹",
+      "comparison": "wording",
+      "source": "late",
+      "index": 17
+    },
+    {
+      "id": 100,
+      "en": "Wargames",
+      "archiveZh": "战争游戏",
+      "previousZh": "战争游戏",
+      "hanonZh": "战争游戏",
+      "comparison": "same",
+      "source": "late",
+      "index": 18
+    },
+    {
+      "id": 101,
+      "en": "Solidarity",
+      "archiveZh": "团结工会",
+      "previousZh": "团结工会",
+      "hanonZh": "团结工会",
+      "comparison": "same",
+      "source": "late",
+      "index": 19
+    },
+    {
+      "id": 102,
+      "en": "Iran-Iraq War",
+      "archiveZh": "两伊战争",
+      "previousZh": "两伊战争",
+      "hanonZh": "伊朗—伊拉克战争",
+      "comparison": "wording",
+      "source": "late",
+      "index": 20
+    },
+    {
+      "id": 103,
+      "en": "Defectors",
+      "archiveZh": "叛逃者",
+      "previousZh": "叛逃者",
+      "hanonZh": "背叛者",
+      "comparison": "wording",
+      "source": "early",
+      "index": 35
+    },
+    {
+      "id": 104,
+      "en": "The Cambridge Five",
+      "archiveZh": "剑桥五杰",
+      "previousZh": "剑桥五杰",
+      "hanonZh": "剑桥五杰",
+      "comparison": "same",
+      "source": "optional",
+      "index": 0
+    },
+    {
+      "id": 105,
+      "en": "Special Relationship",
+      "archiveZh": "英美特殊关系",
+      "previousZh": "英美特殊关系",
+      "hanonZh": "美英特殊关系",
+      "comparison": "wording",
+      "source": "optional",
+      "index": 1
+    },
+    {
+      "id": 106,
+      "en": "NORAD",
+      "archiveZh": "北美防空司令部",
+      "previousZh": "北美防空司令部",
+      "hanonZh": "北美防空司令部",
+      "comparison": "same",
+      "source": "optional",
+      "index": 2
+    },
+    {
+      "id": 107,
+      "en": "Che",
+      "archiveZh": "切·格瓦拉",
+      "previousZh": "切·格瓦拉",
+      "hanonZh": "切·格瓦拉",
+      "comparison": "same",
+      "source": "optional",
+      "index": 3
+    },
+    {
+      "id": 108,
+      "en": "Our Man in Tehran",
+      "archiveZh": "我们的人在德黑兰",
+      "previousZh": "我们的人在德黑兰",
+      "hanonZh": "我们的人在德黑兰",
+      "comparison": "same",
+      "source": "optional",
+      "index": 4
+    },
+    {
+      "id": 109,
+      "en": "Yuri and Samantha",
+      "archiveZh": "尤里和萨曼莎",
+      "previousZh": "尤里和萨曼莎",
+      "hanonZh": "尤里和萨曼莎",
+      "comparison": "same",
+      "source": "optional",
+      "index": 5
+    },
+    {
+      "id": 110,
+      "en": "AWACS Sale to Saudis",
+      "archiveZh": "向沙特出售机载预警系统",
+      "previousZh": "向沙特出售机载预警系统",
+      "hanonZh": "向沙特出售预警机",
+      "comparison": "wording",
+      "source": "optional",
+      "index": 6
+    }
+  ]
+}

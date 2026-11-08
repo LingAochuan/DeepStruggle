@@ -12,7 +12,7 @@ try {
  assert(await panel.isVisible());assert(await rows.count()>0);assert.equal(await p.locator('.vtt-text-card:enabled').count(),0);
  const initial=await ids(),before=await p.evaluate(()=>window.__wb.session.steps.length);
  await rows.first().dispatchEvent('click');assert.equal(await p.evaluate(()=>window.__wb.session.steps.length),before);
- await rows.first().hover();assert(await p.locator('#card-tooltip').isVisible());await p.mouse.move(1400,880);
+ await rows.first().hover();await p.waitForSelector('#hand-card-preview:not(.hidden) img');await p.mouse.move(1400,880);
  await panel.locator('[data-collapse-panel]').click();
  await p.evaluate(()=>{const w=window.__wb;w.handleCountryClick(w.state.legal_actions.valid_ids[0])});
  assert(await panel.isVisible());assert(await panel.evaluate(e=>e.classList.contains('vtt-minimized')));
