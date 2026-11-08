@@ -5,6 +5,8 @@
 - **中文界面**：为游戏术语和界面文字提供简体中文支持。
 - **前端优化**：调整游戏界面的布局、样式与交互。
 
+欢迎访问 [ts.soyoling.top](https://ts.soyoling.top) 在线体验。首次加载可能需要等待约 1 分钟，请耐心等待。
+
 本分支仍在开发中，改动位于 `personal` 分支。开发过程中大量使用 AI 辅助，代码尚未经完整的人工审查，功能与界面也可能继续调整。
 
 感谢原作者 Mikhail Dektyarev 及上游贡献者。原项目的引擎、AI 与开发文档请参阅[上游仓库](https://github.com/mihaild/DeepStruggle)。
