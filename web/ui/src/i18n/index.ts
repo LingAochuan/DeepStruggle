@@ -108,11 +108,17 @@ export function applyStaticMessages(root: ParentNode = document): void {
     });
   }
   root.querySelectorAll<HTMLSelectElement>("[data-locale-select]").forEach(el => { el.value = current; });
+  root.querySelectorAll<HTMLButtonElement>("[data-locale-button]").forEach(el => {
+    el.setAttribute("aria-pressed", String(el.dataset.localeButton === current));
+  });
 }
 export function bindLanguageControls(): void {
   applyStaticMessages();
   document.querySelectorAll<HTMLSelectElement>("[data-locale-select]").forEach(el => {
     el.addEventListener("change", () => setLocale(el.value as Locale));
+  });
+  document.querySelectorAll<HTMLButtonElement>("[data-locale-button]").forEach(el => {
+    el.addEventListener("click", () => setLocale(el.dataset.localeButton as Locale));
   });
 }
 

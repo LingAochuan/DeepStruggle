@@ -1,0 +1,1578 @@
+{
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/?id=2062069267",
+  "cardSource": "https://steamcommunity.com/sharedfiles/filedetails/?id=3311714280",
+  "cardFormat": "Original atlas cells, native dimensions, WebP quality 95; no redrawing",
+  "board": {
+    "file": "board-en.jpg",
+    "source": "https://images.steamusercontent.com/ugc/1009312139318009415/798BF20CE97527867EB8D91DDEF1D218248D173A/",
+    "sha256": "cc53af629a66fbc7b2ff64f2ad4f2d49eb4bbf6bd44e7c55a7930999ede597fb",
+    "width": 2748,
+    "height": 1584,
+    "transform": [
+      0.40830965095868926,
+      1.3647288173405513e-05,
+      -1.3647288173405513e-05,
+      0.40830965095868926,
+      -122.12432611529222,
+      -0.12478154275385414
+    ]
+  },
+  "counters": {
+    "turn": {
+      "file": "counters/en/turn.png",
+      "source": "https://images.steamusercontent.com/ugc/1009312085871004728/7F583BCFECAD0E3FC6DB447A8B86AEA15FF04CE6/",
+      "sha256": "18a7d7adf3a1d872cc69446c5cc866eb8df86b4dd0a22b4dc2c65fd5e1e0fb17",
+      "width": 2048,
+      "height": 2048
+    },
+    "defcon": {
+      "file": "counters/en/defcon.png",
+      "source": "https://images.steamusercontent.com/ugc/1009312139317893946/A19B18CC7CC4F4F4DB3DFA4A9474B7AC2493A5D6/",
+      "sha256": "78a31eef86587c75a966d2a81d87da53b1e8975e9e2ff31ff5c8f7699cd73c3b",
+      "width": 2048,
+      "height": 2048
+    }
+  },
+  "cards": {
+    "1": {
+      "file": "cards/en/001.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6300,
+      "crop": [
+        0,
+        0,
+        375,
+        525
+      ],
+      "sha256": "659a2c181d4f1f17cd4fc6af13e7e5d600216f4ed3be5c5f958cbcd7fcfc3997"
+    },
+    "2": {
+      "file": "cards/en/002.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6301,
+      "crop": [
+        375,
+        0,
+        750,
+        525
+      ],
+      "sha256": "44b379505bd7827a28cbef0fa7ff9bea3ca24de04921d95a9e8308705fa69037"
+    },
+    "3": {
+      "file": "cards/en/003.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6302,
+      "crop": [
+        750,
+        0,
+        1125,
+        525
+      ],
+      "sha256": "509486fd90ce277af1da4fde6c4cc162116404a8638f0dfc85f380f178f90f46"
+    },
+    "4": {
+      "file": "cards/en/004.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6303,
+      "crop": [
+        1125,
+        0,
+        1500,
+        525
+      ],
+      "sha256": "99210019b466007f77a81131b536b603f52360d420ed381be50daae24e7d422a"
+    },
+    "5": {
+      "file": "cards/en/005.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6304,
+      "crop": [
+        1500,
+        0,
+        1875,
+        525
+      ],
+      "sha256": "1c6ce3503bbee6401f6186d760823960c885cef1999601002bf69c89f26b2a3d"
+    },
+    "6": {
+      "file": "cards/en/006.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6305,
+      "crop": [
+        1875,
+        0,
+        2250,
+        525
+      ],
+      "sha256": "50e04314f13b5ec2413510deb8a1d7e802060ef01c0c09b690b06648ee0cf610"
+    },
+    "7": {
+      "file": "cards/en/007.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6306,
+      "crop": [
+        2250,
+        0,
+        2625,
+        525
+      ],
+      "sha256": "0c099b1a3accba3fd98915f952fce6bca0c0f102aaf01d35b8519371a12a071f"
+    },
+    "8": {
+      "file": "cards/en/008.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6307,
+      "crop": [
+        2625,
+        0,
+        3000,
+        525
+      ],
+      "sha256": "b1359e1098f9de47112c5d028628c4548c6667b1bc4422a37a8610e986b5f451"
+    },
+    "9": {
+      "file": "cards/en/009.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6308,
+      "crop": [
+        3000,
+        0,
+        3375,
+        525
+      ],
+      "sha256": "bfa5e36e4da95abaaefcbd049984b56f2bd70d231a23d7774d7d1860334fa590"
+    },
+    "10": {
+      "file": "cards/en/010.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6309,
+      "crop": [
+        3375,
+        0,
+        3750,
+        525
+      ],
+      "sha256": "2b5512fe203b247a463e0d58c270892c5cbc29b6607042567a58996d8e8bf53d"
+    },
+    "11": {
+      "file": "cards/en/011.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6310,
+      "crop": [
+        0,
+        525,
+        375,
+        1050
+      ],
+      "sha256": "1a314da3671d1cafd3a0032244002af33bdb21e8f822c32691be25f64810b190"
+    },
+    "12": {
+      "file": "cards/en/012.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6311,
+      "crop": [
+        375,
+        525,
+        750,
+        1050
+      ],
+      "sha256": "dea6c44b0d63e7f79b0d581fcae0825370ecaedb0087e227e6a2c500e6be794c"
+    },
+    "13": {
+      "file": "cards/en/013.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6312,
+      "crop": [
+        750,
+        525,
+        1125,
+        1050
+      ],
+      "sha256": "d97265f025ea11886ea2e7962655a431e8c20cf3e13ae41e52ba8e0d6f7adb02"
+    },
+    "14": {
+      "file": "cards/en/014.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6313,
+      "crop": [
+        1125,
+        525,
+        1500,
+        1050
+      ],
+      "sha256": "744bd089baec467bdf0bf7ea13db82eef1d63690ef02bcbb0c08e269e0e058da"
+    },
+    "15": {
+      "file": "cards/en/015.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6314,
+      "crop": [
+        1500,
+        525,
+        1875,
+        1050
+      ],
+      "sha256": "e9b51b2c936b8dbcf0caf00da42c09808dfe14b650b34a3c8132937b44d066ad"
+    },
+    "16": {
+      "file": "cards/en/016.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6315,
+      "crop": [
+        1875,
+        525,
+        2250,
+        1050
+      ],
+      "sha256": "b34bdd574e70957dd8520616175ff48d1f34b26bf5a34058aca2e6362050aac7"
+    },
+    "17": {
+      "file": "cards/en/017.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6316,
+      "crop": [
+        2250,
+        525,
+        2625,
+        1050
+      ],
+      "sha256": "1df9cde7ce7a9c52ab79c010460c18990973e259548712ae6f8b8226eb3d46d2"
+    },
+    "18": {
+      "file": "cards/en/018.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6317,
+      "crop": [
+        2625,
+        525,
+        3000,
+        1050
+      ],
+      "sha256": "21656b2222d565657e40a012d19319f90f33482657ae3f40e77626dc3d1e7550"
+    },
+    "19": {
+      "file": "cards/en/019.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6318,
+      "crop": [
+        3000,
+        525,
+        3375,
+        1050
+      ],
+      "sha256": "61f1e07d615b2221495e2bf6aba17a7a438f23e870e5d085fe1f6cffb2206cdf"
+    },
+    "20": {
+      "file": "cards/en/020.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6319,
+      "crop": [
+        3375,
+        525,
+        3750,
+        1050
+      ],
+      "sha256": "a41b33633e9c7f5f90577ae13b7d0920118d06315d48bc5cef8f9eb03c77289b"
+    },
+    "21": {
+      "file": "cards/en/021.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6320,
+      "crop": [
+        0,
+        1050,
+        375,
+        1575
+      ],
+      "sha256": "88d3722ff265ffe75c27a026a2e12c39eaeedf6d0b81e27499d0bf553a28497f"
+    },
+    "22": {
+      "file": "cards/en/022.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6321,
+      "crop": [
+        375,
+        1050,
+        750,
+        1575
+      ],
+      "sha256": "628dbb44864f8d6e8da437816a1110f62eae95f0363a7c31e4ca91b68922e6b2"
+    },
+    "23": {
+      "file": "cards/en/023.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6322,
+      "crop": [
+        750,
+        1050,
+        1125,
+        1575
+      ],
+      "sha256": "51540b815ce9d237a2b2f1aff2514520145046e0c82807bf451aa95ab5a6afc0"
+    },
+    "24": {
+      "file": "cards/en/024.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6323,
+      "crop": [
+        1125,
+        1050,
+        1500,
+        1575
+      ],
+      "sha256": "36e7e048a46638637582738879d0167162883ac8decfbc50899dfbb9effe7240"
+    },
+    "25": {
+      "file": "cards/en/025.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6324,
+      "crop": [
+        1500,
+        1050,
+        1875,
+        1575
+      ],
+      "sha256": "bf614eede436e5f9df19a129a696249cc37fba2ae7c2045508858093f337463c"
+    },
+    "26": {
+      "file": "cards/en/026.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6325,
+      "crop": [
+        1875,
+        1050,
+        2250,
+        1575
+      ],
+      "sha256": "2991ffdfd5937378d3128b19595e5e6c84359d5024138e1ddf7334f680394a02"
+    },
+    "27": {
+      "file": "cards/en/027.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6326,
+      "crop": [
+        2250,
+        1050,
+        2625,
+        1575
+      ],
+      "sha256": "3d5825e32121a23100528f3e55eb8a2ad8ee57fef9c3597a3378217aaf412030"
+    },
+    "28": {
+      "file": "cards/en/028.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6327,
+      "crop": [
+        2625,
+        1050,
+        3000,
+        1575
+      ],
+      "sha256": "7be9554d3cfa1218ae62a52a6fbdddcf9aa229339cb61f5ef19330de9b27db87"
+    },
+    "29": {
+      "file": "cards/en/029.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6328,
+      "crop": [
+        3000,
+        1050,
+        3375,
+        1575
+      ],
+      "sha256": "454fc12e178899293ba40dfe0887fd7d4e04631d72d1f3db3455dd3f439119ea"
+    },
+    "30": {
+      "file": "cards/en/030.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6329,
+      "crop": [
+        3375,
+        1050,
+        3750,
+        1575
+      ],
+      "sha256": "cc4de933a0ee846a2ebd6151b651633d05934ab26087340b282379483472220a"
+    },
+    "31": {
+      "file": "cards/en/031.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6330,
+      "crop": [
+        0,
+        1575,
+        375,
+        2101
+      ],
+      "sha256": "751af740cd48c25dc0c5557d6b55db5e357441de3a93f33d731d763fc2ba338b"
+    },
+    "32": {
+      "file": "cards/en/032.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6331,
+      "crop": [
+        375,
+        1575,
+        750,
+        2101
+      ],
+      "sha256": "d27662ba2cec16dbf8daed9b80b3c2fd9cfe23eafe50d864a08f2ea0d048c1ab"
+    },
+    "33": {
+      "file": "cards/en/033.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6332,
+      "crop": [
+        750,
+        1575,
+        1125,
+        2101
+      ],
+      "sha256": "8a290c68a422c27248376e9ec0a2319ad76bdd391749d7e60a6cd2102026611c"
+    },
+    "34": {
+      "file": "cards/en/034.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6333,
+      "crop": [
+        1125,
+        1575,
+        1500,
+        2101
+      ],
+      "sha256": "bba26625dca9cd362432a92396144ee413333856519ef6b1996319193be5c349"
+    },
+    "35": {
+      "file": "cards/en/035.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6334,
+      "crop": [
+        1500,
+        1575,
+        1875,
+        2101
+      ],
+      "sha256": "8ee52e1923af01128d0f4754f7a29c08927fa4bd5b1ffc277c49e7e1886771f5"
+    },
+    "36": {
+      "file": "cards/en/036.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6600,
+      "crop": [
+        0,
+        0,
+        375,
+        525
+      ],
+      "sha256": "73bcced172a2830085a6a43cf99478105adc60dd579b3cfb5feab4d6152333fe"
+    },
+    "37": {
+      "file": "cards/en/037.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6601,
+      "crop": [
+        375,
+        0,
+        750,
+        525
+      ],
+      "sha256": "5427941e8206d41929e4aa9af9bf2184ec43f51ba8d42391262af18049ace595"
+    },
+    "38": {
+      "file": "cards/en/038.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6602,
+      "crop": [
+        750,
+        0,
+        1125,
+        525
+      ],
+      "sha256": "aa5f22f2a81e019325cde8ee0a8fcfb06307b856afa80531269226772d79519d"
+    },
+    "39": {
+      "file": "cards/en/039.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6603,
+      "crop": [
+        1125,
+        0,
+        1500,
+        525
+      ],
+      "sha256": "e88fb58925e63c7e0fd738284d639b0ea61529d2d7f9ed859f7f1a9489086aae"
+    },
+    "40": {
+      "file": "cards/en/040.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6604,
+      "crop": [
+        1500,
+        0,
+        1875,
+        525
+      ],
+      "sha256": "cbbcbd15997cd3769f1330458a797cdcf1ea16bfd99126b5fda615db9f94321a"
+    },
+    "41": {
+      "file": "cards/en/041.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6605,
+      "crop": [
+        1875,
+        0,
+        2250,
+        525
+      ],
+      "sha256": "0d99eba024e5be3aade171ac92ff32428960f9cdde284b1b9e102484861f57c9"
+    },
+    "42": {
+      "file": "cards/en/042.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6606,
+      "crop": [
+        2250,
+        0,
+        2625,
+        525
+      ],
+      "sha256": "9c71c46a9978dda376f755d5fdf1ea75ccf5c2c9386a102a1ad79a29e23fdd80"
+    },
+    "43": {
+      "file": "cards/en/043.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6607,
+      "crop": [
+        2625,
+        0,
+        3000,
+        525
+      ],
+      "sha256": "e6c03b2c6a20423db0a11969326b0d516bce317a3b88fd2ad13746c80630c85f"
+    },
+    "44": {
+      "file": "cards/en/044.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6608,
+      "crop": [
+        3000,
+        0,
+        3375,
+        525
+      ],
+      "sha256": "2b5da4bb75716e9f8b067648952002026129070fe435e09370d867c313c19c8b"
+    },
+    "45": {
+      "file": "cards/en/045.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6609,
+      "crop": [
+        3375,
+        0,
+        3750,
+        525
+      ],
+      "sha256": "110a769b1a29090af11242ee275fc6f3aaae99c88e885ffb54329249fc867094"
+    },
+    "46": {
+      "file": "cards/en/046.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6610,
+      "crop": [
+        0,
+        525,
+        375,
+        1050
+      ],
+      "sha256": "e632df5afff720e2c4620cb13a973e064bfc65a6888cf8988889d22fcb4dd7e6"
+    },
+    "47": {
+      "file": "cards/en/047.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6611,
+      "crop": [
+        375,
+        525,
+        750,
+        1050
+      ],
+      "sha256": "6c7c9c64a0829a0e95efa983c8869f108a6aa7bea201547b4951757352fc3657"
+    },
+    "48": {
+      "file": "cards/en/048.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6612,
+      "crop": [
+        750,
+        525,
+        1125,
+        1050
+      ],
+      "sha256": "db1ed9097c7c2f56c1b8243ea4eee520e49c8f24dc943f76b4db1349f34be2f5"
+    },
+    "49": {
+      "file": "cards/en/049.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6613,
+      "crop": [
+        1125,
+        525,
+        1500,
+        1050
+      ],
+      "sha256": "c41f779d33e4c7c9cbc8becbba6d40b4a56731efa428292a887b240a1f5ad15e"
+    },
+    "50": {
+      "file": "cards/en/050.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6614,
+      "crop": [
+        1500,
+        525,
+        1875,
+        1050
+      ],
+      "sha256": "d0c5cd281b90e47f1d9abbd3a6c05939ead54459b622f62000659df6c207dd78"
+    },
+    "51": {
+      "file": "cards/en/051.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6615,
+      "crop": [
+        1875,
+        525,
+        2250,
+        1050
+      ],
+      "sha256": "adb8340e1fc92f95c5a3eda62a6faa35d628793d78254a9ad0c1fc7d29609994"
+    },
+    "52": {
+      "file": "cards/en/052.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6616,
+      "crop": [
+        2250,
+        525,
+        2625,
+        1050
+      ],
+      "sha256": "d549e4ea422b1273524a3daabc2bccf40219dabcf6f55decd62f7b03c7544341"
+    },
+    "53": {
+      "file": "cards/en/053.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6617,
+      "crop": [
+        2625,
+        525,
+        3000,
+        1050
+      ],
+      "sha256": "939749bcfd648b1e2c8d0491a8ddf2c99b5e6948a5306790441499c8fc2f6d9f"
+    },
+    "54": {
+      "file": "cards/en/054.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6618,
+      "crop": [
+        3000,
+        525,
+        3375,
+        1050
+      ],
+      "sha256": "b18d900ab9b4cacfe8c79ee9919b1d94c00a6df228d758803fd7e065f53dc19d"
+    },
+    "55": {
+      "file": "cards/en/055.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6619,
+      "crop": [
+        3375,
+        525,
+        3750,
+        1050
+      ],
+      "sha256": "528103b921391305b14bede6cf18a6a92b295cf0cb520c6b45510e4de7283cc4"
+    },
+    "56": {
+      "file": "cards/en/056.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6620,
+      "crop": [
+        0,
+        1050,
+        375,
+        1575
+      ],
+      "sha256": "124b6ee2e4ae68994e921194710543ad12c20405966b6f9bc329db2e16f52023"
+    },
+    "57": {
+      "file": "cards/en/057.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6621,
+      "crop": [
+        375,
+        1050,
+        750,
+        1575
+      ],
+      "sha256": "d0a3d7173302d23b8efeb9e28da0b6b86d0a726a41109e19749c03fdf8599905"
+    },
+    "58": {
+      "file": "cards/en/058.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6622,
+      "crop": [
+        750,
+        1050,
+        1125,
+        1575
+      ],
+      "sha256": "9ab17ae31c9c592dc1d8b5b89f3223557fbd127f94aba629d83ca1d62287c4fd"
+    },
+    "59": {
+      "file": "cards/en/059.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6623,
+      "crop": [
+        1125,
+        1050,
+        1500,
+        1575
+      ],
+      "sha256": "50b7dd56abd7775b2307230c2c9728a08c5c02aafa5f2003f6f3bce6a778ad69"
+    },
+    "60": {
+      "file": "cards/en/060.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6624,
+      "crop": [
+        1500,
+        1050,
+        1875,
+        1575
+      ],
+      "sha256": "6deb84196e91c282a254d70b469e0b7870e19ddb6af5139d832535de7dfd4735"
+    },
+    "61": {
+      "file": "cards/en/061.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6625,
+      "crop": [
+        1875,
+        1050,
+        2250,
+        1575
+      ],
+      "sha256": "3d5154159738e53dcb3e4656e7b57725f0d6193df06b118d53aad9a810101d00"
+    },
+    "62": {
+      "file": "cards/en/062.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6626,
+      "crop": [
+        2250,
+        1050,
+        2625,
+        1575
+      ],
+      "sha256": "586a367a8087103f89f0937d4f1761ece2c089d3e9956a940a119543381f14d4"
+    },
+    "63": {
+      "file": "cards/en/063.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6627,
+      "crop": [
+        2625,
+        1050,
+        3000,
+        1575
+      ],
+      "sha256": "9c7fa710b2a9dca2ef5457f20d0039ca5391ba444e3b910effc8182ff9159c94"
+    },
+    "64": {
+      "file": "cards/en/064.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6628,
+      "crop": [
+        3000,
+        1050,
+        3375,
+        1575
+      ],
+      "sha256": "406311f2af0f5d8905e6c543975d1bd06b76aa4fdbe6a499f1e8d2267db00da2"
+    },
+    "65": {
+      "file": "cards/en/065.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6629,
+      "crop": [
+        3375,
+        1050,
+        3750,
+        1575
+      ],
+      "sha256": "ffdf4d298041f3dc46647b1207d0d6f57fb0877578220ea54597450600c03bff"
+    },
+    "66": {
+      "file": "cards/en/066.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6630,
+      "crop": [
+        0,
+        1575,
+        375,
+        2101
+      ],
+      "sha256": "ace5de5fba6b5ea12a429d8e56b40353cd5c6dfa8e3fd21c57b7268ed8e1ac9d"
+    },
+    "67": {
+      "file": "cards/en/067.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6631,
+      "crop": [
+        375,
+        1575,
+        750,
+        2101
+      ],
+      "sha256": "1134e52016e21b1f98fcc993a0535f986f7d2c1ad10a38881c60c2a2a7049ba3"
+    },
+    "68": {
+      "file": "cards/en/068.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6632,
+      "crop": [
+        750,
+        1575,
+        1125,
+        2101
+      ],
+      "sha256": "6eb69dd56adfdda8646fc85c15a33598c5f5d8141990bb600d6ab117751b94fe"
+    },
+    "69": {
+      "file": "cards/en/069.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6633,
+      "crop": [
+        1125,
+        1575,
+        1500,
+        2101
+      ],
+      "sha256": "f74499dff0800f142f0cfe8b0ebc77dd8254d800f4fafc7679af0093084052fc"
+    },
+    "70": {
+      "file": "cards/en/070.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6634,
+      "crop": [
+        1500,
+        1575,
+        1875,
+        2101
+      ],
+      "sha256": "d9d4bafc2a3a4f21ab460f387ed9903f649404220a8a17d676ffb906e11979b9"
+    },
+    "71": {
+      "file": "cards/en/071.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6635,
+      "crop": [
+        1875,
+        1575,
+        2250,
+        2101
+      ],
+      "sha256": "dafd5986aa64384a7b0250bcd668483adaf70fd06f6588f145cc9e61ff951513"
+    },
+    "72": {
+      "file": "cards/en/072.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6636,
+      "crop": [
+        2250,
+        1575,
+        2625,
+        2101
+      ],
+      "sha256": "fc4c95553353dc458562763ba9219ae50ed56919c0979e2f5bff823886028896"
+    },
+    "73": {
+      "file": "cards/en/073.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6637,
+      "crop": [
+        2625,
+        1575,
+        3000,
+        2101
+      ],
+      "sha256": "81c56e0f439ca52b0825a6eb695ec707739ef02933ce48eb328a453e6c560374"
+    },
+    "74": {
+      "file": "cards/en/074.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6638,
+      "crop": [
+        3000,
+        1575,
+        3375,
+        2101
+      ],
+      "sha256": "2528b5490d9386385af53a35f85c0455ec1510c995db55af25d98ed6f067d031"
+    },
+    "75": {
+      "file": "cards/en/075.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6639,
+      "crop": [
+        3375,
+        1575,
+        3750,
+        2101
+      ],
+      "sha256": "431fe6ac7acfb24f9229a1c77347438a6e15de861f9adf4f95e9ce4c8aa7a541"
+    },
+    "76": {
+      "file": "cards/en/076.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6640,
+      "crop": [
+        0,
+        2101,
+        375,
+        2626
+      ],
+      "sha256": "f4c55f512d9bd6c72e325b09c4bcb8e739eb341dbbf0606475f4a00f6ed8332d"
+    },
+    "77": {
+      "file": "cards/en/077.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6641,
+      "crop": [
+        375,
+        2101,
+        750,
+        2626
+      ],
+      "sha256": "3b750425b2734fb482a9d9760c4e23a287ca38f0537bbb8a8e22c2fdb12b8338"
+    },
+    "78": {
+      "file": "cards/en/078.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6642,
+      "crop": [
+        750,
+        2101,
+        1125,
+        2626
+      ],
+      "sha256": "b951e95c3b4ecf8e65da8f26e902011503627d6ebfcc05c0d73aea13e9cd79c3"
+    },
+    "79": {
+      "file": "cards/en/079.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6643,
+      "crop": [
+        1125,
+        2101,
+        1500,
+        2626
+      ],
+      "sha256": "95f97a951d8113a076e308832691eb635851108c29b1604557451d162c93fd9a"
+    },
+    "80": {
+      "file": "cards/en/080.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6644,
+      "crop": [
+        1500,
+        2101,
+        1875,
+        2626
+      ],
+      "sha256": "1c850fac32f21b6633ccbeaba6593bcc91fc19b0a529fd08541d73071e91a105"
+    },
+    "81": {
+      "file": "cards/en/081.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6645,
+      "crop": [
+        1875,
+        2101,
+        2250,
+        2626
+      ],
+      "sha256": "20e64cd2658294ab9d57b1e88c3cdd4bcec5855dc901a14b933a51a0a4ff0f5a"
+    },
+    "82": {
+      "file": "cards/en/082.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6500,
+      "crop": [
+        0,
+        0,
+        375,
+        525
+      ],
+      "sha256": "dad8a194c6e4217603c3124a48762b1b8b584f03de90c6b6683536367a5cc90a"
+    },
+    "83": {
+      "file": "cards/en/083.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6501,
+      "crop": [
+        375,
+        0,
+        750,
+        525
+      ],
+      "sha256": "35d32c0347a7799ec891065340ed0647b92c9352efc79fde6e8d883f59332f27"
+    },
+    "84": {
+      "file": "cards/en/084.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6502,
+      "crop": [
+        750,
+        0,
+        1125,
+        525
+      ],
+      "sha256": "5ea71bc5b75d42815b33ac010a02b0d0592674ad2fda04bf2871da42af77cd70"
+    },
+    "85": {
+      "file": "cards/en/085.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6503,
+      "crop": [
+        1125,
+        0,
+        1500,
+        525
+      ],
+      "sha256": "9ebaa719c99be8ab7ab082dc146f20615b6ed5b5b78e018b0ae3198835364de6"
+    },
+    "86": {
+      "file": "cards/en/086.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6504,
+      "crop": [
+        1500,
+        0,
+        1875,
+        525
+      ],
+      "sha256": "19db85b007e0a919d5ef458435328e46f6c385b5144eb387b5a9de5295cd548c"
+    },
+    "87": {
+      "file": "cards/en/087.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6505,
+      "crop": [
+        1875,
+        0,
+        2250,
+        525
+      ],
+      "sha256": "a021044782b3b34a8866d6eeb5380c113f668f2c4b94fb40a63e1488e9c3f936"
+    },
+    "88": {
+      "file": "cards/en/088.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6506,
+      "crop": [
+        2250,
+        0,
+        2625,
+        525
+      ],
+      "sha256": "381047a1d5f8d84887250686d12ebc2db0e821ccabe49e0cbfcaadedad978983"
+    },
+    "89": {
+      "file": "cards/en/089.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6507,
+      "crop": [
+        2625,
+        0,
+        3000,
+        525
+      ],
+      "sha256": "c59251a02ee3991068cbb9ad479234ba5326b8a58394e98417c1de7eca5cca74"
+    },
+    "90": {
+      "file": "cards/en/090.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6508,
+      "crop": [
+        3000,
+        0,
+        3375,
+        525
+      ],
+      "sha256": "79149e1bd13650027e9a6e90cf011cfe95cf06fae4c013b6f7f6dac5878d703c"
+    },
+    "91": {
+      "file": "cards/en/091.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6509,
+      "crop": [
+        3375,
+        0,
+        3750,
+        525
+      ],
+      "sha256": "80dd0df9946b7d1e55aa72069ff41ee9742b492f46d3ac6db95a0aae2c647712"
+    },
+    "92": {
+      "file": "cards/en/092.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6510,
+      "crop": [
+        0,
+        525,
+        375,
+        1050
+      ],
+      "sha256": "100dce51f80c5689e55394ea34cf4fe3ef5de941d4cbbbc1f812a3c72bb321b2"
+    },
+    "93": {
+      "file": "cards/en/093.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6511,
+      "crop": [
+        375,
+        525,
+        750,
+        1050
+      ],
+      "sha256": "3476565cc89ebd19a467ae51c18130322ad210460f8ee551ee7521d01ce0fbfd"
+    },
+    "94": {
+      "file": "cards/en/094.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6512,
+      "crop": [
+        750,
+        525,
+        1125,
+        1050
+      ],
+      "sha256": "1b40bc3aea7b3a97e117dd14fea90ae105e81c2c7e94ed7e5651fb4125af72e0"
+    },
+    "95": {
+      "file": "cards/en/095.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6513,
+      "crop": [
+        1125,
+        525,
+        1500,
+        1050
+      ],
+      "sha256": "0ddeb71057c33403a1f3d8e3fbe687fddd32cd8816fbc5bef90f7acdf23000f0"
+    },
+    "96": {
+      "file": "cards/en/096.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6514,
+      "crop": [
+        1500,
+        525,
+        1875,
+        1050
+      ],
+      "sha256": "8273235a691b40e624f51f0dffa5de557e60eba3c6e849e5d874e155a4e1491a"
+    },
+    "97": {
+      "file": "cards/en/097.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6515,
+      "crop": [
+        1875,
+        525,
+        2250,
+        1050
+      ],
+      "sha256": "e19eacd9d9143a9bd6da8d2c9a573f4e45d34f3c142f06a1f004d0c13b49c94e"
+    },
+    "98": {
+      "file": "cards/en/098.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6516,
+      "crop": [
+        2250,
+        525,
+        2625,
+        1050
+      ],
+      "sha256": "54ca62cc52f0f33d0fca47eba756391c35a3ad167b336d44f3c9117554d6bd65"
+    },
+    "99": {
+      "file": "cards/en/099.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6517,
+      "crop": [
+        2625,
+        525,
+        3000,
+        1050
+      ],
+      "sha256": "653eb45f6bee3ed80c8a953858e557761f1fd315044aa6e6680b2d2fea1a11a1"
+    },
+    "100": {
+      "file": "cards/en/100.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6518,
+      "crop": [
+        3000,
+        525,
+        3375,
+        1050
+      ],
+      "sha256": "bb8713a2e084da4ec85d18cacb9fbcfe0b25c0bb2def7b01962b651c17cea073"
+    },
+    "101": {
+      "file": "cards/en/101.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6519,
+      "crop": [
+        3375,
+        525,
+        3750,
+        1050
+      ],
+      "sha256": "76633ebb4a1be4ab10248d816b6b6f7e9a6a2d957dfa2f0432a15d79d8634897"
+    },
+    "102": {
+      "file": "cards/en/102.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6520,
+      "crop": [
+        0,
+        1050,
+        375,
+        1575
+      ],
+      "sha256": "71f71501651a8e198d71e6c08c8ff03e58c8192b3808359d8aa4f8b13c3f648c"
+    },
+    "103": {
+      "file": "cards/en/103.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6335,
+      "crop": [
+        1875,
+        1575,
+        2250,
+        2101
+      ],
+      "sha256": "0f465c6383fa74ea809a304a7ce5c9549878a1ce4a7c0330c4c182afa5a7db60"
+    },
+    "104": {
+      "file": "cards/en/104.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6336,
+      "crop": [
+        2250,
+        1575,
+        2625,
+        2101
+      ],
+      "sha256": "f78d33bbc082e6bb561966a26897a3354eab6059c1be36b8cd7d583d40fe91ca"
+    },
+    "105": {
+      "file": "cards/en/105.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6337,
+      "crop": [
+        2625,
+        1575,
+        3000,
+        2101
+      ],
+      "sha256": "53d43bfcabe941bdc7064417898b051a3835b7e3328480b8bac6a0eb35052e78"
+    },
+    "106": {
+      "file": "cards/en/106.webp",
+      "width": 375,
+      "height": 526,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497831836/DE3ED760D0FEA34FF5AF1FD584EAFA6D6129EFB4/",
+      "ttsCardID": 6338,
+      "crop": [
+        3000,
+        1575,
+        3375,
+        2101
+      ],
+      "sha256": "5b9cf477ec152fe423a68393e7149b2405ea77de1a8a6e9bb97bbec39f6b3469"
+    },
+    "107": {
+      "file": "cards/en/107.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6646,
+      "crop": [
+        2250,
+        2101,
+        2625,
+        2626
+      ],
+      "sha256": "a93f33f744d5e3926b972ff990dd0079f620f689e228981744c12769fbff2492"
+    },
+    "108": {
+      "file": "cards/en/108.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497881443/C91905610285E1F679BAB4C9AC8D01F925C9D002/",
+      "ttsCardID": 6647,
+      "crop": [
+        2625,
+        2101,
+        3000,
+        2626
+      ],
+      "sha256": "ace48f1b105b14c48e334e6c0ec48e3852d8c98f4fdedb2d372fc97daa8af10c"
+    },
+    "109": {
+      "file": "cards/en/109.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6521,
+      "crop": [
+        375,
+        1050,
+        750,
+        1575
+      ],
+      "sha256": "97360e9b82f36249bb74d42fb17b7d3063aa8aa23c1532e9d37afb75c1023a9d"
+    },
+    "110": {
+      "file": "cards/en/110.webp",
+      "width": 375,
+      "height": 525,
+      "source": "https://steamusercontent-a.akamaihd.net/ugc/2313225941497886555/CF1F8EE0B6AEE1C8DA63CB6B850CFA28F6F31608/",
+      "ttsCardID": 6522,
+      "crop": [
+        750,
+        1050,
+        1125,
+        1575
+      ],
+      "sha256": "94e9516ce24348f446c8c6564a0fc79d01f1ef20c7e98a3807cbe3e4244d3543"
+    }
+  }
+}

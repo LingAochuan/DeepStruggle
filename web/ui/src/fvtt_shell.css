@@ -161,6 +161,10 @@ body.player-view .vtt-effects { left: 12px; }
 .vtt-shell .mode-choice { padding: 12px 14px; margin-bottom: 10px; }
 .vtt-shell .mode-choice-title { color: #e1c99e; font-size: 15px; }
 .vtt-shell .mode-choice-text { color: #c4bdaf; }
+.mode-language { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding-top: 12px; border-top: 1px solid var(--border-color); }
+.mode-language-options { display: flex; gap: 8px; }
+.vtt-shell .mode-language .btn { min-height: 36px; padding: 6px 12px; }
+.vtt-shell .mode-language .btn[aria-pressed="true"] { background: #b3955b30; border-color: #bca070; color: #e1c99e; }
 .vtt-shell .mode-model-details, .vtt-shell .mode-dialog-note { background: transparent; border-color: var(--border-color); color: var(--text-muted); }
 .vtt-shell .card-tooltip { z-index: 150; background: #24231ff5; border: 1px solid #b4a18488; border-radius: 5px; box-shadow: 0 4px 18px #0009; }
 .vtt-shell .card-tooltip.hanon-card-preview {
@@ -428,6 +432,12 @@ body.vtt-dock-open .map-rolls { right: 440px; }
 .vtt-shell #text-card-picker .side-neutral .vtt-card-name { color: var(--text-main); }
 .vtt-shell #text-card-picker .previewing { background: #b4a18413; }
 @media (min-width: 701px) {
+  html[lang="en"] .vtt-shell #text-card-picker:not(.vtt-minimized) { width: min(370px, calc(100vw - 88px)); }
+  .vtt-shell #text-card-picker:not(.vtt-minimized) .vtt-panel-heading { position: relative; padding-left: 10px; padding-right: 64px; }
+  .vtt-shell #text-card-picker:not(.vtt-minimized) .vtt-card-tabs { justify-content: flex-start; }
+  .vtt-shell #text-card-picker:not(.vtt-minimized) .vtt-card-tabs button { flex: none; white-space: nowrap; overflow-wrap: normal; padding-inline: 3px; display: flex; align-items: center; justify-content: center; }
+  .vtt-shell #text-card-picker:not(.vtt-minimized) #text-card-picker-count { position: absolute; right: 41px; }
+  .vtt-shell #text-card-picker:not(.vtt-minimized) .vtt-panel-toggle { position: absolute; right: 10px; }
   .vtt-shell #text-card-picker .vtt-text-card { height: 30px; }
   .vtt-shell #text-card-picker .vtt-card-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }

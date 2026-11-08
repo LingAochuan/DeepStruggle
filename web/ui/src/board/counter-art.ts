@@ -1,4 +1,6 @@
-/** Original Hanon TTS counter textures, optional personal resources (not bundled into source). */
+import { locale } from '../i18n';
+import english from '../artwork/english-sources.json';
+/** Original TTS counter textures, optional personal resources (not bundled into source). */
 const NS = 'http://www.w3.org/2000/svg';
 export type CounterArt = 'influence-us' | 'influence-ussr' | 'turn' | 'vp' | 'space-us' | 'space-ussr'
   | 'action-round' | 'defcon' | 'mil-us' | 'mil-ussr';
@@ -13,7 +15,9 @@ export function counterArt(name: CounterArt, x: number, y: number, size: number,
     'data-face': back ? 'back' : 'front', 'pointer-events': 'none', overflow: 'hidden' };
   for (const [key, value] of Object.entries(attrs)) svg.setAttribute(key, String(value));
   const image = document.createElementNS(NS, 'image');
-  image.setAttribute('href', `${import.meta.env.BASE_URL}personal/counters/${name}.png`);
+  const translated = locale() === 'en' && (name === 'turn' || name === 'defcon')
+    ? english.counters[name].file : `counters/${name}.png`;
+  image.setAttribute('href', `${import.meta.env.BASE_URL}personal/${translated}`);
   image.setAttribute('width', '2048'); image.setAttribute('height', '2048');
   if (rotate) image.setAttribute('transform', `rotate(180 1050.5 ${faceY + 445.5})`);
   // Without the optional pack, the existing vector counter beneath the image stays visible.

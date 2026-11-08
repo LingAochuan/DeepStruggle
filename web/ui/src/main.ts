@@ -424,9 +424,10 @@ export class TSApp {
     if (!dialog) return;
     const note = document.getElementById("mode-dialog-note");
     if (note) {
-      note.textContent = label(reason === "new"
-        ? t("A fresh deal follows your choice. Close to keep the game on the board.")
-        : t("You can change this any time in Settings."));
+      note.dataset.i18n = reason === "new"
+        ? "A fresh deal follows your choice. Close to keep the game on the board."
+        : "You can change this any time in Settings.";
+      note.textContent = t(note.dataset.i18n);
     }
     this.closeModelMode();
     this.moveModelSection("mode-model-slot");

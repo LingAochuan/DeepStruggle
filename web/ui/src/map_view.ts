@@ -1,4 +1,4 @@
-import { t, label, setModalRenderer } from "./i18n";
+import { t, label, setModalRenderer, locale, onLocaleChange } from "./i18n";
 import { countryName } from "./i18n";
 import { GameState, LastTurnCountry, MapMetadata, RecentRoll, RegionSideScore } from "./types";
 import { renderRollTray } from "./roll_tray";
@@ -10,6 +10,7 @@ import { HANON, BOARD_RECTS, BOARD_REGIONS, boardCenter } from "./board/hanon";
 import { renderBoardTracks } from "./board/tracks";
 import { TracksView } from "./tracks_view";
 import { counterArt } from "./board/counter-art";
+import englishArt from './artwork/english-sources.json';
 
 /** A scoring card's badge and summary: the engine's scoring (RegionScore) with names and colours. */
 export interface RegionScoreAudit {
@@ -240,6 +241,8 @@ export class MapView {
   private classicBoard = false;
   private alignment = false;
   private boardImageUrl = `${import.meta.env.BASE_URL}personal/hanon-board.jpg`;
+  private englishBoard = false;
+  private boardLoadGeneration = 0;
   private svg: SVGSVGElement;
   private mapData: MapMetadata | null = null;
   private lastState: GameState | null = null;
@@ -283,18 +286,37 @@ export class MapView {
       align.setAttribute("aria-pressed", String(this.alignment));
       if (this.lastState) this.render(this.lastState);
     });
+    this.loadBoard(true);
+    onLocaleChange(() => this.loadBoard(false));
+  }
+
+  /** Async locale loads cannot reset the camera or supersede a newer language request. */
+  private loadBoard(initial: boolean) {
+    const generation = ++this.boardLoadGeneration;
+    const english = locale() === 'en';
+    const url = `${import.meta.env.BASE_URL}personal/${english ? englishArt.board.file : 'hanon-board.jpg'}`;
+    const select = document.getElementById('map-theme') as HTMLSelectElement | null;
     const image = new Image();
     image.onload = () => {
+      if (generation !== this.boardLoadGeneration) return;
+      this.boardImageUrl = url;
+      this.englishBoard = english;
       this.boardReady = true;
       let preferred = "classic";
       try { preferred = localStorage.getItem("deepstruggle.map-style.v1") ?? preferred; } catch { /* optional */ }
       this.classicBoard = preferred !== "diagram";
       if (select) { select.disabled = false; select.value = this.classicBoard ? "classic" : "diagram"; }
-      this.resetView();
+      if (initial) this.resetView();
       if (this.lastState) this.render(this.lastState);
     };
-    image.onerror = () => { if (select) select.value = "diagram"; };
-    image.src = this.boardImageUrl;
+    image.onerror = () => {
+      if (generation !== this.boardLoadGeneration) return;
+      this.boardReady = false;
+      this.classicBoard = false;
+      if (select) { select.value = 'diagram'; select.disabled = true; }
+      if (this.lastState) this.render(this.lastState);
+    };
+    image.src = url;
   }
 
   public fetchMetadata() {
@@ -752,8 +774,16 @@ export class MapView {
 
   /** Artwork and interactive geometry share this SVG's coordinate system, including pan/zoom. */
   private renderClassicBoard(state: GameState) {
-    this.svg.appendChild(svgEl("image", { href: this.boardImageUrl, x: 0, y: 0,
-      width: HANON.width, height: HANON.height, "pointer-events": "none", class: "board-art" }));
+    const art = svgEl('image', { href: this.boardImageUrl, x: 0, y: 0,
+      width: this.englishBoard ? englishArt.board.width : HANON.width,
+      height: this.englishBoard ? englishArt.board.height : HANON.height,
+      transform: this.englishBoard ? `matrix(${englishArt.board.transform.join(' ')})` : null,
+      'pointer-events': 'none', class: 'board-art' });
+    // Clip the original English image's extra deck column; retain the shared hit/track coordinates.
+    const board = svgEl('svg', { x: 0, y: 0, width: HANON.width, height: HANON.height,
+      viewBox: `0 0 ${HANON.width} ${HANON.height}`, overflow: 'hidden', 'pointer-events': 'none' });
+    board.append(art);
+    this.svg.append(board);
     const legal = new Set(state.legal_actions?.decision_type === engineLayout()?.decision_types.POINT_NODE
       ? state.legal_actions?.valid_ids ?? [] : []);
     const changed = this.influenceChanges(state);

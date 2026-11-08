@@ -594,6 +594,22 @@ with Vite (`tests/web/js_runner.py`).
 
 ## Display locales (English and Simplified Chinese)
 
+The initial play-mode dialog includes English / 简体中文 buttons below its choices.
+They use `data-locale-button` and the same saved locale as the Settings selector;
+`applyStaticMessages` synchronizes their pressed state. Switching language leaves
+the dialog open and does not choose a mode or restart the game. Keep the language
+names and bilingual group label readable regardless of the current locale.
+
+The local bilingual artwork preview uses `src/artwork/english-sources.json` for
+English board/counter/card URLs, hashes, crops and the board affine transform.
+`cards/art.ts` selects by locale for every consumer, including CIA hand reveals.
+English resources are optional ignored files under `public/personal/`; missing
+resources use localized text/vector/diagram fallbacks rather than Chinese art.
+The map clips the English image's extra deck column into the shared Hanon bounds;
+country and track geometry stay unchanged. Async locale loads must preserve the
+camera and reject stale callbacks. Check `tests/web/tabletop_art_locales.mjs`.
+English assets are locally prepared only; the Azure download pack is not yet updated.
+
 The optional personal classic board is documented in `../../docs/board-theme.md`.
 `src/board/hanon-layout.json` maps all 84 engine country IDs to artwork rectangles;
 do not replace `rules/map.json` positions or names. Image and interaction overlays
@@ -686,7 +702,10 @@ pending previews, resets list scrolling and calls `onRerender` to restore analys
 badges on return to the hand; readonly pile rows omit `card-item` and `data-primary`.
 The active tab survives state/locale updates and panel collapse.
 The expanded desktop panel has a fixed 250px height: a 38px header, seven 30px
-rows and borders. The list scrolls internally; empty/short piles keep the same frame.
+rows and borders. In English its width is 370px (Chinese remains 320px), so the
+three pile labels stay on one line. The tab group aligns to the left header inset;
+the count and collapse control occupy reserved space on the right. The list scrolls
+internally; empty/short piles keep the same frame.
 Narrow viewports cap this height to preserve room for current actions.
 Check `tests/web/tabletop_piles.mjs` for browsing, updates, hover, legal-choice isolation,
 replay, language and narrow-screen behavior.

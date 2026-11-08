@@ -8,8 +8,26 @@ unchanged. The original diagram is still available from the map-style selector.
 Place the personal artwork at `web/ui/public/personal/hanon-board.jpg`. This folder
 is git-ignored and is not part of a source contribution. Without it, the page falls
 back to the diagram. The selected style is saved as `deepstruggle.map-style.v1`.
-The image is a Chinese board; switching interface languages does not translate
-text embedded in its pixels. Card artwork is outside this change.
+The local bilingual preview selects original artwork with the interface locale.
+Chinese uses `hanon-board.jpg` and `cards/001.webp` through `110.webp`; English uses
+`board-en.jpg` and `cards/en/001.webp` through `110.webp`. English turn and DEFCON
+textures live in `counters/en/turn.png` and `counters/en/defcon.png`. Other counters
+are shared. Missing localized art uses the existing diagram/vector/text fallback,
+not the other language's artwork. All paths are relative to `public/personal/`.
+
+`src/artwork/english-sources.json` (under `web/ui/`) records the English sources,
+hashes, native image sizes, card crops and board transform. The map and counters
+come from Payne's Workshop item 2062069267, credited by Hanon; the 110 English
+faces come from Scripted (EN), item 3311714280. The English map is kept byte-for-byte:
+an SVG affine transform aligns it to the existing Hanon coordinate system and a
+nested SVG clips its extra left-hand deck column. No country or track coordinates
+change. Locale swaps preserve the camera and reject stale image-load callbacks.
+All card consumers, including the one-time hand reveal, use `cards/art.ts`.
+
+This English pack is currently supplied locally and is git-ignored, like the
+Chinese art. The Azure preparation scripts still prepare the previously published
+Chinese packs; distributing/preparing the English pack for Azure is a separate
+deployment step, not performed by the local preview build.
 
 The personal Azure workflow prepares this optional pack using
 `node deploy/azure/prepare-artwork.mjs` before Vite builds. The script verifies the
@@ -70,6 +88,10 @@ shell; game actions still go through the existing session/engine APIs.
 `node tests/web/board_layout.mjs` checks all IDs, image aspect, rectangle bounds and
 overlap, plus all 79 printed track cells and their separation from country targets.
 Run `node tests/web/i18n.mjs` and the frontend production build too.
+`node tests/web/tabletop_art_locales.mjs <base-url>` verifies all 113 English
+files by hash, both locales, unchanged country geometry, camera preservation,
+country clicks after pan/zoom, hand/HUD/log/effect previews, a real CIA reveal,
+missing-resource fallbacks and late image responses during language changes.
 With Vite or a production preview running, `node tests/web/tabletop_ui.mjs <base-url>`
 checks the actual browser shell, legal setup/headline choices, undo/debug, player
 redaction, model-form relocation, replay file loading/scrubbing, effects and track

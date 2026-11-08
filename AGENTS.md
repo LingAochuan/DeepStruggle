@@ -44,6 +44,13 @@ side-colored names and a separate fixed-right image preview after 100 ms of dwel
 See `node tests/web/tabletop_card_art.mjs` and `docs/board-theme.md` for validation
 and the personal artwork boundary.
 
+The local bilingual artwork preview uses `web/ui/src/artwork/english-sources.json`:
+English map registration shares the Hanon country/track coordinates; English card
+faces and turn/DEFCON textures follow the display locale. Camera and game state
+survive language switches. Assets remain optional, ignored personal resources;
+the English pack is locally prepared, not yet part of Azure's published packs.
+See `tests/web/tabletop_art_locales.mjs` for locale, reveal, and image-load checks.
+
 Hand-reveal events use `web/ui/src/hand_reveal.ts`: a one-time modal row of the
 viewer's engine-revealed cards, with a localized Close button and no permanent
 opponent-hand tab. Only live actions trigger it; ordinary renders do not. Auto-play
