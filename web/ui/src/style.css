@@ -2687,3 +2687,17 @@ body.drop-target #map-container { outline: 3px dashed var(--warning); outline-of
   .rs { min-width: 0; }
   .modal-content, .modal-content.modal-lg { width: calc(100vw - 16px); max-width: none; max-height: 86vh; }
 }
+
+/* Locale controls and Chinese track labels: allow whole groups to wrap, never individual glyphs. */
+.locale-control { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; font-size: 11px; }
+.locale-control select { color: inherit; background: var(--bg-panel-solid, #111827); border: 1px solid var(--border-color, #475569); border-radius: 4px; padding: 3px 5px; }
+html[lang="zh-CN"] { font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif; }
+html[lang="zh-CN"] .global-tracks { flex-wrap: wrap; gap: 6px 14px; }
+html[lang="zh-CN"] .track-group { flex-shrink: 0; min-width: max-content; }
+html[lang="zh-CN"] .track-label,
+html[lang="zh-CN"] .turn-ar-badge,
+html[lang="zh-CN"] .superpower-track,
+html[lang="zh-CN"] .pill-side { white-space: nowrap; }
+html[lang="zh-CN"] .space-race-track-group { min-width: 0; }
+html[lang="zh-CN"] .space-race-header-widget { flex-wrap: wrap; height: auto; }
+html[lang="zh-CN"] .card-desc { line-height: 1.6; }

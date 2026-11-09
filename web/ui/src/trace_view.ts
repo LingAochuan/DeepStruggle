@@ -1,26 +1,5 @@
-/**
- * Showing what the model believed, next to what it did.
- *
- * Four views over the same per-step trace (see `ai/eval/policy_readout.py`):
- *   - the value ribbon, the calibrated critic as P(US wins) across the whole game, under the
- *     timeline;
- *   - a probability chip on each log row, and a chip for the calibrated value's move;
- *   - **a probability on every choosable thing** -- each card in hand, each mode button, each
- *     country on the map -- for the decision about to be made from the position on screen;
- *   - the readout panel: each side's P(victory) and expected VP from its own point of view, the
- *     side to move shown plainly and the other dimmed, since only its reading is trained.
- *
- * **Which decision the board's numbers belong to.** A replay step's snapshot is the position
- * *after* its action, so the board on screen is the node the *next* step was decided at -- its
- * `decision_context` is that decision, and the HUD is already rendering its buttons. The
- * probabilities painted on the board therefore come from step N+1, while the critic numbers
- * describe the position itself, which is step N's `critic`. Pairing them the other way would
- * label a hand that no longer holds the card that was played.
- *
- * Every view is optional at runtime: a replay from a heuristic bot, a human game, or one
- * recorded before the trace existed has no `policy`/`critic` keys, and the views hide rather
- * than render zeros.
- */
+import { localizeLog } from "./i18n/log";
+import { t, label } from "./i18n";
 import { ReplayStep, PolicyTrace, CriticTrace } from "./replay_controls";
 import { GameState } from "./types";
 import { engineLayout } from "./engine/layout";
@@ -153,11 +132,11 @@ export function calibratedSeries(steps: ReplayStep[]): Array<CalibratedValue | n
 
 /** How a finished game came out, from the terminal display state. */
 export function resultText(state: GameState | null | undefined): string {
-  if (!state) return "Game over.";
+  if (!state) return t("Game over.");
   const u = num(state.terminal_utility);
-  const who = u > 0 ? "US won" : u < 0 ? "USSR won" : "drawn";
+  const who = u > 0 ? t("US won") : u < 0 ? t("USSR won") : "drawn";
   const vp = state.victory_points === undefined ? undefined : num(state.victory_points);
-  return `Game over — ${who}${vp !== undefined ? ` (VP ${vp > 0 ? "+" : ""}${vp})` : ""}.`;
+  return t("Game over — {0}{1}.", [who, vp !== undefined ? t(" (VP {0}{1})", [vp > 0 ? "+" : "", vp]) : ""]);
 }
 
 /**
@@ -177,14 +156,14 @@ export function valueSidesHtml(c: CriticTrace, decider: Side | null,
     const evp = vp === undefined ? null : vp * VP_LIMIT;
     return `
       <div class="value-side ${cls} ${status}" data-side="${s}" data-p="${p === null ? "" : p.toFixed(6)}" data-vp="${evp === null ? "" : evp.toFixed(4)}"
-           title="${s}'s own view: P(victory) = (1 + v_win)/2, expected final VP margin = v_vp × ${VP_LIMIT}${decider && decider !== s ? ` (${decider} is to move)` : ""}">
-        <div class="value-side-name">${s}</div>
-        <div class="value-side-p">${p === null ? "–" : pct(p)}</div>
-        <div class="value-side-vp">${evp === null ? "–" : signed1(evp)} VP</div>
+           title="${t("{0}'s own view: P(victory) = (1 + v_win)/2, expected final VP margin = v_vp × {1}{2}", [s, VP_LIMIT, decider && decider !== s ? t(" ({0} is to move)", [decider]) : ""])}">
+        <div class="value-side-name">${label(s)}</div>
+        <div class="value-side-p">${label(p === null ? "–" : pct(p))}</div>
+        <div class="value-side-vp">${t("{0} VP", [evp === null ? "–" : signed1(evp)])}</div>
       </div>`;
   };
-  const parts = [`<div class="value-sides" data-decider="${decider ?? "none"}">${side("US")}${side("USSR")}</div>`];
-  if (!decider && terminal) parts.push(`<div class="value-result">${resultText(terminal)}</div>`);
+  const parts = [`<div class="value-sides" data-decider="${decider ?? "none"}">${`${side("US")}${side("USSR")}`}</div>`];
+  if (!decider && terminal) parts.push(`<div class="value-result">${label(resultText(terminal))}</div>`);
   return parts.join("");
 }
 
@@ -194,16 +173,16 @@ export function policyChipHtml(steps: ReplayStep[], idx: number): string {
   const pol = step.policy;
   const parts: string[] = [];
   if (pol && pol.source === "forced") {
-    parts.push(`<span class="trace-chip trace-chip-forced" title="One legal action -- played by the loop, not chosen">forced</span>`);
+    parts.push(`<span class="trace-chip trace-chip-forced" title="${t("One legal action -- played by the loop, not chosen")}">${t("forced")}</span>`);
   } else if (pol && pol.p_chosen !== undefined) {
     const p = num(pol.p_chosen);
     const offMode = pol.argmax_idx !== undefined && pol.argmax_idx !== pol.chosen_idx;
-    const title = `policy probability of the move it played (T=1)`
-      + (pol.p_max !== undefined ? `; best was ${num(pol.p_max).toFixed(3)}` : "")
-      + (offMode ? " -- not the mode" : "");
+    const title = t("policy probability of the move it played (T=1)")
+      + (pol.p_max !== undefined ? t("; best was {0}", [num(pol.p_max).toFixed(3)]) : "")
+      + (offMode ? t(" -- not the mode") : "");
     parts.push(
-      `<span class="trace-chip" style="border-color:${probColor(p)};color:${probColor(p)}" title="${title}">`
-      + `p=${p.toFixed(3)}${offMode ? " ✳" : ""}</span>`);
+      `<span class="trace-chip" style="border-color:${probColor(p)};color:${probColor(p)}" title="${label(title)}">`
+      + `${t("p={0}{1}", [p.toFixed(3), offMode ? " ✳" : ""])}</span>`);
   }
   const series = calibratedSeries(steps);
   const cur = series[idx];
@@ -214,7 +193,7 @@ export function policyChipHtml(steps: ReplayStep[], idx: number): string {
     // of probability is the 0.05 of v_win this chip used to be keyed on.
     if (Math.abs(dp) >= 0.025) {
       const cls = dp > 0 ? "trace-dv-us" : "trace-dv-ussr";
-      parts.push(`<span class="trace-chip ${cls}" title="the calibrated critic's P(US wins) moved by this many points across this step -- each position read from the side to move there (${prev.decider}, then ${cur.decider})">ΔP ${dp > 0 ? "+" : "−"}${Math.abs(dp * 100).toFixed(0)}%</span>`);
+      parts.push(`<span class="trace-chip ${cls}" title="${t("the calibrated critic's P(US wins) moved by this many points across this step -- each position read from the side to move there ({0}, then {1})", [prev.decider, cur.decider])}">${t("ΔP {0}{1}%", [dp > 0 ? "+" : "−", Math.abs(dp * 100).toFixed(0)])}</span>`);
     }
   }
   return parts.join("");
@@ -292,13 +271,13 @@ export function renderValueRibbon(
           <stop offset="100%" stop-color="var(--us-blue-light)" stop-opacity="0.05"/>
         </linearGradient>
       </defs>
-      ${ticks.join("")}
+      ${label(ticks.join(""))}
       <line x1="0" y1="${mid}" x2="${W}" y2="${mid}" stroke="var(--text-dim)" stroke-width="1" vector-effect="non-scaling-stroke"/>
-      ${paths.join("")}
+      ${label(paths.join(""))}
       <line x1="${cx.toFixed(1)}" y1="0" x2="${cx.toFixed(1)}" y2="${H}" stroke="var(--warning)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
     </svg>
-    <span class="ribbon-label ribbon-label-top">US</span>
-    <span class="ribbon-label ribbon-label-bottom">USSR</span>`;
+    <span class="ribbon-label ribbon-label-top">${t("US")}</span>
+    <span class="ribbon-label ribbon-label-bottom">${t("USSR")}</span>`;
 
   container.onclick = (ev: MouseEvent) => {
     const rect = container.getBoundingClientRect();
@@ -328,10 +307,11 @@ export function htmlBadge(p: number, mark: BadgeMark, note?: string): HTMLElemen
   span.className = "trace-choice-badge" + (mark ? " played" : "");
   span.style.color = probColor(p);
   span.style.borderColor = probColor(p);
-  span.textContent = fmtP(p) + (mark === "played" ? " ◀" : mark === "favourite" ? " ★" : "");
-  span.title = `policy probability ${p} (temperature 1)`
-    + (mark === "played" ? " -- the move it played" : mark === "favourite" ? " -- the model's favourite" : "")
-    + (note ? `\n${note}` : "");
+  span.textContent = label(fmtP(p) + (mark === "played" ? " ◀" : mark === "favourite" ? " ★" : ""));
+  span.title = label(t("policy probability {0} (temperature 1)", [p])
+    + (mark === "played" ? t(" -- the move it played") : mark === "favourite" ? t(" -- the model's favourite") : "")
+    + (note ? `
+${note}` : ""));
   return span;
 }
 
@@ -369,14 +349,14 @@ export function svgBadge(g: Element, p: number, played: boolean, note?: string):
   text.setAttribute("y", (y + h / 2 + 1.15).toString());
   text.setAttribute("text-anchor", "middle");
   text.setAttribute("fill", played ? "#FDE68A" : "#E2E8F0");
-  text.textContent = fmtP(p);
+  text.textContent = label(fmtP(p));
   // As large as fits: bold digits run to about 0.62 em. (Not textLength, which squeezes the glyphs
   // but leaves the text's measured box at its natural width.)
   text.setAttribute("font-size", Math.min(3.1, (w - 0.4) / (text.textContent.length * 0.62)).toFixed(2));
   text.setAttribute("font-weight", "bold");
   if (note) {
     const title = document.createElementNS(NS, "title");
-    title.textContent = `${fmtP(p)} -- ${note}`;
+    title.textContent = label(`${fmtP(p)} -- ${note}`);
     text.appendChild(title);
   }
   g.appendChild(text);
@@ -448,13 +428,13 @@ export function decorateChoices(policy: PolicyTrace | undefined, state: GameStat
 
 function nextDecisionHtml(pol: PolicyTrace | undefined, index: number): string {
   if (!pol) {
-    return `<div class="trace-empty">No recorded decision from this position.</div>`;
+    return `<div class="trace-empty">${t("No recorded decision from this position.")}</div>`;
   }
   if (pol.source === "forced") {
-    return `<div class="trace-empty">Next step is forced — one legal action, played by the loop.</div>`;
+    return `<div class="trace-empty">${t("Next step is forced — one legal action, played by the loop.")}</div>`;
   }
   if (pol.source === "scripted") {
-    return `<div class="trace-empty">Next step is a scripted opening — the policy was overruled.</div>`;
+    return `<div class="trace-empty">${t("Next step is a scripted opening — the policy was overruled.")}</div>`;
   }
   // A replay's trace is the file's: every field is checked or escaped on its way into the HTML.
   const offMode = pol.argmax_idx !== undefined && pol.argmax_idx !== pol.chosen_idx;
@@ -463,14 +443,14 @@ function nextDecisionHtml(pol: PolicyTrace | undefined, index: number): string {
   const nLegal = pol.n_legal !== undefined ? num(pol.n_legal) : undefined;
   return `
     <div class="trace-head">
-      <span class="trace-head-item" title="probability the policy put on the move it went on to play, at temperature 1">plays <b style="color:${probColor(pChosen)}">${pChosen.toFixed(5)}</b></span>
-      <span class="trace-head-item" title="probability of its most likely move">best ${num(pol.p_max ?? 0).toFixed(5)}</span>
-      ${pol.entropy !== undefined ? `<span class="trace-head-item" title="entropy of the distribution, in nats">H ${num(pol.entropy).toFixed(3)}</span>` : ""}
-      ${nLegal !== undefined ? `<span class="trace-head-item">${nLegal} legal</span>` : ""}
-      ${offMode ? `<span class="trace-head-item trace-offmode" title="the sampler did not take the policy's own best move">off-mode</span>` : ""}
+      <span class="trace-head-item" title="${t("probability the policy put on the move it went on to play, at temperature 1")}">${t("plays")} <b style="color:${probColor(pChosen)}">${label(pChosen.toFixed(5))}</b></span>
+      <span class="trace-head-item" title="${t("probability of its most likely move")}">${t("best {0}", [num(pol.p_max ?? 0).toFixed(5)])}</span>
+      ${`${pol.entropy !== undefined ? `<span class="trace-head-item" title="${t("entropy of the distribution, in nats")}">${t("H {0}", [num(pol.entropy).toFixed(3)])}</span>` : ""}
+      ${nLegal !== undefined ? `<span class="trace-head-item">${t("{0} legal", [nLegal])}</span>` : ""}
+      ${offMode ? `<span class="trace-head-item trace-offmode" title="${t("the sampler did not take the policy's own best move")}">${t("off-mode")}</span>` : ""}`}
     </div>
-    <div class="trace-note">step ${index + 2}: ${escapeHtml(played?.name ?? `#${num(pol.chosen_idx)}`)}</div>
-    <div class="trace-note trace-hint">probabilities for all ${nLegal ?? "legal"} options are on the cards, buttons and map</div>`;
+    <div class="trace-note">${t("step {0}: {1}", [index + 2, escapeHtml(localizeLog(played?.name ?? `#${num(pol.chosen_idx)}`))])}</div>
+    <div class="trace-note trace-hint">${t("probabilities for all {0} options are on the cards, buttons and map", [nLegal ?? "legal"])}</div>`;
 }
 
 /**
@@ -494,16 +474,16 @@ export function renderTracePanel(steps: ReplayStep[], index: number): void {
     return;
   }
   panel.classList.remove("hidden");
-  if (badge) badge.textContent = nextPolicy?.source ?? "critic only";
+  if (badge) badge.textContent = label(nextPolicy?.source ?? t("critic only"));
 
   const sections: string[] = [];
   if (critic) {
     const decider = replayDecider(steps, index);
     const terminal = current?.state_snapshot?.is_terminal ? current.state_snapshot : null;
-    sections.push(`<div class="trace-section-label">POSITION ON SCREEN — after step ${index + 1}${decider ? `, <span class="analysis-who ${decider.toLowerCase()}">${decider}</span> to move` : ""}</div>`);
+    sections.push(`<div class="trace-section-label">${t("POSITION ON SCREEN — after step {0}{1}", [index + 1, decider ? `, <span class="analysis-who ${decider.toLowerCase()}">${label(decider)}</span> ${t("to move")}` : ""])}</div>`);
     sections.push(valueSidesHtml(critic, decider, terminal));
   }
-  sections.push(`<div class="trace-section-label">NEXT DECISION — from this position</div>`);
+  sections.push(`<div class="trace-section-label">${t("NEXT DECISION — from this position")}</div>`);
   sections.push(nextDecisionHtml(nextPolicy, index));
   body.innerHTML = sections.join("");
 }

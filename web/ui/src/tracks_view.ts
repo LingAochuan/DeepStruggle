@@ -1,3 +1,4 @@
+import { t, label, setModalRenderer } from "./i18n";
 import { GameState } from './types';
 import { engineLayout } from './engine/layout';
 import { escapeHtml, num } from './html';
@@ -34,13 +35,13 @@ export function spaceRaceBoxes(): SpaceBoxMetadata[] {
   const boxes = engineLayout()?.space_boxes ?? [];
   return boxes.map((b, box) => ({
     box, minOps: b.min_ops, maxRoll: b.max_roll, vpFirst: b.vp_first, vpSecond: b.vp_second,
-    ...(SPACE_RACE_TEXT[box] ?? { name: `Box ${box}`, ability: "None", abilityShort: "None" }),
+    ...(SPACE_RACE_TEXT[box] ?? { name: t("Box {0}", [box]), ability: t("None"), abilityShort: t("None") }),
   }));
 }
 
 /** A box's name, safe for any number a replay's state holds. */
 function boxName(box: number): string {
-  return escapeHtml(SPACE_RACE_TEXT[box]?.name ?? `Box ${box}`);
+  return escapeHtml(SPACE_RACE_TEXT[box]?.name ?? t("Box {0}", [box]));
 }
 
 /** What the next box asks, as the app's "NEXT PROJECT: 2 OPS: Roll 1-3": a card of N Ops, a roll. */
@@ -48,9 +49,9 @@ function nextProject(at: number): string {
   const boxes = spaceRaceBoxes();
   if (!boxes.length) return "";
   const next = boxes[at + 1];
-  if (!next) return `<span class="pill-next" title="The last box, the Space Station: the space race is over">done</span>`;
-  return `<span class="pill-next" title="Box ${next.box}, ${next.name}: a card of ${next.minOps}+ Ops, then a roll of 1-${next.maxRoll}">`
-    + `next ${next.minOps} Ops · 1–${next.maxRoll}</span>`;
+  if (!next) return `<span class="pill-next" title="${t("The last box, the Space Station: the space race is over")}">${t("done")}</span>`;
+  return `<span class="pill-next" title="${t("Box {0}, {1}: a card of {2}+ Ops, then a roll of 1-{3}", [next.box, next.name, next.minOps, next.maxRoll])}">`
+    + `${t("next {0} Ops · 1–{1}", [next.minOps, next.maxRoll])}</span>`;
 }
 
 export class TracksView {
@@ -84,13 +85,13 @@ export class TracksView {
     // Needle pos in percentage: -20 (USSR) is 0%, 0 is 50%, +20 (US) is 100%
     const needlePercent = Math.max(0, Math.min(100, ((vp + 20) / 40) * 100));
 
-    let vpLabel = 'TIE 0';
+    let vpLabel = t("TIE 0");
     let vpClass = 'tie';
     if (vp > 0) {
-      vpLabel = `US +${vp}`;
+      vpLabel = t("US +{0}", [vp]);
       vpClass = 'us';
     } else if (vp < 0) {
-      vpLabel = `USSR +${Math.abs(vp)}`;
+      vpLabel = t("USSR +{0}", [Math.abs(vp)]);
       vpClass = 'ussr';
     }
 
@@ -99,79 +100,79 @@ export class TracksView {
     this.container.innerHTML = `
       <!-- DEFCON Track -->
       <div class="track-group">
-        <span class="track-label">DEFCON</span>
+        <span class="track-label">${t("DEFCON")}</span>
         <div class="defcon-scale">
-          ${[5, 4, 3, 2, 1].map(lvl => `
+          ${label([5, 4, 3, 2, 1].map(lvl => `
             <div class="defcon-box ${defcon === lvl ? 'active' : ''}" data-level="${lvl}">
-              ${lvl}
+              ${label(lvl)}
             </div>
-          `).join('')}
+          `).join(''))}
         </div>
       </div>
 
       <!-- Victory Points Meter -->
       <div class="track-group">
-        <span class="track-label">VICTORY POINTS</span>
+        <span class="track-label">${t("VICTORY POINTS")}</span>
         <div class="vp-meter-container">
           <div class="vp-bar">
             <div class="vp-fill-ussr" style="width: ${needlePercent}%;"></div>
             <div class="vp-center-line"></div>
             <div class="vp-needle" style="left: ${needlePercent}%;"></div>
           </div>
-          <span class="vp-val-badge ${vpClass}">${vpLabel}</span>
+          <span class="vp-val-badge ${vpClass}">${label(vpLabel)}</span>
         </div>
       </div>
 
       <!-- Turn & Era -->
       <div class="track-group">
-        <span class="track-label">TURN & ERA</span>
+        <span class="track-label">${t("TURN & ERA")}</span>
         <div class="turn-ar-badge">
-          <strong>T${turn}/10</strong>
+          <strong>${t("T{0}/10", [turn])}</strong>
           <span style="color: var(--text-dim);">•</span>
-          <span>${eraName}</span>
+          <span>${label(eraName)}</span>
         </div>
       </div>
 
       <!-- Action Round -->
       <div class="track-group">
-        <span class="track-label">ACTION ROUND</span>
+        <span class="track-label">${t("ACTION ROUND")}</span>
         <div class="turn-ar-badge">
-          <strong>${(phase === 0 || state.current_phase_name === 'SETUP') ? 'SETUP' : ((phase === 1 || state.current_phase_name === 'HEADLINE') ? 'HEADLINE' : ((phase === 3 || state.current_phase_name === 'GAME_OVER') ? 'GAME OVER' : `AR ${ar}`))}</strong>
+          <strong>${label((phase === 0 || state.current_phase_name === 'SETUP') ? 'SETUP' : ((phase === 1 || state.current_phase_name === 'HEADLINE') ? 'HEADLINE' : ((phase === 3 || state.current_phase_name === 'GAME_OVER') ? 'GAME OVER' : t("AR {0}", [ar]))))}</strong>
         </div>
       </div>
 
       <!-- Military Ops Track -->
       <div class="track-group">
-        <span class="track-label">MILITARY OPS (REQ: ${defcon})</span>
+        <span class="track-label">${t("MILITARY OPS (REQ: {0})", [defcon])}</span>
         <div class="superpower-track">
-          <span style="color: var(--ussr-red-light); font-weight: bold;">USSR:</span>
+          <span style="color: var(--ussr-red-light); font-weight: bold;">${t("USSR:")}</span>
           <div class="milops-pips">
-            ${[1, 2, 3, 4, 5].map(i => `<div class="pip ${i <= ussrMilOps ? 'filled-ussr' : ''}"></div>`).join('')}
+            ${label([1, 2, 3, 4, 5].map(i => `<div class="pip ${i <= ussrMilOps ? 'filled-ussr' : ''}"></div>`).join(''))}
           </div>
           <span style="color: var(--text-dim); margin: 0 4px;">|</span>
-          <span style="color: var(--us-blue-light); font-weight: bold;">US:</span>
+          <span style="color: var(--us-blue-light); font-weight: bold;">${t("US:")}</span>
           <div class="milops-pips">
-            ${[1, 2, 3, 4, 5].map(i => `<div class="pip ${i <= usMilOps ? 'filled-us' : ''}"></div>`).join('')}
+            ${label([1, 2, 3, 4, 5].map(i => `<div class="pip ${i <= usMilOps ? 'filled-us' : ''}"></div>`).join(''))}
           </div>
         </div>
       </div>
 
       <!-- Space Race Visual Track Widget -->
       <div class="track-group space-race-track-group">
-        <span class="track-label">SPACE RACE</span>
-        <div class="space-race-header-widget" id="space-race-widget" role="button" tabindex="0" title="Space Race: USSR at Box #${ussrSpace}, US at Box #${usSpace}. Click to open full Deluxe Space Track & Perks.">
+        <span class="track-label">${t("SPACE RACE")}</span>
+        <div class="space-race-header-widget" id="space-race-widget" role="button" tabindex="0" title="${t("Space Race: USSR at Box #{0}, US at Box #{1}. Click to open full Deluxe Space Track & Perks.", [ussrSpace, usSpace])}">
           <!-- USSR Pill -->
-          <div class="space-pill ussr" title="USSR Space: Box #${ussrSpace} (${boxName(ussrSpace)}) | Attempts Used: ${ussrTurnsUsed}/${maxUssrAttempts}">
+          <div class="space-pill ussr" title="${t("USSR Space: Box #{0} ({1}) | Attempts Used: {2}/{3}", [ussrSpace, boxName(ussrSpace), ussrTurnsUsed, maxUssrAttempts])}">
             <span class="pill-dot ussr"></span>
-            <span class="pill-side">USSR:</span>
-            <span class="pill-box-num">#${ussrSpace}</span>
-            <span class="pill-attempts">(${ussrTurnsUsed}/${maxUssrAttempts})</span>
-            ${nextProject(ussrSpace)}
+            <span class="pill-side">${t("USSR:")}</span>
+            <span class="pill-box-num">${`#${ussrSpace}`}</span>
+            <span class="pill-attempts">${`(${ussrTurnsUsed}/${maxUssrAttempts})`}</span>
+            ${label(nextProject(ussrSpace))}
           </div>
 
           <!-- Mini Progress Ladder (Boxes 0 to 8) -->
           <div class="space-mini-ladder">
-            ${[0, 1, 2, 3, 4, 5, 6, 7, 8].map(step => {
+            ${label([0, 1, 2, 3, 4, 5, 6, 7, 8].map(step => {
               const hasUs = usSpace === step;
               const hasUssr = ussrSpace === step;
               let occ = '';
@@ -180,28 +181,28 @@ export class TracksView {
               else if (hasUssr) occ = 'ussr';
 
               return `
-                <div class="mini-box ${occ ? 'active ' + occ : ''}" data-step="${step}" title="Box ${step}: ${boxName(step)}">
-                  <span class="mini-box-num">${step}</span>
+                <div class="mini-box ${occ ? "active " + occ : ''}" data-step="${step}" title="${t("Box {0}: {1}", [step, boxName(step)])}">
+                  <span class="mini-box-num">${label(step)}</span>
                   <div class="mini-box-tokens">
-                    ${hasUssr ? '<div class="mini-token ussr" title="USSR at Box ' + step + '"></div>' : ''}
-                    ${hasUs ? '<div class="mini-token us" title="US at Box ' + step + '"></div>' : ''}
+                    ${`${hasUssr ? '<div class="mini-token ussr" title="' + t('USSR at Box {0}', [step]) + `"></div>` : ''}
+                    ${hasUs ? '<div class="mini-token us" title="' + t('US at Box {0}', [step]) + `"></div>` : ''}`}
                   </div>
                 </div>
               `;
-            }).join('')}
+            }).join(''))}
           </div>
 
           <!-- US Pill -->
-          <div class="space-pill us" title="US Space: Box #${usSpace} (${boxName(usSpace)}) | Attempts Used: ${usTurnsUsed}/${maxUsAttempts}">
+          <div class="space-pill us" title="${t("US Space: Box #{0} ({1}) | Attempts Used: {2}/{3}", [usSpace, boxName(usSpace), usTurnsUsed, maxUsAttempts])}">
             <span class="pill-dot us"></span>
-            <span class="pill-side">US:</span>
-            <span class="pill-box-num">#${usSpace}</span>
-            <span class="pill-attempts">(${usTurnsUsed}/${maxUsAttempts})</span>
-            ${nextProject(usSpace)}
+            <span class="pill-side">${t("US:")}</span>
+            <span class="pill-box-num">${`#${usSpace}`}</span>
+            <span class="pill-attempts">${`(${usTurnsUsed}/${maxUsAttempts})`}</span>
+            ${label(nextProject(usSpace))}
           </div>
 
           <!-- Expand Icon Button -->
-          <span class="space-view-btn" title="View Space Race Details">
+          <span class="space-view-btn" title="${t("View Space Race Details")}">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
               <polyline points="15 3 21 3 21 9"></polyline>
@@ -230,19 +231,20 @@ export class TracksView {
     const activeBadge = document.getElementById('active-player-badge');
     if (activeBadge) {
       const activePlayer = state.decision_context?.decision_player || phasing || 'NONE';
-      activeBadge.textContent = `${activePlayer} TURN`;
+      activeBadge.textContent = label(t("{0} TURN", [activePlayer]));
       activeBadge.className = `player-badge ${activePlayer.toLowerCase()}`;
     }
   }
 
   public showSpaceRaceModal(state: GameState) {
+    setModalRenderer(() => this.showSpaceRaceModal(this.currentState ?? state));
     const modalContainer = document.getElementById('modal-container');
     const modalContent = modalContainer?.querySelector('.modal-content');
     const modalTitle = document.getElementById('modal-title');
     const modalBody = document.getElementById('modal-body');
     if (!modalContainer || !modalTitle || !modalBody) return;
 
-    modalTitle.innerHTML = `🚀 <span>DELUXE SPACE RACE TRACK & PERKS</span>`;
+    modalTitle.innerHTML = `🚀 <span>${t("DELUXE SPACE RACE TRACK & PERKS")}</span>`;
     modalContent?.classList.add('modal-lg');
 
     const usSpace = num(state.space?.US ?? 0);
@@ -253,13 +255,13 @@ export class TracksView {
     const maxUsAttempts = (usSpace >= 2 && ussrSpace < 2) ? 2 : 1;
     const maxUssrAttempts = (ussrSpace >= 2 && usSpace < 2) ? 2 : 1;
 
-    let leadText = "TIED ON SPACE RACE TRACK";
+    let leadText = t("TIED ON SPACE RACE TRACK");
     let leadClass = "tie";
     if (usSpace > ussrSpace) {
-      leadText = `🔵 US LEADS BY ${usSpace - ussrSpace} SPACES`;
+      leadText = t("🔵 US LEADS BY {0} SPACES", [usSpace - ussrSpace]);
       leadClass = "us";
     } else if (ussrSpace > usSpace) {
-      leadText = `🔴 USSR LEADS BY ${ussrSpace - usSpace} SPACES`;
+      leadText = t("🔴 USSR LEADS BY {0} SPACES", [ussrSpace - usSpace]);
       leadClass = "ussr";
     }
 
@@ -270,57 +272,57 @@ export class TracksView {
           <!-- USSR Card -->
           <div class="space-summary-card ussr-border">
             <div class="card-header-row">
-              <h4 style="color: var(--ussr-red-light); margin: 0;">🔴 USSR Space Program</h4>
+              <h4 style="color: var(--ussr-red-light); margin: 0;">${t("🔴 USSR Space Program")}</h4>
               <span class="badge ${ussrTurnsUsed >= maxUssrAttempts ? 'badge-danger' : 'badge-success'}">
-                ${ussrTurnsUsed >= maxUssrAttempts ? 'Max Attempts Used' : 'Attempt Available'}
+                ${label(ussrTurnsUsed >= maxUssrAttempts ? t("Max Attempts Used") : t("Attempt Available"))}
               </span>
             </div>
             <div class="summary-stat-row">
-              <span>Position:</span>
-              <strong>Box #${ussrSpace} — ${boxName(ussrSpace)}</strong>
+              <span>${t("Position:")}</span>
+              <strong>${t("Box #{0} — {1}", [ussrSpace, boxName(ussrSpace)])}</strong>
             </div>
             <div class="summary-stat-row">
-              <span>Attempts this Turn:</span>
-              <strong>${ussrTurnsUsed} / ${maxUssrAttempts} max</strong>
+              <span>${t("Attempts this Turn:")}</span>
+              <strong>${t("{0} / {1} max", [ussrTurnsUsed, maxUssrAttempts])}</strong>
             </div>
             <div class="summary-stat-row">
-              <span>Active Superpower Perks:</span>
-              <em class="perk-highlight">${this.getActivePerkSummary(ussrSpace, usSpace)}</em>
+              <span>${t("Active Superpower Perks:")}</span>
+              <em class="perk-highlight">${label(this.getActivePerkSummary(ussrSpace, usSpace))}</em>
             </div>
           </div>
 
           <!-- Center Lead Status -->
           <div class="space-lead-indicator">
-            <span class="lead-badge ${leadClass}">${leadText}</span>
-            <div class="lead-subtext">Play card Ops ≥ Box requirement to attempt advance</div>
+            <span class="lead-badge ${leadClass}">${label(leadText)}</span>
+            <div class="lead-subtext">${t("Play card Ops ≥ Box requirement to attempt advance")}</div>
           </div>
 
           <!-- US Card -->
           <div class="space-summary-card us-border">
             <div class="card-header-row">
-              <h4 style="color: var(--us-blue-light); margin: 0;">🔵 US Space Program</h4>
+              <h4 style="color: var(--us-blue-light); margin: 0;">${t("🔵 US Space Program")}</h4>
               <span class="badge ${usTurnsUsed >= maxUsAttempts ? 'badge-danger' : 'badge-success'}">
-                ${usTurnsUsed >= maxUsAttempts ? 'Max Attempts Used' : 'Attempt Available'}
+                ${label(usTurnsUsed >= maxUsAttempts ? t("Max Attempts Used") : t("Attempt Available"))}
               </span>
             </div>
             <div class="summary-stat-row">
-              <span>Position:</span>
-              <strong>Box #${usSpace} — ${boxName(usSpace)}</strong>
+              <span>${t("Position:")}</span>
+              <strong>${t("Box #{0} — {1}", [usSpace, boxName(usSpace)])}</strong>
             </div>
             <div class="summary-stat-row">
-              <span>Attempts this Turn:</span>
-              <strong>${usTurnsUsed} / ${maxUsAttempts} max</strong>
+              <span>${t("Attempts this Turn:")}</span>
+              <strong>${t("{0} / {1} max", [usTurnsUsed, maxUsAttempts])}</strong>
             </div>
             <div class="summary-stat-row">
-              <span>Active Superpower Perks:</span>
-              <em class="perk-highlight">${this.getActivePerkSummary(usSpace, ussrSpace)}</em>
+              <span>${t("Active Superpower Perks:")}</span>
+              <em class="perk-highlight">${label(this.getActivePerkSummary(usSpace, ussrSpace))}</em>
             </div>
           </div>
         </div>
 
         <!-- 9 Milestone Boxes Grid -->
         <div class="space-ladder-grid">
-          ${spaceRaceBoxes().map(box => {
+          ${label(spaceRaceBoxes().map(box => {
             const isUsHere = usSpace === box.box;
             const isUssrHere = ussrSpace === box.box;
             let occupancyClass = "";
@@ -345,55 +347,55 @@ export class TracksView {
               <div class="space-box-card ${occupancyClass}" data-box="${box.box}">
                 <div class="space-box-header">
                   <div class="box-title-group">
-                    <span class="space-box-num">BOX #${box.box}</span>
-                    <span class="space-box-name">${box.name}</span>
+                    <span class="space-box-num">${t("BOX #{0}", [box.box])}</span>
+                    <span class="space-box-name">${label(box.name)}</span>
                   </div>
                   <div class="space-box-tokens">
-                    ${isUssrHere ? '<span class="space-player-token ussr">🔴 USSR</span>' : ''}
-                    ${isUsHere ? '<span class="space-player-token us">🔵 US</span>' : ''}
+                    ${`${isUssrHere ? `<span class="space-player-token ussr">${t("🔴 USSR")}</span>` : ''}
+                    ${isUsHere ? `<span class="space-player-token us">${t("🔵 US")}</span>` : ''}`}
                   </div>
                 </div>
 
                 <div class="space-box-details">
                   <div class="detail-item">
-                    <span class="detail-label">Required Ops:</span>
-                    <strong class="detail-val">${box.minOps > 0 ? `≥ ${box.minOps} Ops` : 'None'}</strong>
+                    <span class="detail-label">${t("Required Ops:")}</span>
+                    <strong class="detail-val">${label(box.minOps > 0 ? t("≥ {0} Ops", [box.minOps]) : t("None"))}</strong>
                   </div>
                   <div class="detail-item">
-                    <span class="detail-label">Roll to Advance:</span>
-                    <strong class="detail-val">${box.maxRoll > 0 ? `🎲 1–${box.maxRoll}` : 'None'}</strong>
+                    <span class="detail-label">${t("Roll to Advance:")}</span>
+                    <strong class="detail-val">${label(box.maxRoll > 0 ? `🎲 1–${box.maxRoll}` : t("None"))}</strong>
                   </div>
                   <div class="detail-item">
-                    <span class="detail-label">1st Player VP:</span>
-                    <strong class="detail-val vp-first">${box.vpFirst > 0 ? `+${box.vpFirst} VP` : '—'}</strong>
+                    <span class="detail-label">${t("1st Player VP:")}</span>
+                    <strong class="detail-val vp-first">${label(box.vpFirst > 0 ? t("+{0} VP", [box.vpFirst]) : '—')}</strong>
                   </div>
                   <div class="detail-item">
-                    <span class="detail-label">2nd Player VP:</span>
-                    <strong class="detail-val vp-second">${box.vpSecond > 0 ? `+${box.vpSecond} VP` : '—'}</strong>
+                    <span class="detail-label">${t("2nd Player VP:")}</span>
+                    <strong class="detail-val vp-second">${label(box.vpSecond > 0 ? t("+{0} VP", [box.vpSecond]) : '—')}</strong>
                   </div>
                 </div>
 
-                ${box.ability !== 'None' ? `
+                ${label(box.ability !== 'None' ? `
                   <div class="space-box-ability ${(isUsActivePerk || isUssrActivePerk) ? 'active-privilege' : ''}">
-                    <div class="ability-title">✨ Privilege (1st Player Only):</div>
-                    <div class="ability-desc">${box.ability}</div>
-                    ${isUssrActivePerk ? '<div class="perk-holder ussr">🔴 ACTIVE FOR USSR</div>' : ''}
-                    ${isUsActivePerk ? '<div class="perk-holder us">🔵 ACTIVE FOR US</div>' : ''}
-                    ${(!isUsActivePerk && !isUssrActivePerk && usSpace >= box.box && ussrSpace >= box.box && box.box > 0) ? '<div class="perk-holder cancelled">✕ CANCELLED (BOTH REACHED)</div>' : ''}
+                    <div class="ability-title">${t("✨ Privilege (1st Player Only):")}</div>
+                    <div class="ability-desc">${label(box.ability)}</div>
+                    ${`${isUssrActivePerk ? `<div class="perk-holder ussr">${t("🔴 ACTIVE FOR USSR")}</div>` : ''}
+                    ${isUsActivePerk ? `<div class="perk-holder us">${t("🔵 ACTIVE FOR US")}</div>` : ''}
+                    ${(!isUsActivePerk && !isUssrActivePerk && usSpace >= box.box && ussrSpace >= box.box && box.box > 0) ? `<div class="perk-holder cancelled">${t("✕ CANCELLED (BOTH REACHED)")}</div>` : ''}`}
                   </div>
-                ` : ''}
+                ` : '')}
 
                 <div class="space-box-footer">
-                  <span class="${isUssrHere ? 'status-current ussr' : (isPassedByUssr ? 'status-passed' : 'status-pending')}">
-                    USSR: ${isUssrHere ? '📍 HERE' : (isPassedByUssr ? '✓ Cleared' : 'Pending')}
+                  <span class="${isUssrHere ? "status-current ussr" : (isPassedByUssr ? 'status-passed' : 'status-pending')}">
+                    ${t("USSR: {0}", [isUssrHere ? t("📍 HERE") : (isPassedByUssr ? t("✓ Cleared") : 'Pending')])}
                   </span>
-                  <span class="${isUsHere ? 'status-current us' : (isPassedByUs ? 'status-passed' : 'status-pending')}">
-                    US: ${isUsHere ? '📍 HERE' : (isPassedByUs ? '✓ Cleared' : 'Pending')}
+                  <span class="${isUsHere ? "status-current us" : (isPassedByUs ? 'status-passed' : 'status-pending')}">
+                    ${t("US: {0}", [isUsHere ? t("📍 HERE") : (isPassedByUs ? t("✓ Cleared") : 'Pending')])}
                   </span>
                 </div>
               </div>
             `;
-          }).join('')}
+          }).join(''))}
         </div>
       </div>
     `;
@@ -403,10 +405,10 @@ export class TracksView {
 
   private getActivePerkSummary(myStep: number, oppStep: number): string {
     const perks: string[] = [];
-    if (myStep >= 2 && oppStep < 2) perks.push("2 attempts/turn");
-    if (myStep >= 4 && oppStep < 4) perks.push("Opponent reveals headline first");
-    if (myStep >= 6 && oppStep < 6) perks.push("Discard held card at turn end");
-    if (myStep >= 8 && oppStep < 8) perks.push("8th Action Round");
-    return perks.length > 0 ? perks.join(", ") : "None";
+    if (myStep >= 2 && oppStep < 2) perks.push(t("2 attempts/turn"));
+    if (myStep >= 4 && oppStep < 4) perks.push(t("Opponent reveals headline first"));
+    if (myStep >= 6 && oppStep < 6) perks.push(t("Discard held card at turn end"));
+    if (myStep >= 8 && oppStep < 8) perks.push(t("8th Action Round"));
+    return perks.length > 0 ? perks.join(", ") : t("None");
   }
 }

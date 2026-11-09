@@ -1,3 +1,5 @@
+import { t, label, setModalRenderer } from "./i18n";
+import { countryName } from "./i18n";
 import { GameState, LastTurnCountry, MapMetadata, RecentRoll, RegionSideScore } from "./types";
 import { renderRollTray } from "./roll_tray";
 import { NetSide, regionNet, regionSummaryHtml, STANDING_SHORT } from "./region_summary";
@@ -150,17 +152,17 @@ const REGION_BADGE_H = 34;
  */
 export function controlLine(side: "US" | "USSR", own: number, opp: number, stability: number,
                             controlledBy: string): string {
-  const tag = `<span class="ct-${side.toLowerCase()}">${side}</span>`;
+  const tag = `<span class="ct-${side.toLowerCase()}">${label(side)}</span>`;
   if (controlledBy === side) {
     const spare = own - opp - stability;
-    return `${tag} controls${spare > 0 ? `, ${spare} to spare` : ", with nothing to spare"}`;
+    return t("{0} controls{1}", [tag, spare > 0 ? t(", {0} to spare", [spare]) : t(", with nothing to spare")]);
   }
   const control = Math.max(0, opp + stability - own);
-  if (controlledBy === "NONE") return `${tag} controls with +${control} (${control} Op${control === 1 ? "" : "s"})`;
+  if (controlledBy === "NONE") return t("{0} controls with +{1} ({2} Op{3})", [tag, control, control, control === 1 ? "" : "s"]);
   const brk = opp - stability - own + 1;
   const breakOps = 2 * brk;
   const controlOps = breakOps + (control - brk);
-  return `${tag} breaks with +${brk} (${breakOps} Ops), controls with +${control} (${controlOps} Ops)`;
+  return t("{0} breaks with +{1} ({2} Ops), controls with +{3} ({4} Ops)", [tag, brk, breakOps, control, controlOps]);
 }
 
 type SvgAttrs = Record<string, string | number | null | undefined>;
@@ -175,7 +177,7 @@ function svgEl<K extends keyof SVGElementTagNameMap>(tag: K, attrs: SvgAttrs): S
 
 function svgText(text: string, attrs: SvgAttrs): SVGTextElement {
   const t = svgEl("text", attrs);
-  t.textContent = text;
+  t.textContent = label(text);
   return t;
 }
 
@@ -427,14 +429,14 @@ export class MapView {
       const card = CARD_META.get(cardId);
       const listed = (s: RegionSideScore) => s.controlled.map(c => {
         const star = se ? (c.vp ?? 0) > 1 : !!c.battleground;
-        return `${names.get(c.id) ?? `#${c.id}`}${star ? " ★" : ""}`;
+        return `${countryName(c.id, names.get(c.id) ?? `#${c.id}`)}${star ? " ★" : ""}`;
       });
       return {
         regionId: r.slot,
         regionName: se ? "SOUTHEAST ASIA" : titleCase(key).toUpperCase(),
         badgePos: look?.pos ?? [0, 0],
         color: (se ? REGION_STYLE["Southeast Asia"] : REGION_STYLE[titleCase(key)] ?? REGION_STYLE["Europe"]).accent,
-        scoringCardName: card ? `${card.name} (#${cardId})` : `Card #${cardId}`,
+        scoringCardName: card ? `${card.name} (#${cardId})` : t("Card #{0}", [cardId]),
         scoringCardText: (card?.description ?? "").replace(/;?\s*MAY NOT BE HELD!?\s*$/i, ""),
         scoringCard: scoringCardWhereabouts(state, cardId),
         southeastAsia: se,
@@ -556,7 +558,7 @@ export class MapView {
       text.setAttribute("font-size", "10");
       text.setAttribute("font-weight", "900");
       text.setAttribute("letter-spacing", "1");
-      text.textContent = sp.label;
+      text.textContent = label(sp.label);
       g.appendChild(text);
       spGroup.appendChild(g);
     });
@@ -641,7 +643,7 @@ export class MapView {
       }));
 
       // The name, squeezed rather than cut when it is long.
-      const label = SHORT_NAMES[c.name] ?? c.name;
+      const label = countryName(c.id, SHORT_NAMES[c.name] ?? c.name);
       const room = stabX - (left + 1.6) - 0.8;
       const name = svgText(label, {
         class: "country-name", x: left + 1.6, y: top + BAND_H / 2 + 1.75,
@@ -761,19 +763,19 @@ export class MapView {
     const ctrl = sc?.controlled_by ?? "NONE";
     const lines = [controlLine("US", us, ussr, c.stability, ctrl), controlLine("USSR", ussr, us, c.stability, ctrl)];
     const adjacent = [...(c.neighbours || [])];
-    if (c.superpower_adjacent) adjacent.push(c.superpower_adjacent === "USA" ? "the US" : "the USSR");
-    const standing = ctrl === "US" ? `<b class="ct-us">US controls</b>` : ctrl === "USSR" ? `<b class="ct-ussr">USSR controls</b>` : "Uncontrolled";
+    if (c.superpower_adjacent) adjacent.push(c.superpower_adjacent === "USA" ? t("the US") : t("the USSR"));
+    const standing = ctrl === "US" ? `<b class="ct-us">${t("US controls")}</b>` : ctrl === "USSR" ? `<b class="ct-ussr">${t("USSR controls")}</b>` : "Uncontrolled";
     // Whether a coup or realignment is allowed here is the engine's to say (the legal targets lit on
     // the map); the card gives only the board's numbers.
     this.tooltipEl.innerHTML = `
-      <div class="ct-head"><span class="ct-name">${escapeHtml(c.name)}</span>${c.battleground ? `<span class="ct-bg">Battleground</span>` : ""}</div>
-      <div class="ct-sub">${escapeHtml([c.region, ...(c.subregions || [])].join(" \u00b7 "))} \u00b7 stability ${c.stability}</div>
-      <div class="ct-inf"><span class="ct-us">US ${us}</span><span class="ct-ussr">USSR ${ussr}</span><span>${standing}</span></div>
-      <div class="ct-rows">${lines.map(l => `<div>${l}</div>`).join("")}
-        <div>Coup: die + Ops must beat <b>${2 * c.stability}</b></div>
-        ${lc && state.last_turn ? `<div class="ct-last">${escapeHtml(state.last_turn.player)}'s last turn: ${escapeHtml(describeLastTurnCountry(lc))}</div>` : ""}
+      <div class="ct-head"><span class="ct-name">${label(escapeHtml(c.name))}</span>${label(c.battleground ? `<span class="ct-bg">${t("Battleground")}</span>` : "")}</div>
+      <div class="ct-sub">${t("{0} · stability {1}", [escapeHtml([c.region, ...(c.subregions || [])].map(label).join(" \u00b7 ")), c.stability])}</div>
+      <div class="ct-inf"><span class="ct-us">${t("US {0}", [us])}</span><span class="ct-ussr">${t("USSR {0}", [ussr])}</span><span>${label(standing)}</span></div>
+      <div class="ct-rows">${label(lines.map(l => `<div>${label(l)}</div>`).join(""))}
+        <div>${t("Coup: die + Ops must beat")} <b>${label(2 * c.stability)}</b></div>
+        ${label(lc && state.last_turn ? `<div class="ct-last">${t("{0}'s last turn: {1}", [escapeHtml(state.last_turn.player), escapeHtml(describeLastTurnCountry(lc))])}</div>` : "")}
       </div>
-      <div class="ct-adj">Adjacent: ${escapeHtml(adjacent.join(", ") || "none")}</div>`;
+      <div class="ct-adj">${t("Adjacent: {0}", [escapeHtml(adjacent.map(label).join(", ") || label("none"))])}</div>`;
     this.tooltipEl.classList.remove("hidden");
     this.placeTooltip(e);
   }
@@ -794,14 +796,14 @@ export class MapView {
     const lt = state.last_turn;
     if (!lt) {
       el.classList.add("hidden");
-      el.textContent = "";
+      el.textContent = label("");
       return;
     }
     el.classList.remove("hidden");
     const what = lt.countries.length
-      ? lt.countries.map(lc => `${lc.name} ${describeLastTurnCountry(lc)}`).join(" · ")
-      : "no country changed";
-    el.textContent = `${lt.player}'s last turn (${lt.label}): ${what}`;
+      ? lt.countries.map(lc => `${countryName(lc.id, lc.name)} ${describeLastTurnCountry(lc)}`).join(" · ")
+      : t("no country changed");
+    el.textContent = label(t("{0}'s last turn ({1}): {2}", [lt.player, lt.label, what]));
   }
 
   /**
@@ -850,7 +852,7 @@ export class MapView {
 
       // Row 2: each side's standing and its total (Southeast Asia has no standings, only VP).
       const line = (side: string, s: RegionSideScore) =>
-        s.status === null ? `${side} ${s.vp} VP` : `${side} ${STANDING_SHORT[s.status]} ${s.vp}`;
+        s.status === null ? t("{0} {1} VP", [side, s.vp]) : `${label(side)} ${label(STANDING_SHORT[s.status])} ${s.vp}`;
       const usLine = line("US", audit.us);
       const ussrLine = line("USSR", audit.ussr);
       g.appendChild(svgText(usLine, {
@@ -904,13 +906,14 @@ export class MapView {
 
   /** The region's scoring summary, pinned in the modal: what a click (or a tap) on a badge opens. */
   private openRegionSummary(audit: RegionScoreAudit) {
+    setModalRenderer(() => this.openRegionSummary(audit));
     this.hideRegionTooltip();
     const container = document.getElementById("modal-container");
     const title = document.getElementById("modal-title");
     const body = document.getElementById("modal-body");
     if (!container || !title || !body) return;
     container.querySelector(".modal-content")?.classList.remove("modal-lg");
-    title.textContent = audit.scoringCardName;
+    title.textContent = label(audit.scoringCardName);
     body.innerHTML = regionSummaryHtml(audit);
     container.classList.remove("hidden");
   }
@@ -926,7 +929,7 @@ export class MapView {
 export function describeLastTurnCountry(lc: LastTurnCountry): string {
   const signed = (v: number) => (v > 0 ? `+${v}` : `\u2212${-v}`);
   const parts: string[] = [];
-  if (lc.ussr) parts.push(`USSR ${signed(lc.ussr)}`);
-  if (lc.us) parts.push(`US ${signed(lc.us)}`);
-  return parts.length ? parts.join(", ") : "targeted, no change";
+  if (lc.ussr) parts.push(t("USSR {0}", [signed(lc.ussr)]));
+  if (lc.us) parts.push(t("US {0}", [signed(lc.us)]));
+  return parts.length ? parts.join(", ") : t("targeted, no change");
 }

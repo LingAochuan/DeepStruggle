@@ -129,3 +129,6 @@ a:hover { text-decoration: underline; }
 }
 .lb-flags summary { cursor: pointer; color: var(--text-muted); }
 .lb-codes-line a code { color: var(--gold); }
+
+.locale-control { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 12px; }
+.locale-control select { color: inherit; background: #111827; border: 1px solid #475569; border-radius: 4px; padding: 4px; }

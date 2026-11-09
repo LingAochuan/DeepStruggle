@@ -8,8 +8,8 @@
 
 import { escapeHtml } from "../html";
 
-const REF = /Card #(\d{1,3}) \([^)]*\)|\(#(\d{1,3})(?:, [^)]*)?\)/g;
-const DRAWS = /^(\s*• (?:US|USSR) draws \d+ cards?: )(.+)$/;
+const REF = /(?:Card|卡牌) #(\d{1,3})[ （(]+[^)）]*[)）]|\(#(\d{1,3})(?:, [^)]*)?\)/g;
+const DRAWS = /^(\s*• (?:(?:US|USSR) draws \d+ cards?: |(?:美国|苏联)抽取 \d+ 张牌：))(.+)$/;
 
 export interface CardNames {
   /** The names a card goes by in the log (the engine's and the rules'); empty for no such card. */
