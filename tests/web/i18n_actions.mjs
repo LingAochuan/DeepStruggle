@@ -25,12 +25,59 @@ const engine = await m.WasmEngine.load(pathToFileURL(resolve('web/ui/public') + 
 const session = new m.GameSession(engine);
 session.newGame(6);
 const state = engine.display(), L = engine.layout, modes = new Set();
+// Shared policy slots must name this decision, never concatenate both contexts.
+for (const [kind, offset, definitions, expected] of [
+  ['SELECT_PLAY_MODE', L.offsets.play_mode, L.resolutions, {
+    EVENT: '结算事件', SPACE: '尝试太空竞赛', OPS_INFLUENCE: '使用行动点：放置影响力',
+    OPS_COUP: '使用行动点：尝试政变', OPS_REALIGN: '使用行动点：调整阵营',
+  }],
+  ['SELECT_OP_MODE', L.offsets.op_mode, L.op_modes, {
+    INFLUENCE: '放置影响力', COUP: '尝试政变', REALIGN: '进行调整阵营',
+  }],
+]) {
+  const position = { ...state, decision_context: { ...state.decision_context, decision_type: L.decision_types[kind] } };
+  for (const [name, value] of Object.entries(definitions)) {
+    const text = m.actionName(engine, offset + value, position);
+    assert.equal(m.localizeLog(text), expected[name]);
+    assert(!text.includes('/ OpMode:'), text);
+  }
+}
+// Special stop choices are decisions, not generic passes. Exercise both locales and
+// every binary/DEFCON/region branch even if the opening fixtures never draw that card.
+for (const [kind, card, expected] of [
+  ['SELECT_PLAY_MODE', 'GRAIN_SALES_TO_SOVIETS', "Return the drawn card to the USSR and conduct Grain Sales' 2 Ops"],
+  ['SELECT_CARD', 'OUR_MAN_IN_TEHRAN', 'Done — return the rest to the deck'],
+  ['SELECT_CARD', 'SALT_NEGOTIATIONS', 'Take no card'],
+]) {
+  const position = { ...state, decision_context: { ...state.decision_context,
+    decision_type: L.decision_types[kind], resolving_card: L.card_ids[card] } };
+  const text = m.actionName(engine, L.confirm_done_index, position);
+  assert.equal(text, expected);
+  assert(!/[A-Za-z]{3}/.test(m.localizeLog(text)), m.localizeLog(text));
+}
+for (const key of ['WARSAW_PACT_FORMED', 'OLYMPIC_GAMES', 'WARGAMES', 'CHERNOBYL', 'SUMMIT', 'HOW_I_LEARNED_TO_STOP_WORRYING']) {
+  const levels = ['SUMMIT', 'HOW_I_LEARNED_TO_STOP_WORRYING'].includes(key);
+  for (const choice of key === 'CHERNOBYL' ? Object.values(L.regions) : levels ? [1,2,3,4,5] : [0,1]) {
+    const position = { ...state, decision_context: { ...state.decision_context,
+      decision_type: L.decision_types.CHOOSE_BRANCH, resolving_card: L.card_ids[key] } };
+    const idx = key === 'CHERNOBYL' ? L.offsets.region + choice : levels ? L.offsets.defcon_value + choice - 1 : L.offsets.branch + choice;
+    const expected = m.branchMeta(L.card_ids[key], choice, position).title;
+    assert.equal(m.actionName(engine, idx, position), expected);
+    assert(!/[A-Za-z]{3}/.test(m.localizeLog(expected)), expected);
+  }
+}
 for (const side of ['US', 'USSR']) for (let card = 1; card <= 110; card++) for (const resolution of Object.values(L.resolutions)) {
   const before = { ...state, current_phase_name: 'ACTION_ROUND', decision_context: {
-    ...state.decision_context, decision_player: side, resolving_card: 0, pending_op_card: card,
+    ...state.decision_context, decision_type: L.decision_types.SELECT_PLAY_MODE,
+    decision_player: side, resolving_card: 0, pending_op_card: card,
   } };
   const info = m.clickInfo(engine, before, { decision_type: L.decision_types.SELECT_PLAY_MODE, primary_id: resolution, secondary_id: 0, flags: 0 }, side);
   modes.add(info.mode);
+  const policyName = m.actionName(engine, L.offsets.play_mode + resolution, before);
+  assert(!/[A-Za-z]{3}/.test(m.localizeLog(policyName)), policyName);
+  if (info.mode.includes('then')) assert.equal(policyName, info.mode);
+  const cancelledEvent = { ...before, decision_context: { ...before.decision_context, resolving_card: L.card_ids.UN_INTERVENTION } };
+  assert.ok(!m.actionName(engine, L.offsets.play_mode + resolution, cancelledEvent).includes('then the'), 'UN Intervention must not promise an opponent event');
   if (info.mode.endsWith('then Ops')) for (const op of ['Influence', 'Coup', 'Realignment']) modes.add(info.mode.slice(0, -3) + 'Ops: ' + op);
 }
 for (const op of ['Influence', 'Coup', 'Realignment']) modes.add('Event, then Ops: ' + op);
@@ -55,6 +102,8 @@ for (let seed = 1; seed <= 6; seed++) {
       const valid = []; engine.mask(false).forEach((v, i) => { if (v) valid.push(i); });
       const position = engine.display();
       for (const i of valid) choices.add(m.actionName(engine, i, position));
+      if ([L.decision_types.SELECT_PLAY_MODE, L.decision_types.SELECT_OP_MODE].includes(engine.decisionType()))
+        for (const i of valid) assert.equal(m.actionName(engine, i), m.actionName(engine, i, position));
       assert.equal(session.applyFlat(valid[x % valid.length], false), null);
       clicks++;
       if (!engine.isTerminal() || trial === 24) break;

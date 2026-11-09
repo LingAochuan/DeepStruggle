@@ -12,7 +12,6 @@
  */
 import { WasmEngine, PLAYER_US, PLAYER_USSR } from "../engine/wasm_engine";
 import { actionName } from "../game/names";
-import { GameState } from "../types";
 import { Model } from "./model";
 import { CriticTrace, PolicyTrace } from "../replay_controls";
 import { AnalysisChoice, LiveAnalysis } from "../analysis_view";
@@ -44,9 +43,8 @@ export async function analyze(engine: WasmEngine, model: Model, modelKey: string
   if (legalMask) for (let i = 0; i < act; i++) if (legalMask[i]) legal.push(i);
   const decisionType = engine.decisionType();
   const L = engine.layout;
-  // An event's branch is named by what it means, which needs the position (game/branches.ts).
-  const branchy = legal.some(i => i >= L.offsets.branch && i !== L.confirm_done_index);
-  const shown: GameState | undefined = branchy ? engine.display() : undefined;
+  // Modes and stop/return choices also depend on the event, not just branch slots.
+  const shown = engine.display();
   const actions = new Map(legal.map(idx => {
     if (merged && engine.isMergedInfluenceAction(idx)) {
       // A composed E4.1 action: "Ops for influence" plus its first placement -- one action for

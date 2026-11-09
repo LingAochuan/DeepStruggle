@@ -9,6 +9,33 @@ WebAssembly, models as ONNX -- so `dist/` works from GitHub Pages as well as fro
 
 ## 1. Architecture & Component Structure
 
+Replay analysis lives inside the existing `data-dock-page="analysis"` in personal mode.
+`analysis/replay.ts` verifies the entire replay from seed/shared position on a separate
+WASM engine before inference, using recorded rules, forced dice and debug overrides.
+It never edits the live engine or loads a display snapshot as a save. Cancel, model
+changes and replacement replays discard obsolete asynchronous results.
+`replay_analysis_view.ts` and `replay_analysis.css` display two post-action win curves,
+linked to the timeline, plus the selected step's post-action critic and pre-action policy.
+An unmatched merged/macro micro-action gets no invented agreement score. Terminal
+critic estimates remain estimates, with the actual result displayed separately.
+The personal UI omits the engine-build notice, curve legend and explanatory paragraph;
+validation and actionable errors are retained. No rollout search runs for this feature.
+The replay toolbar (transport, timeline, speed and optional local-server picker) sits
+immediately below the win chart and above the selected step details. Settings keeps
+only the live/replay switch and export/import controls. DOM IDs and ReplayControls
+listeners stay unchanged so chart seeking, scrubbing and playback share one step index.
+After a replay with a displayable first step loads (file, drop or local-server picker),
+the analysis dock opens and scrolls to the top, even if a model has not been selected.
+`game/names.ts` names shared policy slots according to the actual decision type:
+play-mode choices and deferred Ops choices use their respective HUD titles, never
+the old combined `Resolution / OpMode` label. `tests/web/i18n_actions.mjs` checks
+both contexts and the engine-backed naming path used by live and replay analysis.
+Exports preserve metadata; new steps include optional `forced_die`/`seat_rules`, with
+active `debug_overrides` on the document. Snapshot-only files remain watchable.
+Run `node tests/web/replay_analysis.mjs` and `node tests/web/replay_analysis_browser.mjs
+<preview-url>` (the latter accepts `PLAYWRIGHT_MODULE` / `BROWSER_EXECUTABLE_PATH`),
+plus the existing tabletop reveal/replay regression when changing replay lifecycle.
+
 `hand_reveal.ts` and `hand_reveal.css` show a transient, centered horizontal card
 row when a live action reveals an opponent's hand (CIA Created, Lone Gunman,
 Aldrich Ames, or newly engine-revealed cards such as Cambridge Five). Both input
@@ -594,6 +621,14 @@ with Vite (`tests/web/js_runner.py`).
 
 ## Display locales (English and Simplified Chinese)
 
+Policy readouts snapshot the display context before model inference to name return/pass
+choices and opponent-event order. Replay action matching normalizes historical stop
+encodings only against legal stop choices after reconstruction verification. The replay
+chart adds dashed guides at 25% and 75% without extra numeric labels.
+Replay descriptions annotate card names after escaping imported text, with the shared
+card preview and keyboard handlers; recommendation rows are not annotated. Annotation
+runs even before model analysis is available and is rebuilt on step/locale changes.
+
 The initial play-mode dialog includes English / 简体中文 buttons below its choices.
 They use `data-locale-button` and the same saved locale as the Settings selector;
 `applyStaticMessages` synchronizes their pressed state. Switching language leaves
@@ -711,6 +746,11 @@ Narrow viewports cap this height to preserve room for current actions.
 Check `tests/web/tabletop_piles.mjs` for browsing, updates, hover, legal-choice isolation,
 replay, language and narrow-screen behavior.
 Player views stay on their own hand; developer view follows the decision player.
+During replay four tabs share the compact card window: US hand, USSR hand, discard,
+and removed. The selected hand persists across timeline steps and includes its China
+card. Replay rows have no action-choice attributes or policy badges. All four tabs
+keep the same panel dimensions. Leaving replay hides the additional hand tab and
+restores the ordinary single-hand view; keyboard navigation skips the hidden tab.
 Only redacted legal SELECT_CARD IDs are enabled. Extra event choices from other piles
 are listed separately below the hand. Manual minimization survives phase changes;
 an empty hand retains its panel. The fixed-right hover preview uses visible rows only. Never expose

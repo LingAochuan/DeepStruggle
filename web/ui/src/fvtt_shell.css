@@ -442,6 +442,11 @@ body.vtt-dock-open .map-rolls { right: 440px; }
   .vtt-shell #text-card-picker .vtt-card-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
 .hand-card-preview { position: fixed; z-index: 50; padding-left: 12px; box-sizing: border-box; }
+/* Four replay tabs share the existing compact hand window. */
+@media (min-width: 701px) {
+  html[lang="en"] .vtt-shell #text-card-picker.vtt-replay-tabs:not(.vtt-minimized) .vtt-panel-heading { padding-block: 3px; }
+  html[lang="en"] .vtt-shell #text-card-picker.vtt-replay-tabs .vtt-card-tabs button { flex: 1; white-space: normal; padding-block: 0; font-size: 11px; line-height: 1.1; }
+}
 .hand-card-preview img { display: block; width: 100%; height: 100%; border-radius: 3px; box-shadow: 0 8px 28px #000b; }
 .hand-card-fallback { height: 100%; overflow: auto; padding: 12px; background: #24231ff5; border: 1px solid #b4a18466; border-radius: 4px; font-size: 12px; box-shadow: 0 8px 28px #000b; }
 .hand-card-fallback p { margin: 8px 0 0; }

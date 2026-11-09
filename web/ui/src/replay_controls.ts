@@ -58,6 +58,8 @@ export interface ReplayStep {
   event_tracks?: EventTrackState[];
   policy?: PolicyTrace;
   critic?: CriticTrace;
+  forced_die?: number;
+  seat_rules?: { US: number; USSR: number };
 }
 
 export interface ReplayFile {
@@ -67,7 +69,11 @@ export interface ReplayFile {
     seed?: number;
     total_steps?: number;
     result?: any;
+    engine_fingerprint?: string;
+    start_position?: string;
   };
+  initial_state?: { seed?: number };
+  debug_overrides?: Array<{ step: number; override: { kind: string; id?: number; us?: number; ussr?: number; value?: number } }>;
   steps?: ReplayStep[];
   logs?: any[];
   events?: any[];
@@ -79,6 +85,8 @@ export interface ReplayFile {
 }
 
 export class ReplayControls {
+  public document: ReplayFile | null = null;
+  public onLoad: (() => void) | null = null;
   public steps: ReplayStep[] = [];
   public currentStep = 0;
   private isPlaying = false;
@@ -163,6 +171,7 @@ export class ReplayControls {
 
   public loadReplayData(replayData: ReplayFile) {
     this.stop();
+    this.document = replayData;
     if (replayData.steps && replayData.steps.length > 0) {
       this.steps = replayData.steps;
     } else if (replayData.logs && replayData.logs.length > 0) {
@@ -203,6 +212,7 @@ export class ReplayControls {
     if (this.steps.length > 0 && this.steps[0].state_snapshot && Object.keys(this.steps[0].state_snapshot).length > 0) {
       this.onStepChange(this.steps[0].state_snapshot, 0, this.steps);
     }
+    this.onLoad?.();
   }
 
   private setupListeners() {
@@ -293,7 +303,7 @@ export class ReplayControls {
   }
 
   private updateUI() {
-    this.labelEl.textContent = label(t("Step {0} / {1}", [this.currentStep, Math.max(0, this.steps.length - 1)]));
+    this.labelEl.textContent = label(t("Step {0} / {1}", [this.steps.length ? this.currentStep + 1 : 0, this.steps.length]));
   }
 
   /**
@@ -307,7 +317,7 @@ export class ReplayControls {
     let doc: object | null = null;
     let name = "ts_replay.tslog.json";
     if (this.watching && this.steps.length > 0) {
-      doc = { steps: this.steps };
+      doc = { ...this.document, steps: this.steps };
       name = `ts_replay_step_${this.currentStep}.tslog.json`;
     } else if (this.liveReplay) {
       doc = this.liveReplay();

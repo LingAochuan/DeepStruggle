@@ -6,6 +6,7 @@
 <title data-i18n="Twilight Struggle Engine Workbench">Twilight Struggle Engine Workbench</title>
 <link href="/src/style.css" rel="stylesheet"/>
   <link rel="stylesheet" href="/src/fvtt_shell.css">
+  <link rel="stylesheet" href="/src/replay_analysis.css">
 </head>
 <body class="vtt-shell">
 <div id="app">
@@ -33,6 +34,7 @@
 <section id="text-card-picker" class="vtt-glass hidden" aria-label="Choose a card">
 <header class="vtt-panel-heading"><div class="vtt-card-tabs" role="tablist">
 <button id="text-card-picker-title" data-card-pile="hand" role="tab" aria-controls="text-card-picker-list" aria-selected="true" type="button"></button>
+<button id="text-card-tab-ussr" class="hidden" hidden data-card-pile="ussr-hand" role="tab" aria-controls="text-card-picker-list" aria-selected="false" tabindex="-1" type="button"></button>
 <button id="text-card-tab-discard" data-card-pile="discard" role="tab" aria-controls="text-card-picker-list" aria-selected="false" tabindex="-1" type="button"></button>
 <button id="text-card-tab-removed" data-card-pile="removed" role="tab" aria-controls="text-card-picker-list" aria-selected="false" tabindex="-1" type="button"></button>
 </div><span id="text-card-picker-count"></span><button class="vtt-panel-toggle" data-collapse-panel aria-controls="text-card-picker-list" type="button">‹</button></header>
@@ -71,6 +73,52 @@
 </div>
 <div class="trace-body" id="analysis-body"></div>
 </div>
+<div class="panel hidden" id="replay-analysis-panel">
+<div class="panel-header"><h3 data-i18n="REPLAY ANALYSIS">REPLAY ANALYSIS</h3></div>
+<div class="trace-body">
+<div class="rep-analysis-toolbar">
+<button id="rep-analysis-model" class="btn btn-secondary btn-sm" data-i18n="Choose model">Choose model</button>
+<button id="rep-analysis-restart" class="btn btn-primary btn-sm" data-i18n="Reanalyse">Reanalyse</button>
+<button id="rep-analysis-cancel" class="btn btn-secondary btn-sm" data-i18n="Stop analysis">Stop analysis</button>
+</div>
+<p id="rep-analysis-model-label"></p>
+<div id="rep-analysis-status" role="status" aria-live="polite"></div>
+<progress id="rep-analysis-progress" hidden></progress>
+<div id="rep-analysis-chart" tabindex="0" role="slider"></div>
+<div class="replay-toolbar" id="replay-toolbar">
+<div class="transport-controls">
+<button class="btn-icon" data-i18n-title="First Step" id="btn-rep-first" title="First Step"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14M19 5 9 12l10 7z"/></svg></button>
+<button class="btn-icon" data-i18n-title="Previous Step" id="btn-rep-prev" title="Previous Step"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m17 5-10 7 10 7z"/></svg></button>
+<button class="btn btn-primary btn-sm" data-i18n="Play replay" id="btn-rep-play">Play replay</button>
+<button class="btn-icon" data-i18n-title="Next Step" id="btn-rep-next" title="Next Step"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 5 10 7-10 7z"/></svg></button>
+<button class="btn-icon" data-i18n-title="Last Step" id="btn-rep-last" title="Last Step"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5v14M5 5l10 7-10 7z"/></svg></button>
+</div>
+<div class="timeline-container">
+<span data-i18n="Step 0 / 0" id="rep-step-label">Step 0 / 0</span>
+<input id="rep-timeline-slider" max="0" min="0" type="range" value="0"/>
+<!-- The calibrated critic across the whole game as P(US wins), one column per step:
+               each position read from the side to move there. Empty for a replay without a trace. -->
+<div class="value-ribbon hidden" data-i18n-title="Critic: P(US wins) across the game, each position read from the side to move (the only trained reading); the faint dashed line is the other, untrained side's reading. Click to seek." id="rep-value-ribbon" title="Critic: P(US wins) across the game, each position read from the side to move (the only trained reading); the faint dashed line is the other, untrained side's reading. Click to seek."></div>
+</div>
+<div class="replay-options">
+<select class="replay-select-dropdown" data-i18n-title="Replays in the local server's replay directory" id="rep-server-select" title="Replays in the local server's replay directory">
+<option data-i18n="Local replays..." value="">Local replays...</option>
+</select>
+<label><span data-i18n="Speed:">Speed:</span>
+<select id="rep-speed-select">
+<option data-i18n="1.0s" value="1000">1.0s</option>
+<option data-i18n="0.5s" selected="" value="500">0.5s</option>
+<option data-i18n="0.2s" value="200">0.2s</option>
+<option data-i18n="Fast" value="50">Fast</option>
+</select>
+</label>
+
+</div>
+</div>
+<div id="rep-analysis-detail"></div>
+</div>
+</div>
+
 <div class="panel trace-panel hidden" id="trace-panel">
 <div class="panel-header">
 <h3 data-i18n="MODEL READOUT">MODEL READOUT</h3>
@@ -171,38 +219,11 @@
 <label class="vtt-setting"><span data-i18n="Map style">Map style</span><select id="map-theme" disabled><option value="classic" data-i18n="Classic board">Classic board</option><option value="diagram" data-i18n="Diagram">Diagram</option></select></label>
 <button id="map-registration" class="btn vtt-dev-setting" aria-pressed="false" data-i18n="Show alignment">Show alignment</button>
 <div class="vtt-setting-buttons"><button class="btn btn-secondary btn-sm" data-i18n="New Game" data-i18n-title="A new game with a fresh deal; asks for the play mode first" id="btn-new-game" title="A new game with a fresh deal; asks for the play mode first">New Game</button><button class="btn btn-primary btn-sm hidden" data-i18n="Result" data-i18n-title="The result, and adding the game to the stats database" id="btn-game-result" title="The result, and adding the game to the stats database">Result</button></div>
-<details class="vtt-replay-settings"><summary data-i18n="Game and replay">Game and replay</summary><button class="btn btn-primary btn-sm" data-i18n="Replay Mode" id="btn-toggle-replay">Replay Mode</button><div class="replay-toolbar" id="replay-toolbar">
-<div class="transport-controls">
-<button class="btn-icon" data-i18n-title="First Step" id="btn-rep-first" title="First Step"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14M19 5 9 12l10 7z"/></svg></button>
-<button class="btn-icon" data-i18n-title="Previous Step" id="btn-rep-prev" title="Previous Step"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m17 5-10 7 10 7z"/></svg></button>
-<button class="btn btn-primary btn-sm" data-i18n="Play replay" id="btn-rep-play">Play replay</button>
-<button class="btn-icon" data-i18n-title="Next Step" id="btn-rep-next" title="Next Step"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 5 10 7-10 7z"/></svg></button>
-<button class="btn-icon" data-i18n-title="Last Step" id="btn-rep-last" title="Last Step"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5v14M5 5l10 7-10 7z"/></svg></button>
-</div>
-<div class="timeline-container">
-<span data-i18n="Step 0 / 0" id="rep-step-label">Step 0 / 0</span>
-<input id="rep-timeline-slider" max="0" min="0" type="range" value="0"/>
-<!-- The calibrated critic across the whole game as P(US wins), one column per step:
-               each position read from the side to move there. Empty for a replay without a trace. -->
-<div class="value-ribbon hidden" data-i18n-title="Critic: P(US wins) across the game, each position read from the side to move (the only trained reading); the faint dashed line is the other, untrained side's reading. Click to seek." id="rep-value-ribbon" title="Critic: P(US wins) across the game, each position read from the side to move (the only trained reading); the faint dashed line is the other, untrained side's reading. Click to seek."></div>
-</div>
-<div class="replay-options">
-<select class="replay-select-dropdown" data-i18n-title="Replays in the local server's replay directory" id="rep-server-select" title="Replays in the local server's replay directory">
-<option data-i18n="Local replays..." value="">Local replays...</option>
-</select>
-<label><span data-i18n="Speed:">Speed:</span>
-<select id="rep-speed-select">
-<option data-i18n="1.0s" value="1000">1.0s</option>
-<option data-i18n="0.5s" selected="" value="500">0.5s</option>
-<option data-i18n="0.2s" value="200">0.2s</option>
-<option data-i18n="Fast" value="50">Fast</option>
-</select>
-</label>
+<details class="vtt-replay-settings"><summary data-i18n="Game and replay">Game and replay</summary><button class="btn btn-primary btn-sm" data-i18n="Replay Mode" id="btn-toggle-replay">Replay Mode</button><div class="replay-options vtt-replay-file-actions">
 <button class="btn btn-secondary btn-sm" data-i18n="Export Replay" id="btn-rep-export">Export Replay</button>
 <label class="btn btn-secondary btn-sm file-upload-label">
 <span data-i18n="Load Replay">Load Replay</span> <input accept=".json" id="input-replay-file" style="display: none;" type="file"/>
 </label>
-</div>
 </div></details>
 <details class="vtt-about"><summary data-i18n="About this game">About this game</summary><span class="status-badge" data-i18n="LOADING ENGINE…" id="connection-status">LOADING ENGINE…</span><p data-i18n="Unofficial fan project, not affiliated with or endorsed by GMT Games. Twilight Struggle® is a registered trademark of GMT Games, LLC.">Unofficial fan project, not affiliated with or endorsed by GMT Games. Twilight Struggle® is a registered trademark of GMT Games, LLC.</p></details>
 </div>

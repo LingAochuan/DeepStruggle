@@ -32,6 +32,21 @@ coloured by the actor; a whole headline phase is one neutral card. Net changes a
 derived only from redacted logs, leaving saved records and replay steps unchanged.
 Log cards retain their content height in the scrolling stream, including long histories.
 The shell self-hosts Adobe Source Han Serif CN under its accompanying OFL license.
+The personal Model analysis dock also hosts replay analysis: an isolated WASM engine
+verifies all reconstructed boards, then reads both sides' critic and each step's policy.
+The two-colour chart seeks the replay timeline. Explanatory banners and the chart legend
+are intentionally omitted in this compact view; reconstruction errors remain visible.
+Playback controls, speed and timeline sit between that chart and the step readout;
+Settings retains only live/replay mode switching, replay export and replay import.
+Loading a playable replay automatically opens the analysis dock at its top.
+Replay step descriptions share card-art hovers with the log; policy recommendation rows remain plain text.
+Replay uses four tabs in the same compact card window: US hand, USSR hand, discard,
+and removed. The selected hand persists across steps; live-view redaction remains unchanged.
+Policy choice names use the current decision type to distinguish shared play-mode
+and deferred-ops slots, matching the HUD instead of displaying both names together.
+Event return/stop choices and opponent-event timing also use the pre-action context.
+Replay matching accepts legacy stop encodings; the chart has unlabeled 25/75% dashed guides.
+See `web/ui/AGENTS.md` for the replay tests and optional recording fields.
 Space details use one horizontal rail of eight stages with optional Steam sprites
 (`space/steam-track.json`). UI pictographs and the VP log filter are removed; saved
 English log records remain intact, with pictographs stripped only when displayed.

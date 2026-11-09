@@ -216,6 +216,7 @@ export class GameSession {
     };
     const before = this.engine.display();
     const snapshot = this.engine.snapshot();
+    const seatRules = this.engine.seatRules;
     const refused = this.engine.step(a, forcedDie);
     if (refused) return refused;
     // Only now is there something to undo.
@@ -271,6 +272,7 @@ export class GameSession {
       step_index: this.stepIndex, turn: before.turn, ar, phase, player,
       action: { decision_type: a.decision_type, primary_id: a.primary_id, secondary_id: a.secondary_id, flags: a.flags },
       description: main, state_snapshot: after, rolls, event_tracks: eventTracks,
+      forced_die: forcedDie, seat_rules: seatRules,
     });
 
     if (this.engine.isTerminal()) {
@@ -418,6 +420,8 @@ export class GameSession {
       engine_fingerprint: this.engine.fingerprint,
     };
     if (this.startPosition) metadata.start_position = this.startPosition;
-    return { version: "1.0", metadata, initial_state: { seed: this.seed }, steps: this.steps };
+    return { version: "1.0", metadata, initial_state: { seed: this.seed }, steps: this.steps,
+      debug_overrides: this.events.filter(e => e.kind === "debug" && !e.undone && e.override)
+        .map(e => ({ step: e.step, override: e.override })) };
   }
 }

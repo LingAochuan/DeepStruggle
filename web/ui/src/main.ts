@@ -15,6 +15,8 @@ import { GameSession } from "./game/session";
 import { decodePosition, encodePosition } from "./game/position";
 import { Model, sourceFromParam, sourceToParam } from "./analysis/model";
 import { analyze } from "./analysis/readout";
+import { ReplayAnalyzer } from "./analysis/replay";
+import { ReplayAnalysisView } from "./replay_analysis_view";
 import {
   DEFAULT_ROLLOUT, LEAVES, RolloutSpec, STOPS, parseRolloutParam, parseSearchParam, rolloutParam,
 } from "./analysis/rollout_spec";
@@ -54,6 +56,15 @@ export class TSApp {
   public replayControls: ReplayControls;
   private debugPanel: DebugPanel;
   private analysisPanel: AnalysisPanel;
+  private replayAnalyzer = new ReplayAnalyzer(() => {
+    this.replayAnalysisView?.render();
+    if (this.isReplayMode && this.shown) {
+      this.redecorate();
+      if (this.replayAnalyzer.state.points[this.replayCurrentStep])
+        document.getElementById("trace-panel")?.classList.add("hidden");
+    }
+  });
+  private replayAnalysisView: ReplayAnalysisView;
 
   private engine: WasmEngine | null = null;
   /** A replay's log entries, built once per loaded replay. */
@@ -138,6 +149,23 @@ export class TSApp {
       this.renderTrace();
     });
     this.replayControls.liveReplay = () => this.session?.replay() ?? null;
+    this.replayAnalysisView = new ReplayAnalysisView(this.replayAnalyzer,
+      index => this.replayControls.goToStep(index), () => this.analyseReplay(), root => {
+        this.cardsView.hideTooltip();
+        annotateCardRefs(root, this.cardNames());
+      });
+    this.replayControls.onLoad = () => {
+      this.replayAnalyzer.cancel(true);
+      this.replaySteps = this.replayControls.steps;
+      this.replayCurrentStep = this.replayControls.currentStep;
+      this.renderReplayAnalysis();
+      this.analyseReplay();
+      const first = this.replaySteps[0]?.state_snapshot;
+      if (first && Object.keys(first).length > 0) {
+        this.shell.open("analysis");
+        document.getElementById("vtt-dock-content")!.scrollTop = 0;
+      }
+    };
 
     this.analysisPanel = new AnalysisPanel(
       (pick: ModelPick | null) => this.loadModel(pick),
@@ -168,6 +196,7 @@ export class TSApp {
     this.analysisPanel.onModelLabel = (text, status) => {
       this.modelLabel = { text, status };
       this.renderModelModeLabels();
+      if (this.isReplayMode) this.renderReplayAnalysis();
     };
     this.setupSearchChoice();
     this.setupGlobalControls();
@@ -891,6 +920,7 @@ export class TSApp {
   }
 
   private async runAnalysis(version: number) {
+    if (this.isReplayMode) return;
     const model = this.model;
     if (!model || !this.engine) {
       this.maybeAutoPlay();
@@ -922,12 +952,14 @@ export class TSApp {
     const load = ++this.modelLoads;
     this.analysisOff = !pick;
     this.liveAnalysis = undefined;
+    this.replayAnalyzer.cancel(true);
     if (!pick) {
       this.model = null;
       this.modelKey = "";
       this.modelSha = "";
       this.runner?.setModel(null, "");
       this.analysisPanel.setOff();
+      if (this.isReplayMode) { this.renderReplayAnalysis(); this.syncUrl(); return; }
       if (this.seatSides()) return this.refresh();
       this.renderState();
       this.syncUrl();
@@ -943,7 +975,7 @@ export class TSApp {
       this.model = m;
       this.modelSha = sha;
       this.modelKey = `m${load}`;
-      this.runner?.setModel(m, this.modelKey);
+      if (!this.isReplayMode) this.runner?.setModel(m, this.modelKey);
       const fp = m.meta.engineFingerprint;
       this.analysisPanel.setLoaded({
         key: this.modelKey,
@@ -961,6 +993,12 @@ export class TSApp {
       this.modelKey = "";
       this.modelSha = "";
       this.analysisPanel.setError(e instanceof Error ? e.message : String(e));
+    }
+    if (this.isReplayMode) {
+      this.renderReplayAnalysis();
+      this.analyseReplay();
+      this.syncUrl();
+      return;
     }
     if (this.seatSides()) return this.refresh();
     this.syncUrl();
@@ -994,6 +1032,7 @@ export class TSApp {
   }
 
   private setReplayMode(on: boolean) {
+    const changed = this.isReplayMode !== on;
     if (!on) this.replayControls.stop();
     if (on) this.handReveal.clear();
     this.isReplayMode = on;
@@ -1006,8 +1045,31 @@ export class TSApp {
       replayBtn.className = on ? "btn btn-warning btn-sm" : "btn btn-primary btn-sm";
     }
     this.analysisPanel?.show(!on);
+    this.replayAnalysisView?.show(on);
+    if (!on) {
+      this.replayAnalyzer.cancel();
+      if (changed && this.engine) {
+        this.runner?.setModel(this.model, this.modelKey);
+        this.refresh();
+      }
+    } else if (changed) {
+      this.runner?.setModel(null, "");
+      this.renderReplayAnalysis();
+    }
     // The same position can change from playable to replay-only without a state refresh.
     if (this.shown) this.cardsView.render(this.shown);
+  }
+
+  private renderReplayAnalysis(): void {
+    this.replayAnalysisView?.set(this.replaySteps, this.replayCurrentStep,
+      this.modelLabel.status === "ready" ? this.modelLabel.text : "");
+  }
+
+  private analyseReplay(): void {
+    if (!this.isReplayMode || !this.engine || !this.model || this.modelLabel.status !== "ready" || !this.replayControls.document) return;
+    const model = this.model, key = this.modelKey;
+    void this.replayAnalyzer.run(this.replayControls.document, this.replayControls.steps,
+      engine => analyze(engine, model, key));
   }
 
   private renderState() {
@@ -1054,6 +1116,12 @@ export class TSApp {
   private redecorate() {
     annotateCardRefs(document.getElementById('decision-body')!, this.cardNames());
     if (this.isReplayMode) {
+      const computed = this.replayAnalyzer.state.points[this.replayCurrentStep]?.after;
+      if (computed) {
+        decorateChoices(computed.policy ? { ...computed.policy, chosen_idx: undefined,
+          top: computed.choices.map(c => ({ idx: c.idx, p: c.p, name: c.name })) } : undefined, this.shown);
+        return;
+      }
       const next = this.replaySteps[this.replayCurrentStep + 1];
       decorateChoices(next?.policy, this.shown);
     } else {
@@ -1087,6 +1155,7 @@ export class TSApp {
    * step N+1, while the critic numbers describe the position itself and come from step N.
    */
   private renderTrace() {
+    this.renderReplayAnalysis();
     const ribbon = document.getElementById("rep-value-ribbon");
     if (ribbon) {
       renderValueRibbon(ribbon, this.replaySteps, this.replayCurrentStep,
@@ -1094,7 +1163,10 @@ export class TSApp {
     }
     const next = this.replaySteps[this.replayCurrentStep + 1];
     renderTracePanel(this.replaySteps, this.replayCurrentStep);
-    decorateChoices(next?.policy, this.state);
+    if (this.replayAnalyzer.state.points[this.replayCurrentStep]) {
+      document.getElementById("trace-panel")?.classList.add("hidden");
+      this.redecorate();
+    } else decorateChoices(next?.policy, this.state);
   }
 
   private renderLogStream() {
@@ -1426,8 +1498,8 @@ export class TSApp {
       this.renderLogStream();
     });
 
-    // Log and current-action card references share the same tooltip and keyboard behavior.
-    for (const id of ['action-log-stream', 'decision-body']) {
+    // Log, current-action and replay descriptions share card art and keyboard behavior.
+    for (const id of ['action-log-stream', 'decision-body', 'rep-analysis-detail']) {
       const logStream = document.getElementById(id);
       logStream?.addEventListener("mouseover", (e) => {
         const ref = (e.target as HTMLElement).closest<HTMLElement>(".log-card[data-card-id]");

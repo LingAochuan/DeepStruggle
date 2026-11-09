@@ -1,0 +1,33 @@
+/* Replay analysis inside the personal tabletop dock. */
+#replay-analysis-panel { flex-shrink: 0; min-width: 0; }
+#replay-analysis-panel .trace-body { display: block; }
+.vtt-shell #replay-analysis-panel #replay-toolbar { height: auto; overflow: visible; gap: 8px; padding-top: 8px; }
+.vtt-shell .vtt-replay-file-actions { margin-top: 8px; }
+.rep-analysis-toolbar { display: flex; flex-wrap: wrap; gap: 6px; }
+#rep-analysis-model-label { overflow-wrap: anywhere; font-size: 11px; opacity: .7; margin: 8px 0; }
+#rep-analysis-status { font-size: 12px; overflow-wrap: anywhere; }
+#rep-analysis-progress { width: 100%; margin-top: 8px; accent-color: #7bb9ef; }
+.rep-analysis-note { font-size: 11px; line-height: 1.55; color: var(--text-muted); margin: 8px 0; }
+#rep-analysis-chart { cursor: crosshair; border-radius: 4px; }
+#rep-analysis-chart:focus-visible { outline: 2px solid #8bbbe9; }
+#rep-analysis-chart svg { display: block; width: 100%; height: auto; }
+#rep-analysis-chart text { fill: var(--text-muted); font-size: 11px; }
+.rep-grid { stroke: #65758a; stroke-opacity: .25; }
+.rep-grid-quarter { stroke-dasharray: 4 4; }
+.rep-curve { fill: none; stroke-width: 2; }
+.rep-curve.us { stroke: #74baff; }
+.rep-curve.ussr { stroke: #ff9393; }
+.rep-uncalibrated { stroke-dasharray: 3 3; opacity: .55; }
+.rep-dot.us { fill: #74baff; }
+.rep-dot.ussr { fill: #ff9393; }
+.rep-cursor { stroke: #ddd; stroke-width: 1; stroke-opacity: .5; }
+#rep-analysis-detail { border-top: 1px solid #ffffff20; margin-top: 12px; padding-top: 10px; }
+#rep-analysis-detail h4 { margin: 0 0 6px; font-size: 13px; }
+#rep-analysis-detail h5 { margin: 14px 0 8px; font-size: 12px; }
+.rep-action-name { margin: 0; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.rep-analysis-choices { list-style: none; margin: 8px 0 0; padding: 0; max-height: 260px; overflow-y: auto; }
+.rep-analysis-choices li { display: grid; grid-template-columns: 20px minmax(0,1fr) 48px; align-items: baseline; gap: 6px; padding: 6px; font-size: 12px; border-bottom: 1px solid #ffffff0c; }
+.rep-analysis-choices strong { text-align: right; font-variant-numeric: tabular-nums; }
+.rep-choice-rank { opacity: .5; }
+.rep-analysis-choices small { display: block; color: #9cdbb1; }
+.rep-played { background: #6bc18d18; border-left: 2px solid #6bc18d; }

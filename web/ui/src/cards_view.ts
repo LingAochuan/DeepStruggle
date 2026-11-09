@@ -350,7 +350,7 @@ export class CardsView {
   private locationFilter: string = "ALL";
   private searchFilter: string = "";
   private lastState: GameState | null = null;
-  private selectedPile: 'hand' | 'discard' | 'removed' = 'hand';
+  private selectedPile: 'hand' | 'ussr-hand' | 'discard' | 'removed' = 'hand';
   public onRerender?: () => void;
 
   constructor(onCardClick: (cardId: number) => void) {
@@ -382,21 +382,24 @@ export class CardsView {
 
   private setupTabs() {
     const pileTabs = [...document.querySelectorAll<HTMLButtonElement>('[data-card-pile]')];
-    pileTabs.forEach((button, index) => {
+    pileTabs.forEach(button => {
       button.addEventListener('click', () => {
+        if (button.hidden) return;
         const pile = button.dataset.cardPile;
-        if (pile !== 'hand' && pile !== 'discard' && pile !== 'removed') return;
+        if (pile !== 'hand' && pile !== 'ussr-hand' && pile !== 'discard' && pile !== 'removed') return;
         this.selectedPile = pile;
         if (this.lastState) this.renderTextChoices(this.lastState);
         this.onRerender?.();
         document.getElementById('text-card-picker-list')!.scrollTop = 0;
       });
       button.addEventListener('keydown', e => {
-        const next = e.key === 'ArrowRight' ? (index + 1) % pileTabs.length
-          : e.key === 'ArrowLeft' ? (index + pileTabs.length - 1) % pileTabs.length
-          : e.key === 'Home' ? 0 : e.key === 'End' ? pileTabs.length - 1 : -1;
+        const visibleTabs = pileTabs.filter(tab => !tab.hidden);
+        const index = visibleTabs.indexOf(button);
+        const next = e.key === 'ArrowRight' ? (index + 1) % visibleTabs.length
+          : e.key === 'ArrowLeft' ? (index + visibleTabs.length - 1) % visibleTabs.length
+          : e.key === 'Home' ? 0 : e.key === 'End' ? visibleTabs.length - 1 : -1;
         if (next < 0) return;
-        e.preventDefault(); pileTabs[next].click(); pileTabs[next].focus();
+        e.preventDefault(); visibleTabs[next].click(); visibleTabs[next].focus();
       });
     });
     const tabButtons = document.querySelectorAll(".tabs .tab-btn");
@@ -853,28 +856,34 @@ export class CardsView {
     if (!picker || !list) return;
     this.handPreview.imageWidth();
     this.handPreview.hide();
-    picker.dataset.cardPileView = this.selectedPile;
+    const replay = document.body.classList.contains('replay-view');
+    picker.classList.toggle('vtt-replay-tabs', replay);
+    if (!replay && this.selectedPile === 'ussr-hand') this.selectedPile = 'hand';
+    const isHand = this.selectedPile === 'hand' || this.selectedPile === 'ussr-hand';
+    picker.dataset.cardPileView = isHand ? 'hand' : this.selectedPile;
     const ctx = state.decision_context;
     const L = engineLayout();
     const selectCard = !state.is_terminal && !state.view_hidden_decision && L && ctx
       && num(ctx.decision_type) === L.decision_types.SELECT_CARD;
     const legal = new Set(selectCard ? (state.legal_actions?.valid_ids ?? []).map(Number).filter(id => id >= 1 && id <= 110) : []);
-    const side = state.view === 'US' || state.view === 'USSR' ? state.view
+    const side = replay ? (this.selectedPile === 'ussr-hand' ? 'USSR' : 'US')
+      : state.view === 'US' || state.view === 'USSR' ? state.view
       : ctx?.decision_player === 'US' || ctx?.decision_player === 'USSR' ? ctx.decision_player
       : state.phasing_player === 'US' ? 'US' : 'USSR';
     const hand = new Set((state.hands?.[side] ?? []).map(Number));
     if (state.china_card?.holder === side) hand.add(6);
-    const isHand = this.selectedPile === 'hand';
     // Browse only public piles from the already-redacted state. Playing remains in the hand tab.
-    const ids = isHand ? [...hand, ...[...legal].filter(id => !hand.has(id))]
+    const ids = isHand ? [...hand, ...(!replay ? [...legal].filter(id => !hand.has(id)) : [])]
       : [...new Set((this.selectedPile === 'discard' ? state.discard_pile : state.removed_pile) ?? [])];
     picker.classList.remove('hidden');
     list.replaceChildren();
     document.getElementById("text-card-picker-count")!.textContent = String(isHand ? hand.size : ids.length);
-    const titles = { hand: t(side === 'US' ? 'US hand' : 'USSR hand'), discard: t('Discard pile'), removed: t('Removed from Game') };
+    const titles = { hand: t(replay || side === 'US' ? 'US hand' : 'USSR hand'), 'ussr-hand': t('USSR hand'), discard: t('Discard pile'), removed: t('Removed from Game') };
     document.querySelectorAll<HTMLButtonElement>('[data-card-pile]').forEach(button => {
       const pile = button.dataset.cardPile as keyof typeof titles;
       const active = pile === this.selectedPile;
+      button.hidden = pile === 'ussr-hand' && !replay;
+      button.classList.toggle('hidden', button.hidden);
       button.textContent = titles[pile];
       button.setAttribute('aria-selected', String(active));
       button.tabIndex = active ? 0 : -1;
@@ -897,16 +906,20 @@ export class CardsView {
         note.className = 'vtt-card-list-note'; note.textContent = t('Choose a card'); list.append(note);
         choiceHeading = true;
       }
-      const button = document.createElement("button");
-      button.className = `vtt-text-card${isHand ? ' card-item' : ''} side-${meta.side.toLowerCase()}`;
-      button.dataset.cardId = String(id);
-      if (isHand) button.dataset.primary = String(id);
-      button.disabled = !isHand || !legal.has(id) || document.body.classList.contains("replay-view");
-      button.innerHTML = `<span class="vtt-card-number">#${id}</span><span class="vtt-card-name">${escapeHtml(meta.name)}</span><span class="vtt-card-ops">${t("{0} Ops", [meta.ops])}</span>`;
-      button.addEventListener("click", () => { if (!button.disabled) { this.hideTooltip(); this.onCardClick(id); } });
-      this.handPreview.bind(button, meta);
-      list.appendChild(button);
+      list.appendChild(this.textCardButton(meta, isHand && legal.has(id) && !replay, isHand && !replay));
     }
+  }
+
+  private textCardButton(meta: CardMetadata, playable: boolean, choice: boolean): HTMLButtonElement {
+    const button = document.createElement('button');
+    button.className = `vtt-text-card${choice ? ' card-item' : ''} side-${meta.side.toLowerCase()}`;
+    button.dataset.cardId = String(meta.id);
+    if (choice) button.dataset.primary = String(meta.id);
+    button.disabled = !playable;
+    button.innerHTML = `<span class="vtt-card-number">#${meta.id}</span><span class="vtt-card-name">${escapeHtml(meta.name)}</span><span class="vtt-card-ops">${t('{0} Ops', [meta.ops])}</span>`;
+    button.addEventListener('click', () => { if (!button.disabled) { this.hideTooltip(); this.onCardClick(meta.id); } });
+    this.handPreview.bind(button, meta);
+    return button;
   }
 
   /**

@@ -147,6 +147,11 @@ export class WasmEngine {
     return this.M._ts_obs_features_rules() >>> 0;
   }
 
+  /** The rules actually used in a replay, not those of the analysing model. */
+  get seatRules(): { US: number; USSR: number } {
+    return { US: this.M._ts_seat_rules(1), USSR: this.M._ts_seat_rules(-1) };
+  }
+
   /**
    * Seat `player` (1 US, -1 USSR) with obs_features bits `features`: that side plays their rule
    * bits from here on. True if its rules changed.
