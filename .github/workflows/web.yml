@@ -43,12 +43,34 @@ jobs:
         run: tools/scripts/install_emsdk.sh
 
       - name: Build the WebAssembly engine and the page
+        id: build
         env:
           TS_PYTHON: python
         run: tools/scripts/build_web.sh
 
       - name: Install Chromium for Playwright
+        id: chromium
         run: python -m playwright install --with-deps chromium
 
+      - name: Check localization resources
+        run: node tests/web/i18n.mjs
+
+      - name: Check localization in Chromium
+        timeout-minutes: 5
+        run: |
+          # Reuse Python Playwright's bundled JS driver and matching Chromium.
+          export PLAYWRIGHT_MODULE="$(python -c 'from pathlib import Path; import playwright; print((Path(playwright.__file__).parent / "driver/package/index.mjs").as_uri())')"
+          node web/ui/node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 4173 --strictPort > "$RUNNER_TEMP/i18n-preview.log" 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid" 2>/dev/null || true; cat "$RUNNER_TEMP/i18n-preview.log"' EXIT
+          for attempt in {1..30}; do
+            if curl --silent --fail http://127.0.0.1:4173/ > /dev/null; then break; fi
+            kill -0 "$preview_pid"
+            sleep 1
+          done
+          curl --silent --fail http://127.0.0.1:4173/ > /dev/null
+          node tests/web/i18n_browser.mjs http://127.0.0.1:4173
+
       - name: pytest
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && steps.chromium.outcome == 'success' }}
         run: python -m pytest -q -n auto tests/web

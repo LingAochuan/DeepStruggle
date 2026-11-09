@@ -606,3 +606,5 @@ its matching WASM engine and leaderboard data. It requires Playwright Chromium;
 It covers game/undo/reload preservation, player privacy, open modal fields, replay,
 card tooltips and play modes, locale persistence, mobile width and leaderboard labels.
 Keep dynamic `data-i18n` keys in sync with button state (for example Live/Replay Mode).
+The `web` Actions workflow runs both localization tests before the full Python Web suite;
+the full suite still runs after a localization-check failure if build/browser setup succeeded.

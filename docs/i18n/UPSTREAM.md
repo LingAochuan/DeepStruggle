@@ -48,6 +48,10 @@ during play, undo, modal inputs, player privacy, reload, replay, card tooltips a
 play modes, language persistence, a narrow screen, and the leaderboard. It does
 not replace the native/WASM parity or model-inference tests in the Python suite.
 
+The `web` GitHub Actions workflow runs both localization checks alongside the
+complete Python Web suite, on pull requests or via `workflow_dispatch`. Its browser
+check reuses the JS driver and Chromium installed by Python Playwright.
+
 The standalone Node test uses esbuild from `web/ui/node_modules`; it does not need
 the native engine. It checks complete card/country coverage, reviewed names,
 cross-references, message parameters, English fallback and locale persistence.
