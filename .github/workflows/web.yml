@@ -60,7 +60,7 @@ jobs:
         run: |
           # Reuse Python Playwright's bundled JS driver and matching Chromium.
           export PLAYWRIGHT_MODULE="$(python -c 'from pathlib import Path; import playwright; print((Path(playwright.__file__).parent / "driver/package/index.mjs").as_uri())')"
-          node web/ui/node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 4173 --strictPort > "$RUNNER_TEMP/i18n-preview.log" 2>&1 &
+          node web/ui/node_modules/vite/bin/vite.js preview web/ui --host 127.0.0.1 --port 4173 --strictPort > "$RUNNER_TEMP/i18n-preview.log" 2>&1 &
           preview_pid=$!
           trap 'kill "$preview_pid" 2>/dev/null || true; cat "$RUNNER_TEMP/i18n-preview.log"' EXIT
           for attempt in {1..30}; do
