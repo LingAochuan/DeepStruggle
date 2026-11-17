@@ -27,10 +27,14 @@
 </section>
 <div id="global-tracks" hidden></div>
 <nav id="vtt-dev-tools" class="vtt-tool-column" aria-label="Developer tools" data-i18n-aria-label="Developer tools">
-<button id="btn-undo-action" class="vtt-tool" title="Undo / Cancel Last Action (Ctrl+Z / Esc)" aria-label="Undo / Cancel Last Action (Ctrl+Z / Esc)" data-i18n-title="Undo / Cancel Last Action (Ctrl+Z / Esc)" data-i18n-aria-label="Undo / Cancel Last Action (Ctrl+Z / Esc)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5 3 10l6 5M4 10h10a6 6 0 0 1 0 12" transform="translate(0 -2)"/></svg></button>
 <button id="btn-toggle-debug" class="vtt-tool" title="Debug Tools" aria-label="Debug Tools" data-i18n-title="Debug Tools" data-i18n-aria-label="Debug Tools"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h6l3 5v9H6v-9zM9 2l2 3m4-3-2 3M2 10h4m12 0h4M2 15h4m12 0h4M3 21l3-3m12 0 3 3M12 9v10"/></svg></button>
 </nav>
 <div id="active-flags-container" class="vtt-effects" role="group" aria-label="Active effects" data-i18n-aria-label="Active effects"></div>
+<div id="hand-area">
+<div id="hand-action-tools">
+<button id="btn-undo-action" type="button" class="vtt-tool" disabled title="Undo / Cancel Last Action (Ctrl+Z / Esc)" aria-label="Undo / Cancel Last Action (Ctrl+Z / Esc)" data-i18n-title="Undo / Cancel Last Action (Ctrl+Z / Esc)" data-i18n-aria-label="Undo / Cancel Last Action (Ctrl+Z / Esc)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5 3 10l6 5M4 10h10a6 6 0 0 1 0 12" transform="translate(0 -2)"/></svg></button>
+<button id="btn-confirm-action" type="button" class="vtt-tool" hidden title="Confirm action" aria-label="Confirm action" data-i18n-title="Confirm action" data-i18n-aria-label="Confirm action"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 12 5 5L20 6"/></svg></button>
+</div>
 <section id="text-card-picker" class="vtt-glass hidden" aria-label="Choose a card">
 <header class="vtt-panel-heading"><div class="vtt-card-tabs" role="tablist">
 <button id="text-card-picker-title" data-card-pile="hand" role="tab" aria-controls="text-card-picker-list" aria-selected="true" type="button"></button>
@@ -40,6 +44,7 @@
 </div><span id="text-card-picker-count"></span><button class="vtt-panel-toggle" data-collapse-panel aria-controls="text-card-picker-list" type="button">‹</button></header>
 <div id="text-card-picker-list" role="tabpanel" aria-labelledby="text-card-picker-title"></div>
 </section>
+</div>
 <nav id="vtt-right-tools" class="vtt-tool-column" aria-label="Game tools" data-i18n-aria-label="Game tools">
 <button data-dock-tab="log" class="vtt-tool" title="Action log" aria-label="Action log" data-i18n-title="Action log" data-i18n-aria-label="Action log" aria-expanded="false" aria-controls="vtt-dock"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg></button>
 <button data-dock-tab="analysis" class="vtt-tool" title="Model analysis" aria-label="Model analysis" data-i18n-title="Model analysis" data-i18n-aria-label="Model analysis" aria-expanded="false" aria-controls="vtt-dock"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V5m0 15h17M8 16l4-6 4 3 4-8"/></svg></button>
@@ -239,6 +244,7 @@
 <div class="decision-body" id="decision-body">
 <!-- Rendered by action_hud.ts -->
 </div>
+<div id="pending-player-action" role="status" hidden></div>
 </div></div>
 <div aria-labelledby="mode-dialog-title" aria-modal="true" class="modal-backdrop mode-dialog hidden" id="mode-dialog" role="dialog">
 <div class="modal-content mode-dialog-content">

@@ -38,6 +38,7 @@ try {
  await p.locator('#btn-rep-first').click();assert.equal(await p.evaluate(()=>window.__wb.replayCurrentStep),0);
  await p.locator('#btn-rep-last').click();assert.equal(await p.evaluate(()=>window.__wb.replayCurrentStep),replay.steps.length-1);
  assert.equal(await p.locator('.vtt-text-card:enabled').count(),0);
+ await p.locator('[data-dock-tab=settings]').click(); // Loading a replay opened its analysis tab.
  await p.locator('#btn-toggle-replay').click();assert.equal(await snapshot(),liveBeforeReplay);
  // Finish the second headline/event using engine legal actions and verify the action-round marker.
  let decisions=0;while(await p.evaluate(()=>window.__wb.state.current_phase!==2 && !window.__wb.state.is_terminal)){

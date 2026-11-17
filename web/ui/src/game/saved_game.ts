@@ -12,6 +12,8 @@ const KEY = "ts.workbench.game.v1";
 export interface SavedGame {
   record: GameRecordData;
   submitted: boolean;
+  /** Last committed boundary in this seat. Older saves start a fresh undo window. */
+  playerUndo?: { side: "US" | "USSR"; floor: number };
 }
 
 export function storeGame(game: SavedGame): void {
@@ -28,7 +30,7 @@ export function loadStoredGame(): SavedGame | null {
     if (!raw) return null;
     const v = JSON.parse(raw);
     if (v?.v !== 1 || !v.record || !Array.isArray(v.record.steps)) return null;
-    return { record: v.record as GameRecordData, submitted: v.submitted === true };
+    return { record: v.record as GameRecordData, submitted: v.submitted === true, playerUndo: v.playerUndo };
   } catch {
     return null;
   }

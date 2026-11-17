@@ -220,7 +220,7 @@ web/ui/
      is collapsed; all tools and the floating bottom-right Current Action remain visible.
      Expanding moves that same action panel to the dock footer, preserving its listeners.
    - Settings hold view/language, new game, replay/live, analysis visibility and board theme.
-     Undo/debug form the first left column in developer mode; effect buttons form the second.
+     Debug is in the developer's left column. Undo sits above the hand in live play.
      A temporary text-only card chooser appears at bottom left when the engine requests cards.
      Hand/pile image galleries are deferred and the old three-column layout is absent.
    - `model-mode-section` is one DOM instance. New Game borrows it into `mode-model-slot`;
@@ -423,8 +423,8 @@ web/ui/
    - *★ Play favourite* / key `F` / clicking a row in the panel plays a flat action in the model's
      own action view. **Auto-play** (none / USSR / US, `auto=` in the URL): whenever the chosen
      side is to move, `maybeAutoPlay()` plays the model's favourite after `AUTO_PLAY_DELAY_MS`,
-     with the engine's own die, and drops the move if the position changed meanwhile. With
-     auto-play on, *Cancel* keeps undoing until the decision is the other side's again.
+     with the engine's own die, and drops the move if the position changed meanwhile. In
+     developer view, *Cancel* can also take back automatic moves until the human side acts again.
      `ActionHud.onRerender` re-applies badges after the HUD redraws itself (the die selector).
    - **Search.** The section's search radios (`#mode-opponent`) choose the policy's argmax (`search=policy`) or the **rollout root**
      (`search=rollout:k:worlds:horizon:rule:stop:leaf[:keyed|keyed2][:aligned][:box4][:beliefN][:race<n>]`, always written with every field --
@@ -722,8 +722,12 @@ undo can run. The model form is also a single DOM instance, temporarily borrowed
 the new-game modal and restored to `model-dock-slot` on close.
 
 Settings contain language, view, analysis visibility, board theme/registration,
-new game and the replay controls. Replay remains developer-only. The left undo/debug
-rail is hidden in player view; debug still opens an independent modal. Ongoing-effect
+new game and the replay controls. Replay and the left debug rail are developer-only.
+Undo is anchored above the hand in live play. A seated player's reversible decisions
+stop at the latest confirmed handoff, roll or reveal. A pending choice offers an icon-only
+checkmark beside Undo. Both buttons use the shared tabletop tool styling. Confirming the choice
+commits the sequence before the resulting position is displayed, recorded or analysed.
+Check `tests/web/tabletop_player_undo.mjs` for the boundary, reload and responsive layout. Ongoing-effect
 buttons use the reviewed Steam sprites and retain tooltips, accessible names and details.
 `effects/steam-icons.json` maps stable engine flags and space boxes to optional files
 in ignored `public/personal/effects/`; never use the effect's list index as its identity.

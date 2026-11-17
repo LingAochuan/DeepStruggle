@@ -76,8 +76,9 @@ until separate card artwork is supplied. It remains visible in all phases, inclu
 influence placement and the opponent's turn; only legal card choices are clickable.
 Manual minimization is preserved. A player sees their own hand, while developer
 view follows the decision player. Extra event choices are separate from hand cards.
-Developer-only undo/debug controls and
-Steam icons for active effects occupy two left-edge columns. The debug editor remains a
+Undo sits above the hand. In player view, a matching checkmark button beside it confirms
+the last choice before play passes, dice roll or hidden information is revealed. The developer
+debug tool and Steam icons for active effects occupy the upper left. The debug editor remains a
 dialog. Settings house language, player/developer view, replay, analysis visibility,
 map style, registration and new-game controls. There are no zoom or region buttons.
 `fvtt_shell.ts` manages panel state and `fvtt_shell.css` supplies the dark translucent

@@ -143,7 +143,12 @@ body.vtt-shell { background: #393a36; font-size: 13px; line-height: 1.4; }
 .vtt-effect.side-ussr { border-bottom-color: #ad6f62; }
 body.player-view #vtt-dev-tools, body.player-view .vtt-dev-setting { display: none; }
 body.player-view .vtt-effects { left: 12px; }
-#text-card-picker { position: fixed; left: 12px; bottom: 12px; z-index: 25; width: min(390px, calc(100vw - 88px)); max-height: 37vh; display: flex; flex-direction: column; overflow: hidden; }
+#hand-area { position: fixed; left: var(--vtt-edge); bottom: var(--vtt-edge); z-index: 25; }
+#hand-action-tools { position: absolute; bottom: calc(100% + 7px); left: 0; display: flex; gap: 7px; }
+.vtt-shell #btn-undo-action:disabled { opacity: .5; cursor: default; }
+.replay-view #hand-action-tools, .vtt-minimized #pending-player-action { display: none; }
+#pending-player-action { padding: 10px 12px; }
+#text-card-picker { position: relative; width: min(390px, calc(100vw - 88px)); max-height: 37vh; display: flex; flex-direction: column; overflow: hidden; }
 #text-card-picker-list { overflow: auto; padding: 4px 0; }
 .vtt-text-card { display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px 12px; border: 0; border-bottom: 1px solid #ffffff0c; background: none; color: var(--text-main); text-align: left; cursor: pointer; font: inherit; }
 .vtt-text-card:hover, .vtt-text-card:focus-visible { background: #b3955b30; }
@@ -214,15 +219,17 @@ body.vtt-dock-open .map-rolls { right: 440px; }
   .vtt-effects { left: 50px; top: 8px; }
   body.player-view .vtt-effects { left: 8px; }
   #vtt-floating-action-slot { right: 54px; bottom: 8px; width: min(320px, calc(100vw - 70px)); }
-  #text-card-picker { left: 8px; bottom: 8px; width: min(270px, 44vw); max-height: 32vh; }
+  #text-card-picker { width: min(270px, 44vw); max-height: 32vh; }
   .vtt-shell #decision-panel { max-height: 32vh; }
   .vtt-shell .map-last-turn { display: none; }
   .vtt-shell .map-rolls { top: auto; bottom: 35vh; right: 54px; max-width: 180px; }
   body.vtt-dock-open .map-rolls { display: none; }
 }
 @media (max-width: 580px) {
-  #text-card-picker { width: calc(100vw - 70px); bottom: calc(32vh + 16px); max-height: 27vh; }
-  body.vtt-dock-open #text-card-picker { z-index: 45; max-height: 24vh; bottom: 8px; width: calc(100vw - 70px); }
+  #hand-area { bottom: calc(32vh + 16px); }
+  #text-card-picker { width: calc(100vw - 70px); max-height: 27vh; }
+  body.vtt-dock-open #hand-area { z-index: 45; bottom: 8px; }
+  body.vtt-dock-open #text-card-picker { max-height: 24vh; width: calc(100vw - 70px); }
   body.vtt-dock-open:has(#text-card-picker:not(.hidden)) #vtt-dock { bottom: calc(24vh + 16px); }
   #vtt-dock-action-slot { max-height: 45%; }
   .vtt-effects { max-height: 26vh; }
@@ -253,9 +260,9 @@ body.vtt-dock-open .map-rolls { right: 440px; }
 .dbg-fields select { flex: 1; min-width: 160px; }
 .dbg-footer { display: flex; justify-content: flex-end; padding-top: 12px; border-top: 1px solid var(--border-color); }
 @media (max-width: 580px) {
-  #text-card-picker.vtt-minimized { bottom: 8px; }
+  #hand-area:has(#text-card-picker.vtt-minimized) { bottom: 8px; }
   body.vtt-dock-open:has(#text-card-picker.vtt-minimized:not(.hidden)) #vtt-dock { bottom: 56px; }
-  body:not(.vtt-dock-open):has(#decision-panel.vtt-minimized) #text-card-picker:not(.vtt-minimized) { bottom: 56px; }
+  body:not(.vtt-dock-open):has(#decision-panel.vtt-minimized) #hand-area:has(#text-card-picker:not(.vtt-minimized)) { bottom: 56px; }
   .vtt-shell .vtt-text-card { grid-template-columns: 24px minmax(0, 1fr) auto 60px; gap: 5px; padding-inline: 8px; }
 }
 /* Shared tabletop materials cover transient UI as well as the permanent dock. */
@@ -307,7 +314,6 @@ body.vtt-dock-open .map-rolls { right: 440px; }
 .vtt-shell .tab-btn.active { background: #b3955b25; color: var(--text-main); }
 /* Fill the whole minimized square, including the header's former padding area. */
 .vtt-shell #text-card-picker.vtt-minimized, .vtt-shell #decision-panel.vtt-minimized { position: relative; padding: 0; cursor: pointer; border-radius: 0; }
-.vtt-shell #text-card-picker.vtt-minimized { position: fixed; }
 .vtt-shell .vtt-minimized > header, .vtt-shell .vtt-minimized > .panel-header { position: absolute; inset: 0; display: block; }
 .vtt-shell .vtt-minimized .vtt-panel-toggle { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; }
 @media (max-width: 580px) {

@@ -23,6 +23,9 @@ The fullscreen tabletop shell uses FVTT-style floating controls (`fvtt_shell.ts`
 `fvtt_shell.css`), with current actions docked into the expanded right panel and
 text card choices at bottom left. Live tracks render inside the SVG using
 `board/track-layout.json`; the original header tracks are no longer mounted.
+Undo sits above the hand. A seated player can take back their own pending decisions
+until they confirm a handoff, random outcome or reveal with the checkmark next to Undo.
+Developer undo retains its full history.
 Ongoing effects use optional original Steam sprites mapped by stable flag keys in
 `effects/steam-icons.json`; unknown/missing icons keep accessible vector fallbacks.
 Personal Azure builds fetch and verify the separate release pack via

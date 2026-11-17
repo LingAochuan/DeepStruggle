@@ -1,4 +1,6 @@
 {
+  "Confirm action": "确认行动",
+  "Confirm or undo this action.": "请确认或撤销这一步。",
   "Return the drawn card to the USSR and conduct Grain Sales' 2 Ops": "将抽到的牌交还苏联，改用向苏联出售谷物的 2 行动点数",
   " (VP {0}{1})": "（胜利点数 {0}{1}）",
   " (a checkpoint's first use exports it to ONNX: a few seconds)": "（首次使用检查点时需导出为 ONNX，约几秒）",

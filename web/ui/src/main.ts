@@ -22,8 +22,9 @@ import {
 } from "./analysis/rollout_spec";
 import { DEFAULT_HF_REPO, defaultHfCatalog, fetchHfDefaultSearch } from "./analysis/hf_catalog";
 import { RolloutRunner } from "./analysis/rollout_runner";
-import { ViewMode, opponentOf, redactState, viewFromParam, viewToParam } from "./game/view";
+import { UNSEEN, ViewMode, opponentOf, redactState, viewFromParam, viewToParam } from "./game/view";
 import { lastTurnOf } from "./game/last_turn";
+import { describeAction } from "./game/describe";
 import { recentRolls } from "./game/rolls";
 import { replayItems } from "./game/log_view";
 import { resultLog, resultEntryHtml, type ResultEntry } from "./game/log_results";
@@ -37,6 +38,23 @@ import { bindLanguageControls, onLocaleChange } from "./i18n";
 
 /** Pause before an auto-played move, long enough to see each one land. */
 const AUTO_PLAY_DELAY_MS = 350;
+
+type BoardMove = { action: MicroAction } | { flat: number; merged: boolean };
+interface PendingMove {
+  move: BoardMove;
+  die: number;
+  source: MoveHow["source"];
+  description: string;
+}
+
+/** Both positions are from the acting player's view. Crossing any of these boundaries
+ * commits the draft before the resulting position can be displayed. */
+function playerBoundary(before: GameState, after: GameState): boolean {
+  return after.is_terminal || after.decision_context.decision_player !== before.decision_context.decision_player
+    || after.turn !== before.turn || after.current_phase !== before.current_phase
+    || after.action_round !== before.action_round || after.phasing_player !== before.phasing_player
+    || Object.entries(before.card_locations ?? {}).some(([id, loc]) => loc === UNSEEN && after.card_locations?.[id] !== UNSEEN);
+}
 
 export class TSApp {
   private state: GameState | null = null;
@@ -70,6 +88,8 @@ export class TSApp {
   /** A replay's log entries, built once per loaded replay. */
   private replayEntries: { steps: ReplayStep[]; entries: ResultEntry[] } | null = null;
   private session: GameSession | null = null;
+  private undoFloor = 0;
+  private pendingMove: PendingMove | null = null;
   private model: Model | null = null;
   private modelKey = "";
   private modelLoads = 0;
@@ -314,6 +334,9 @@ export class TSApp {
       const start = stored.record.start_position ? await decodePosition(stored.record.start_position) : null;
       this.session.replayRecord(stored.record, start, stored.submitted);
       if (this.engine.saveJson() === target) {
+        const saved = stored.playerUndo;
+        this.undoFloor = saved && saved.side === this.view && Number.isInteger(saved.floor)
+          && saved.floor >= 0 && saved.floor <= this.session.stepIndex ? saved.floor : this.session.stepIndex;
         // A game that had ended has had its dialog: reopening the page does not offer it again.
         this.wasOver = !!this.session.result;
         return true;
@@ -327,7 +350,8 @@ export class TSApp {
   /** This browser's copy of the game on the board, for a reload (game/saved_game.ts). */
   private storeGame() {
     if (!this.session) return;
-    storeGame({ record: this.session.record(), submitted: this.session.submitted });
+    storeGame({ record: this.session.record(), submitted: this.session.submitted,
+      playerUndo: this.view === "DEV" ? undefined : { side: this.view, floor: this.undoFloor } });
   }
 
   /** The settings a move is made under, for the game's record: called just before each move. */
@@ -543,6 +567,8 @@ export class TSApp {
     this.handReveal.clear();
     if (mode !== this.view) this.setView(mode, false);
     this.session.newGame(Math.floor(Math.random() * 1_000_000));
+    this.undoFloor = 0;
+    this.pendingMove = null;
     if (this.isReplayMode) this.setReplayMode(false);
     renderTracePanel([], 0);
     this.refresh();
@@ -793,7 +819,11 @@ export class TSApp {
    */
   private setView(v: ViewMode, rerender = true) {
     const changed = v !== this.view;
-    if (changed) this.handReveal.clear();
+    if (changed) {
+      this.handReveal.clear();
+      this.undoFloor = this.session?.stepIndex ?? 0;
+      this.pendingMove = null;
+    }
     this.view = v;
     const sel = document.getElementById("view-select") as HTMLSelectElement | null;
     if (sel) sel.value = v;
@@ -809,6 +839,7 @@ export class TSApp {
       b.title = label(opp ? t("Shows the full state -- switch to the Developer view to use it") : "");
     }
     if (!rerender) return;
+    if (changed) this.storeGame();
     if (opp && this.isReplayMode) {
       this.setReplayMode(false);
       this.state = this.liveState;
@@ -1088,6 +1119,7 @@ export class TSApp {
     this.mapView.render(shown);
     this.cardsView.render(shown);
     this.actionHud.render(shown);
+    this.renderMoveControls();
     annotateCardRefs(document.getElementById('decision-body')!, this.cardNames());
     this.renderLogStream();
     if (!this.isReplayMode) {
@@ -1292,22 +1324,7 @@ export class TSApp {
    * workbench's affordance for testing the engine, as it did on the server.
    */
   private sendAction(action: MicroAction) {
-    if (this.isReplayMode || !this.session || this.handReveal.open) return;
-    if (this.hiddenSideToMove()) {
-      this.refused(t("it is {0}'s move -- the model plays that side in this view", [opponentOf(this.view)]));
-      return;
-    }
-    this.noteSettings();
-    const forcedDie = action.secondary_id ?? 0;
-    const before = redactState(this.session.state(), this.view);
-    const why = this.session.apply(action, forcedDie, this.moveHow("human"));
-    if (why) {
-      this.refused(why);
-      return;
-    }
-    this.afterOwnMove(forcedDie);
-    this.handReveal.observe(before, redactState(this.session.state(), this.view), this.engine!.layout);
-    this.refresh();
+    this.playMove({ action }, action.secondary_id ?? 0, "human");
   }
 
   /**
@@ -1323,23 +1340,65 @@ export class TSApp {
    * panel's list, or auto-play). A composed E4.1 action is applied as its two E4 steps.
    */
   private sendFlatAction(flatIdx: number, forcedDie: number = this.actionHud.selectedDieRoll, auto = false) {
-    if (this.isReplayMode || !this.session || this.handReveal.open) return;
-    // In a player's view only auto-play moves for the other side.
+    this.playMove({ flat: flatIdx, merged: this.model?.meta.mergedInfluence ?? false }, forcedDie, auto ? "auto" : "suggested");
+  }
+
+  private playMove(move: BoardMove, die: number, source: MoveHow["source"], confirmed = false) {
+    const s = this.session, engine = this.engine;
+    if (!s || !engine || this.isReplayMode || this.handReveal.open || this.pendingMove) return;
+    const auto = source === "auto";
     if (!auto && this.hiddenSideToMove()) {
       this.refused(t("it is {0}'s move -- the model plays that side in this view", [opponentOf(this.view)]));
       return;
     }
     this.noteSettings();
-    const how = this.moveHow(auto ? "auto" : "suggested");
-    const before = redactState(this.session.state(), this.view);
-    const why = this.session.applyFlat(flatIdx, this.model?.meta.mergedInfluence ?? false, forcedDie, how);
+    const how = this.moveHow(source);
+    const start = s.stepIndex;
+    const before = redactState(engine.display(), this.view);
+    const checkBoundary = !auto && this.view !== "DEV" && !confirmed;
+    const rng = checkBoundary ? JSON.parse(engine.saveJson()).rng_state : null;
+    const why = "flat" in move ? s.applyFlat(move.flat, move.merged, die, how) : s.apply(move.action, die, how);
     if (why) {
       this.refused(why);
       return;
     }
-    if (!auto) this.afterOwnMove(forcedDie);
-    this.handReveal.observe(before, redactState(this.session.state(), this.view), this.engine!.layout);
+    const after = redactState(engine.display(), this.view);
+    if (checkBoundary && (playerBoundary(before, after) || s.tags.slice(start).some(tag => tag.rolled)
+      || JSON.parse(engine.saveJson()).rng_state !== rng)) {
+      // Keep only the selected input. Even a composed move is rolled back before the
+      // page can display its outcome, save it, disclose a card, or schedule the opponent.
+      const choice = s.steps.at(-1)!.action;
+      const choiceState = s.stepIndex === start + 1 ? before : redactState(s.steps.at(-2)!.state_snapshot, this.view);
+      const description = describeAction(engine, choiceState, choiceState, choice)[0];
+      while (s.stepIndex > start) s.undo(false);
+      this.pendingMove = { move, die, source, description };
+      this.renderMoveControls();
+      return;
+    }
+    if (auto || confirmed) this.undoFloor = s.stepIndex;
+    if (!auto) this.afterOwnMove(die);
+    this.handReveal.observe(before, after, engine.layout);
     this.refresh();
+  }
+
+  private canUndoMove(): boolean {
+    if (this.isReplayMode || !this.session) return false;
+    if (this.view === "DEV") return this.session.canUndo;
+    if (this.pendingMove) return true;
+    const last = this.session.tags.at(-1);
+    return this.session.canUndo && this.session.stepIndex > this.undoFloor && !this.hiddenSideToMove()
+      && last?.mover === this.view && last.source !== "auto";
+  }
+
+  private renderMoveControls() {
+    const pending = this.pendingMove;
+    const undo = document.getElementById("btn-undo-action") as HTMLButtonElement;
+    undo.disabled = !this.canUndoMove();
+    document.getElementById("btn-confirm-action")!.hidden = !pending;
+    document.getElementById("decision-body")!.hidden = !!pending;
+    const status = document.getElementById("pending-player-action")!;
+    status.hidden = !pending;
+    status.textContent = pending ? localizeLog(pending.description) + " · " + t("Confirm or undo this action.") : "";
   }
 
   /**
@@ -1372,7 +1431,16 @@ export class TSApp {
    * get past it.
    */
   private cancelAction() {
-    if (this.isReplayMode || !this.session || !this.engine) return;
+    if (!this.session || !this.engine || !this.canUndoMove()) return;
+    if (this.pendingMove) {
+      this.pendingMove = null;
+      this.renderMoveControls();
+      return;
+    }
+    if (this.view !== "DEV") {
+      if (!this.handReveal.open && this.session.undo()) this.refresh();
+      return;
+    }
     this.handReveal.clear();
     if (this.autoPlayTimer !== null) {
       window.clearTimeout(this.autoPlayTimer);
@@ -1419,6 +1487,13 @@ export class TSApp {
     // Undo / Cancel Action button
     document.getElementById("btn-undo-action")?.addEventListener("click", () => {
       this.cancelAction();
+    });
+    document.getElementById("btn-confirm-action")!.addEventListener("click", () => {
+      const pending = this.pendingMove;
+      if (!pending) return;
+      this.pendingMove = null;
+      this.renderMoveControls();
+      this.playMove(pending.move, pending.die, pending.source, true);
     });
 
     // Global keyboard shortcuts (Ctrl+Z / Cmd+Z / Escape for undo). None while the play-mode
