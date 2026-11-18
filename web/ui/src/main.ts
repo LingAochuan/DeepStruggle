@@ -45,6 +45,8 @@ interface PendingMove {
   die: number;
   source: MoveHow["source"];
   description: string;
+  /** Deterministic country changes shown while the final input awaits confirmation. */
+  countries?: GameState["countries"];
 }
 
 /** Both positions are from the acting player's view. Crossing any of these boundaries
@@ -1116,7 +1118,6 @@ export class TSApp {
     // What each scoring card would score here: the engine's scoring of the state shown.
     shown.region_scores = this.regionScores(shown);
     this.shown = shown;
-    this.mapView.render(shown);
     this.cardsView.render(shown);
     this.actionHud.render(shown);
     this.renderMoveControls();
@@ -1365,13 +1366,15 @@ export class TSApp {
     const after = redactState(engine.display(), this.view);
     if (checkBoundary && (playerBoundary(before, after) || s.tags.slice(start).some(tag => tag.rolled)
       || JSON.parse(engine.saveJson()).rng_state !== rng)) {
-      // Keep only the selected input. Even a composed move is rolled back before the
-      // page can display its outcome, save it, disclose a card, or schedule the opponent.
+      // Keep the input and its deterministic map preview. Roll back before saving,
+      // disclosing hidden information, or scheduling the opponent.
       const choice = s.steps.at(-1)!.action;
       const choiceState = s.stepIndex === start + 1 ? before : redactState(s.steps.at(-2)!.state_snapshot, this.view);
       const description = describeAction(engine, choiceState, choiceState, choice)[0];
+      const countries = !s.tags.slice(start).some(tag => tag.rolled) && JSON.parse(engine.saveJson()).rng_state === rng
+        ? engine.settledDisplay().countries : undefined;
       while (s.stepIndex > start) s.undo(false);
-      this.pendingMove = { move, die, source, description };
+      this.pendingMove = { move, die, source, description, countries };
       this.renderMoveControls();
       return;
     }
@@ -1392,6 +1395,11 @@ export class TSApp {
 
   private renderMoveControls() {
     const pending = this.pendingMove;
+    if (this.shown) {
+      const board = pending?.countries && !this.isReplayMode
+        ? { ...this.shown, countries: pending.countries } : this.shown;
+      this.mapView.render({ ...board, region_scores: this.regionScores(board) });
+    }
     const undo = document.getElementById("btn-undo-action") as HTMLButtonElement;
     undo.disabled = !this.canUndoMove();
     document.getElementById("btn-confirm-action")!.hidden = !pending;

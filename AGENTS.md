@@ -25,6 +25,7 @@ text card choices at bottom left. Live tracks render inside the SVG using
 `board/track-layout.json`; the original header tracks are no longer mounted.
 Undo sits above the hand. A seated player can take back their own pending decisions
 until they confirm a handoff, random outcome or reveal with the checkmark next to Undo.
+Pending deterministic country changes appear on the map and revert on Undo.
 Developer undo retains its full history.
 Ongoing effects use optional original Steam sprites mapped by stable flag keys in
 `effects/steam-icons.json`; unknown/missing icons keep accessible vector fallbacks.

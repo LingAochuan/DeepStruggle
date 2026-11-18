@@ -50,6 +50,12 @@ try {
 
   for (let n = 0; n < 5; n++) await choose();
   const fifth = await position();
+  const placement = await page.evaluate(() => {
+    const w = window.__wb;
+    const target = Object.values(w.state.countries).find(country => country.id === w.state.legal_actions.valid_ids[0]);
+    return { name: target.name, value: target.ussr_influence };
+  });
+  const marker = page.locator(`.board-country[data-name="${placement.name}"] .inf-num-ussr`);
   assert(await undo.isEnabled());
   await choose();
   assert(await confirm.isVisible());
@@ -59,6 +65,9 @@ try {
   assert(await confirm.locator('svg path').isVisible());
   assert.equal(await position(), fifth);
   assert.equal(await page.evaluate(() => window.__wb.session.record().steps.length), 5);
+  assert.equal(await marker.textContent(), String(placement.value + 1));
+  await page.evaluate(() => window.__wb.renderState());
+  assert.equal(await marker.textContent(), String(placement.value + 1));
 
   const logTool = page.locator('[data-dock-tab=log]');
   async function toolStyle(button) {
@@ -87,8 +96,10 @@ try {
   await undo.click();
   assert(await confirm.isHidden());
   assert.equal(await position(), fifth);
+  assert.equal(await marker.textContent(), String(placement.value));
   await choose();
   await confirm.click();
+  assert.equal(await marker.textContent(), String(placement.value + 1));
   assert.equal(await page.evaluate(() => window.__wb.session.record().steps.length), 6);
   assert(await page.evaluate(() => window.__wb.hiddenSideToMove()));
   assert(await undo.isDisabled());
@@ -107,6 +118,34 @@ try {
   assert(await undo.isDisabled());
   await page.keyboard.press('Escape');
   assert.equal(await position(), afterOpponent);
+
+  // US bonus setup ends with Iran 1 -> 2. Preview the number and control before committing.
+  await page.evaluate(() => {
+    const w = window.__wb;
+    w.setView('DEV');
+    w.session.newGame(1); w.refresh();
+    for (let i = 0; i < 14; i++) w.sendFlatAction(Array.from(w.engine.mask(false)).findIndex(Boolean), 0);
+    if (!w.state.legal_actions.valid_ids.includes(25) || w.state.countries.Iran.us_influence !== 1)
+      throw Error('Iran bonus setup fixture changed');
+    w.setView('US');
+  });
+  const iranBefore = await position();
+  const iran = page.locator('.board-country[data-name="Iran"]');
+  await iran.locator('.country-card-bg').click();
+  assert(await confirm.isVisible());
+  assert.equal(await iran.locator('.inf-num-us').textContent(), '2');
+  assert.equal(await iran.getAttribute('data-control'), 'US');
+  assert.equal(await position(), iranBefore);
+  await page.evaluate(() => window.__wb.renderState());
+  assert.equal(await iran.locator('.inf-num-us').textContent(), '2');
+  await undo.click();
+  assert.equal(await iran.locator('.inf-num-us').textContent(), '1');
+  assert.equal(await iran.getAttribute('data-control'), 'NONE');
+  await iran.locator('.country-card-bg').click();
+  await confirm.click();
+  assert.equal(await iran.locator('.inf-num-us').textContent(), '2');
+  assert.equal(await page.evaluate(() => window.__wb.engine.display().countries.Iran.us_influence), 2);
+  assert(await undo.isDisabled());
 
   // The player can also withdraw a suggested Space Race attempt before the roll.
   await page.evaluate(() => {

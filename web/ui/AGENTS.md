@@ -726,7 +726,9 @@ new game and the replay controls. Replay and the left debug rail are developer-o
 Undo is anchored above the hand in live play. A seated player's reversible decisions
 stop at the latest confirmed handoff, roll or reveal. A pending choice offers an icon-only
 checkmark beside Undo. Both buttons use the shared tabletop tool styling. Confirming the choice
-commits the sequence before the resulting position is displayed, recorded or analysed.
+commits the sequence before recording or analysis. Pending deterministic country changes
+preview on the map, including control and regional scoring, and revert on Undo.
+Random outcomes and hidden information await confirmation.
 Check `tests/web/tabletop_player_undo.mjs` for the boundary, reload and responsive layout. Ongoing-effect
 buttons use the reviewed Steam sprites and retain tooltips, accessible names and details.
 `effects/steam-icons.json` maps stable engine flags and space boxes to optional files
