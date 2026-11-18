@@ -729,6 +729,9 @@ checkmark beside Undo. Both buttons use the shared tabletop tool styling. Confir
 commits the sequence before recording or analysis. Pending deterministic country changes
 preview on the map, including control and regional scoring, and revert on Undo.
 Random outcomes and hidden information await confirmation.
+Ops/setup placement previews use the selected point and the pre-action board, with control
+derived by the engine under a temporary snapshot. A deferred war, random discard or deal
+cannot suppress the preview or leak into it. The regression plays through three turns.
 Check `tests/web/tabletop_player_undo.mjs` for the boundary, reload and responsive layout. Ongoing-effect
 buttons use the reviewed Steam sprites and retain tooltips, accessible names and details.
 `effects/steam-icons.json` maps stable engine flags and space boxes to optional files

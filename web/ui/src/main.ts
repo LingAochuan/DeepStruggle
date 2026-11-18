@@ -1371,9 +1371,10 @@ export class TSApp {
       const choice = s.steps.at(-1)!.action;
       const choiceState = s.stepIndex === start + 1 ? before : redactState(s.steps.at(-2)!.state_snapshot, this.view);
       const description = describeAction(engine, choiceState, choiceState, choice)[0];
-      const countries = !s.tags.slice(start).some(tag => tag.rolled) && JSON.parse(engine.saveJson()).rng_state === rng
+      const settledCountries = !s.tags.slice(start).some(tag => tag.rolled) && JSON.parse(engine.saveJson()).rng_state === rng
         ? engine.settledDisplay().countries : undefined;
       while (s.stepIndex > start) s.undo(false);
+      const countries = this.placementPreview(choiceState, choice) ?? settledCountries;
       this.pendingMove = { move, die, source, description, countries };
       this.renderMoveControls();
       return;
@@ -1382,6 +1383,26 @@ export class TSApp {
     if (!auto) this.afterOwnMove(die);
     this.handReveal.observe(before, after, engine.layout);
     this.refresh();
+  }
+
+  /** A legal Ops/setup placement adds one influence before any deferred event or deal.
+   * Read its control markers through the engine, then restore the real position in full. */
+  private placementPreview(before: GameState, action: MicroAction): GameState["countries"] | undefined {
+    const engine = this.engine!, ctx = before.decision_context, L = engine.layout;
+    if (action.decision_type !== L.decision_types.POINT_NODE || ((action.flags ?? 0) & 128)) return;
+    if (before.current_phase_name !== "SETUP" && (ctx.resolving_card || ctx.op_mode !== L.op_modes.INFLUENCE)) return;
+    const country = Object.values(before.countries).find(c => c.id === action.primary_id);
+    const side = ctx.decision_player;
+    if (!country || (side !== "US" && side !== "USSR")) return;
+    const us = Math.min(255, country.us_influence + (side === "US" ? 1 : 0));
+    const ussr = Math.min(255, country.ussr_influence + (side === "USSR" ? 1 : 0));
+    const snapshot = engine.snapshot();
+    try {
+      if (engine.setCountry(country.id, us, ussr)) return;
+      return engine.display().countries;
+    } finally {
+      engine.restore(snapshot);
+    }
   }
 
   private canUndoMove(): boolean {

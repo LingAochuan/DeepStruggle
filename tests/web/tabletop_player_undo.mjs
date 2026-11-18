@@ -147,6 +147,74 @@ try {
   assert.equal(await page.evaluate(() => window.__wb.engine.display().countries.Iran.us_influence), 2);
   assert(await undo.isDisabled());
 
+  // Play successive cards for influence through event resolution and new-turn dealing.
+  // The final placement remains visible even when its continuation draws cards or rolls.
+  await page.evaluate(() => {
+    const w = window.__wb;
+    w.setView('DEV'); w.session.newGame(1); w.refresh();
+  });
+  const coverage = { placements: 0, randomDiscard: 0, turnEnd: 0, war: 0 };
+  for (let i = 0; i < 220; i++) {
+    const step = await page.evaluate(() => {
+      const w = window.__wb, L = w.engine.layout;
+      const before = w.engine.display();
+      if (before.is_terminal || before.turn > 3) return null;
+      w.setView(before.decision_context.decision_player);
+      const mask = w.engine.mask(false);
+      const flat = mask[L.ops_influence_index] ? L.ops_influence_index : Array.from(mask).findIndex(Boolean);
+      const action = w.engine.decodeFlat(flat), ctx = before.decision_context;
+      const country = Object.values(before.countries).find(c => c.id === action.primary_id);
+      const placement = ctx.decision_type === L.decision_types.POINT_NODE && !ctx.resolving_card
+        && ctx.op_mode === L.op_modes.INFLUENCE && before.current_phase_name === 'ACTION_ROUND'
+        && !(action.flags & 128) && country;
+      const save = w.engine.saveJson();
+      w.sendFlatAction(flat, 0);
+      return { pending: !!w.pendingMove, flat, save, before, country: placement ? country : null };
+    });
+    if (!step) break;
+    if (step.pending) {
+      if (step.country) {
+        const side = step.before.decision_context.decision_player;
+        const influence = side === 'US' ? 'us_influence' : 'ussr_influence';
+        const marker = page.locator(`.board-country[data-name="${step.country.name}"] .inf-num-${side.toLowerCase()}`);
+        assert.equal(await marker.textContent(), String(step.country[influence] + 1),
+          `pending card ${step.before.decision_context.pending_op_card}, turn ${step.before.turn}, AR ${step.before.action_round}`);
+        assert.equal(await position(), step.save);
+        const preview = await page.evaluate(() => window.__wb.mapView.lastState.countries);
+        const expected = structuredClone(step.before.countries);
+        expected[step.country.name][influence]++;
+        // Control is derived by the engine; compare all influence totals independently.
+        for (const [name, c] of Object.entries(expected)) {
+          assert.equal(preview[name].us_influence, c.us_influence, name);
+          assert.equal(preview[name].ussr_influence, c.ussr_influence, name);
+        }
+        await undo.click();
+        assert.equal(await position(), step.save);
+        assert.equal(await page.evaluate(name => window.__wb.mapView.lastState.countries[name].ussr_influence, step.country.name),
+          step.country.ussr_influence);
+        assert.equal(await page.evaluate(name => window.__wb.mapView.lastState.countries[name].us_influence, step.country.name),
+          step.country.us_influence);
+        await page.evaluate(flat => window.__wb.sendFlatAction(flat, 0), step.flat);
+        coverage.placements++;
+      }
+      await confirm.click();
+      if (step.country) {
+        const continuation = await page.evaluate(() => ({
+          turn: window.__wb.state.turn,
+          rolled: window.__wb.session.steps.at(-1).rolls.length > 0,
+        }));
+        if (step.before.decision_context.pending_op_card === 5) coverage.randomDiscard++;
+        if (continuation.turn > step.before.turn) coverage.turnEnd++;
+        if (continuation.rolled) coverage.war++;
+      }
+    }
+    await page.evaluate(() => { if (window.__wb.handReveal.open) window.__wb.handReveal.clear(); });
+  }
+  assert(coverage.placements > 10);
+  assert(coverage.randomDiscard > 0);
+  assert(coverage.turnEnd > 0);
+  assert(coverage.war > 0);
+
   // The player can also withdraw a suggested Space Race attempt before the roll.
   await page.evaluate(() => {
     const w = window.__wb;
